@@ -1,4 +1,5 @@
 import { Search, ShoppingBag, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -6,9 +7,11 @@ const Header = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         
         {/* Logo */}
+        <Link to="/">
         <div className="text-xl tracking-widest font-light">
           KAMARI
         </div>
+        </Link>
 
         {/* Navigation */}
         <nav className="hidden md:flex gap-8 text-sm">
@@ -22,7 +25,9 @@ const Header = () => {
         <div className="flex items-center gap-5">
           <Search size={18} />
           <User size={18} />
-          <ShoppingBag size={18} />
+          <Link to="/cart">
+            <ShoppingBag size={18} />
+          </Link>
         </div>
 
       </div>
