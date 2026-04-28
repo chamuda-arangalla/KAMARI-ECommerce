@@ -1,4 +1,5 @@
 import { Search, ShoppingBag, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
