@@ -47,9 +47,11 @@ export default function Cart() {
     setItems((prev) =>
       prev
         .map((item) =>
-          item.id === id ? { ...item, qty: Math.max(0, item.qty + delta) } : item
+          item.id === id
+            ? { ...item, qty: Math.max(0, item.qty + delta) }
+            : item,
         )
-        .filter((item) => item.qty > 0)
+        .filter((item) => item.qty > 0),
     );
   };
 
@@ -111,8 +113,8 @@ export default function Cart() {
             Looks like you haven't added anything yet.
           </p>
           <a
-            href="#"
-            className="inline-block border border-black px-10 py-3 text-xs tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-200"
+            href="/"
+            className="inline-block rounded-full bg-[#E8DED6] px-10 py-3 text-[11px] uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#d8c9bd]"
           >
             CONTINUE SHOPPING
           </a>

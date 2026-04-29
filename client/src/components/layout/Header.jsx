@@ -19,7 +19,14 @@ const Header = () => {
         <div className="flex items-center gap-5 text-[#3B302A]">
           <Search size={16} strokeWidth={1.5} />
           <User size={16} strokeWidth={1.5} />
-          <ShoppingBag size={16} strokeWidth={1.5} />
+          <Link to="/cart" aria-label="Cart" className="relative">
+            <ShoppingBag size={16} strokeWidth={1.5} />
+
+            {/* cart count */}
+            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#3B302A] text-[9px] text-[#F8F5F2]">
+              0
+            </span>
+          </Link>
         </div>
       </div>
     </header>
