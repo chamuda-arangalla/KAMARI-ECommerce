@@ -5,6 +5,7 @@ import CartDrawer from "./components/cart/CartDrawer";
 import Home from "./pages/Home";
 import Cart from "./pages/Cart";
 import CheckoutPage from "./pages/CheckoutPage";
+import CollectionsPage from "./pages/CollectionsPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/collections" element={<CollectionsPage />} />
         </Routes>
       </CartProvider>
     </BrowserRouter>
