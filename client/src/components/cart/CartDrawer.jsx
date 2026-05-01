@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
-import "../../styles/cart/CartDrawer.css";
+import "../../styles/CartDrawer.css";
 
 const FREE_DELIVERY_THRESHOLD = 10000;
 
@@ -156,15 +156,14 @@ export default function CartDrawer() {
                     View Full Bag
                   </Link>
 
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                  <Link
+                    to="/checkout"
+                    onClick={() => setIsDrawerOpen(false)}
                     className="cart-btn-checkout"
                   >
                     <span>Checkout</span>
                     <ArrowRight size={14} strokeWidth={1.5} />
-                  </motion.button>
+                  </Link>
                 </div>
               </div>
             )}

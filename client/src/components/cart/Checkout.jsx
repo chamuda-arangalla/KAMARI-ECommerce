@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tag, X, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const DELIVERY_FEE = 350;
 
@@ -30,12 +31,12 @@ export default function Checkout({
         <div className="border border-[#3B302A]/10 bg-[#F8F5F2] p-8 rounded-2xl">
 
           {/* Title */}
-          <h2 className="text-xs tracking-[0.2em] text-[#3B302A] uppercase mb-8 font-semibold">
+          <h2 className="text-sm tracking-[0.2em] text-[#3B302A] uppercase mb-8 font-semibold">
             Order Summary
           </h2>
 
           {/* Prices */}
-          <div className="space-y-4 text-sm mb-6">
+          <div className="space-y-4 text-base mb-6">
             <div className="flex justify-between text-[#7D746C]">
               <span>
                 Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})
@@ -52,7 +53,7 @@ export default function Checkout({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="flex justify-between text-[#3B302A] text-[13px]"
+                  className="flex justify-between text-[#3B302A] text-[15px]"
                 >
                   <span className="flex items-center gap-1.5">
                     <Tag size={12} />
@@ -82,14 +83,14 @@ export default function Checkout({
 
           {/* Total */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="text-sm tracking-[0.15em] uppercase text-[#3B302A] font-semibold">
+            <span className="text-base tracking-[0.15em] uppercase text-[#3B302A] font-semibold">
               Total
             </span>
             <div className="text-right">
-              <p className="text-xl font-light text-[#3B302A]">
+              <p className="text-2xl font-light text-[#3B302A]">
                 LKR {total.toLocaleString()}
               </p>
-              <p className="text-xs text-[#7D746C] mt-0.5">
+              <p className="text-sm text-[#7D746C] mt-0.5">
                 Incl. taxes
               </p>
             </div>
@@ -100,7 +101,7 @@ export default function Checkout({
             <div className="mb-6">
               <button
                 onClick={() => setPromoOpen(!promoOpen)}
-                className="flex items-center justify-between w-full text-xs tracking-[0.15em] text-[#7D746C] hover:text-[#3B302A] transition uppercase mb-3"
+                className="flex items-center justify-between w-full text-sm tracking-[0.15em] text-[#7D746C] hover:text-[#3B302A] transition uppercase mb-3"
               >
                 <span className="flex items-center gap-2">
                   <Tag size={12} />
@@ -124,11 +125,11 @@ export default function Checkout({
                         onChange={(e) => onPromoChange(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && onApplyPromo()}
                         placeholder="Enter code"
-                        className="flex-1 px-4 py-3 text-sm text-[#3B302A] placeholder-[#7D746C] outline-none bg-[#F8F5F2] uppercase"
+                        className="flex-1 px-4 py-3 text-base text-[#3B302A] placeholder-[#7D746C] outline-none bg-[#F8F5F2] uppercase"
                       />
                       <button
                         onClick={onApplyPromo}
-                        className="px-5 bg-[#E8DED6] text-[#3B302A] text-xs tracking-[0.15em] hover:bg-[#d8c9bd] transition"
+                        className="px-5 bg-[#E8DED6] text-[#3B302A] text-sm tracking-[0.15em] hover:bg-[#d8c9bd] transition"
                       >
                         APPLY
                       </button>
@@ -146,16 +147,18 @@ export default function Checkout({
           )}
 
           {/* Checkout Button */}
-          <motion.button
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            className="w-full rounded-full bg-[#3B302A] text-[#F8F5F2] py-4 flex items-center justify-center gap-3 text-xs tracking-[0.2em] uppercase hover:bg-[#2e2622] transition"
-          >
-            <span>Checkout</span>
-            <ArrowRight size={13} strokeWidth={1.5} />
-          </motion.button>
+          <Link to="/checkout">
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="w-full rounded-full bg-[#3B302A] text-[#F8F5F2] py-4 flex items-center justify-center gap-3 text-sm tracking-[0.2em] uppercase hover:bg-[#2e2622] transition"
+            >
+              <span>Checkout</span>
+              <ArrowRight size={13} strokeWidth={1.5} />
+            </motion.button>
+          </Link>
 
-          <p className="text-center text-xs text-[#7D746C] mt-5 tracking-widest uppercase">
+          <p className="text-center text-sm text-[#7D746C] mt-5 tracking-widest uppercase">
             Pay in installments with Koko & Mintpay
           </p>
 
@@ -163,7 +166,7 @@ export default function Checkout({
             {["Secure Checkout", "Free Returns", "Authentic"].map((t) => (
               <span
                 key={t}
-                className="text-[11px] text-[#7D746C] uppercase text-center"
+                className="text-xs text-[#7D746C] uppercase text-center"
               >
                 {t}
               </span>
