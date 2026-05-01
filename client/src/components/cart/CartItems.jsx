@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const FREE_DELIVERY_THRESHOLD = 10000;
 
@@ -118,12 +119,12 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
 
       {/* Continue Shopping */}
       <div className="mt-8">
-        <a
-          href="/"
+        <Link
+          to="/"
           className="inline-flex items-center gap-2 text-xs tracking-[0.15em] text-[#7D746C] hover:text-[#3B302A] transition uppercase"
         >
           ← Continue Shopping
-        </a>
+        </Link>
       </div>
     </div>
   );

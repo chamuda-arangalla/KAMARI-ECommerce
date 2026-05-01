@@ -1,17 +1,22 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { CartProvider } from "./context/CartContext";
 import Header from "./components/layout/Header";
+import CartDrawer from "./components/cart/CartDrawer";
 import Home from "./pages/Home";
 import Cart from "./pages/Cart";
 
 function App() {
   return (
     <BrowserRouter>
-      <Header />
+      <CartProvider>
+        <Header />
+        <CartDrawer />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/cart" element={<Cart />} />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/cart" element={<Cart />} />
+        </Routes>
+      </CartProvider>
     </BrowserRouter>
   );
 }
