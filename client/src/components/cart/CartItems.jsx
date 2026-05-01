@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const FREE_DELIVERY_THRESHOLD = 10000;
 
@@ -16,7 +17,7 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
         animate={{ opacity: 1 }}
         className="mb-8 p-5 bg-[#F8F5F2] border border-[#3B302A]/10 rounded-xl"
       >
-        <p className="text-xs tracking-[0.16em] text-[#7D746C] mb-3">
+        <p className="text-sm tracking-[0.16em] text-[#7D746C] mb-3">
           {freeDelivery
             ? "✓ YOU'VE UNLOCKED FREE DELIVERY"
             : `ADD LKR ${remaining.toLocaleString()} MORE FOR FREE DELIVERY`}
@@ -56,11 +57,11 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
             <div className="flex flex-col justify-between flex-1 py-0.5">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-base font-medium tracking-[0.06em] text-[#3B302A] uppercase mb-1">
+                  <h3 className="text-lg font-medium tracking-[0.06em] text-[#3B302A] uppercase mb-1">
                     {item.name}
                   </h3>
 
-                  <div className="flex gap-3 text-xs tracking-[0.12em] text-[#7D746C] uppercase">
+                  <div className="flex gap-3 text-sm tracking-[0.12em] text-[#7D746C] uppercase">
                     <span>{item.variant}</span>
                     <span>·</span>
                     <span>Size {item.size}</span>
@@ -100,12 +101,12 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
 
                 {/* Price */}
                 <div className="text-right">
-                  <p className="text-base font-medium text-[#3B302A] tracking-wide">
+                  <p className="text-lg font-medium text-[#3B302A] tracking-wide">
                     LKR {(item.price * item.qty).toLocaleString()}
                   </p>
 
                   {item.qty > 1 && (
-                    <p className="text-xs text-[#7D746C]">
+                    <p className="text-sm text-[#7D746C]">
                       LKR {item.price.toLocaleString()} each
                     </p>
                   )}
@@ -118,12 +119,12 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
 
       {/* Continue Shopping */}
       <div className="mt-8">
-        <a
-          href="/"
-          className="inline-flex items-center gap-2 text-xs tracking-[0.15em] text-[#7D746C] hover:text-[#3B302A] transition uppercase"
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm tracking-[0.15em] text-[#7D746C] hover:text-[#3B302A] transition uppercase"
         >
           ← Continue Shopping
-        </a>
+        </Link>
       </div>
     </div>
   );
