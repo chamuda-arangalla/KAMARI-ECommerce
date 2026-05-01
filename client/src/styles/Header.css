@@ -1,0 +1,151 @@
+/* ── Collections Dropdown ─────────────────────── */
+.collections-dropdown {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 49;
+  background: #ffffff;
+  border-top: 1px solid #e8e2dc;
+  border-bottom: 1px solid #e8e2dc;
+  box-shadow: 0 12px 40px rgba(59, 48, 42, 0.08);
+}
+
+.collections-dropdown-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 36px 48px;
+  display: flex;
+  gap: 56px;
+  align-items: flex-start;
+}
+
+/* ── Left: link list ──────────────────────────── */
+.collections-dropdown-left {
+  width: 340px;
+  flex-shrink: 0;
+}
+
+.collections-dropdown-heading {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #7d746c;
+  margin-bottom: 16px;
+}
+
+.collections-dropdown-all {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: #3b302a;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  transition: color 0.2s;
+}
+
+.collections-dropdown-all:hover {
+  color: #7d746c;
+}
+
+.collections-dropdown-divider {
+  height: 1px;
+  background: #e8e2dc;
+  margin: 14px 0;
+}
+
+/* 2-column grid for 10 categories */
+.collections-dropdown-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+}
+
+.collections-dropdown-link {
+  font-size: 14px;
+  font-weight: 400;
+  color: #3b302a;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 4px 0;
+  text-align: left;
+  transition: color 0.18s;
+  white-space: nowrap;
+}
+
+.collections-dropdown-link:hover {
+  color: #7d746c;
+}
+
+.collections-dropdown-link-arrow {
+  opacity: 0;
+  font-size: 12px;
+  transition: opacity 0.18s;
+}
+
+.collections-dropdown-link:hover .collections-dropdown-link-arrow {
+  opacity: 1;
+}
+
+/* Extra links (New Arrivals, Best Sellers) span full width */
+.collections-dropdown-links-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Right: featured image cards ─────────────── */
+.collections-dropdown-right {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  flex: 1;
+}
+
+.collections-dropdown-card {
+  cursor: pointer;
+}
+
+.collections-dropdown-card-img-wrap {
+  overflow: hidden;
+  border-radius: 8px;
+  aspect-ratio: 3 / 4;
+}
+
+.collections-dropdown-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.collections-dropdown-card:hover .collections-dropdown-card-img {
+  transform: scale(1.04);
+}
+
+.collections-dropdown-card-name {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #3b302a;
+  margin-top: 10px;
+}
+
+.collections-dropdown-card-sub {
+  font-size: 12px;
+  color: #7d746c;
+  margin-top: 3px;
+}
