@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { useAdmin } from '../../context/AdminContext';
-import { AlertCircle, Search, Edit2, Check, X } from 'lucide-react';
+import React, { useState } from "react";
+import AddProductModal from "../../components/admin/AddProductModel";
+import { useAdmin } from "../../context/AdminContext";
+import { AlertCircle, Search, Edit2, Check, X, Plus } from "lucide-react";
 
 const InventoryPage = () => {
   const { products, updateStockCount } = useAdmin();
   const [editingId, setEditingId] = useState(null);
   const [editStock, setEditStock] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   const handleStartEdit = (product) => {
     setEditingId(product.id);
@@ -20,9 +22,10 @@ const InventoryPage = () => {
     setEditingId(null);
   };
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.collection.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.collection.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -30,17 +33,33 @@ const InventoryPage = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-semibold text-[#3b302a]">Inventory</h2>
-          <p className="text-[#a3948b] mt-1">Manage stock levels across all collections</p>
+          <p className="text-[#a3948b] mt-1">
+            Manage stock levels across all collections
+          </p>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]" size={18} />
-          <input 
-            type="text" 
-            placeholder="Search inventory..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-sm w-full md:w-72 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
-          />
+
+        <div className="flex flex-col md:flex-row gap-3">
+          <button
+            onClick={() => setIsAddOpen(true)}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#3b302a] text-white rounded-xl text-sm hover:bg-[#2e2622] transition-all shadow-sm"
+          >
+            <Plus size={18} />
+            Add Product
+          </button>
+
+          <div className="relative">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search inventory..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-sm w-full md:w-72 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
+            />
+          </div>
         </div>
       </div>
 
@@ -49,27 +68,51 @@ const InventoryPage = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">Product</th>
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">Collection</th>
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">Sizes & Stock</th>
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
+                  Product
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
+                  Collection
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
+                  Sizes & Stock
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
+                  Status
+                </th>
                 <th className="px-6 py-4"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
               {filteredProducts.map((product) => {
-                const totalStock = Object.values(product.stock).reduce((a, b) => a + b, 0);
-                const isLowStock = Object.values(product.stock).some(count => count < 5);
+                const totalStock = Object.values(product.stock).reduce(
+                  (a, b) => a + b,
+                  0,
+                );
+                const isLowStock = Object.values(product.stock).some(
+                  (count) => count < 5,
+                );
                 const isEditing = editingId === product.id;
 
                 return (
-                  <tr key={product.id} className="hover:bg-[#fcfaf7] transition-colors">
+                  <tr
+                    key={product.id}
+                    className="hover:bg-[#fcfaf7] transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-4">
-                        <img src={product.image} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-[#e5ddd5]" />
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-12 h-12 rounded-lg object-cover border border-[#e5ddd5]"
+                        />
                         <div>
-                          <p className="font-medium text-[#3b302a]">{product.name}</p>
-                          <p className="text-xs text-[#a3948b]">${product.price}</p>
+                          <p className="font-medium text-[#3b302a]">
+                            {product.name}
+                          </p>
+                          <p className="text-xs text-[#a3948b]">
+                            ${product.price}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -80,18 +123,32 @@ const InventoryPage = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-4">
-                        {Object.entries(isEditing ? editStock : product.stock).map(([size, count]) => (
-                          <div key={size} className="flex flex-col items-center">
-                            <span className="text-[10px] text-[#a3948b] font-bold mb-1">{size}</span>
+                        {Object.entries(
+                          isEditing ? editStock : product.stock,
+                        ).map(([size, count]) => (
+                          <div
+                            key={size}
+                            className="flex flex-col items-center"
+                          >
+                            <span className="text-[10px] text-[#a3948b] font-bold mb-1">
+                              {size}
+                            </span>
                             {isEditing ? (
-                              <input 
-                                type="number" 
+                              <input
+                                type="number"
                                 value={count}
-                                onChange={(e) => setEditStock({...editStock, [size]: e.target.value})}
+                                onChange={(e) =>
+                                  setEditStock({
+                                    ...editStock,
+                                    [size]: e.target.value,
+                                  })
+                                }
                                 className="w-12 text-center bg-[#f8f5f2] border-none rounded p-1 text-sm focus:ring-1 focus:ring-[#c2b2a6]"
                               />
                             ) : (
-                              <span className={`text-sm font-medium ${count < 5 ? 'text-amber-600' : 'text-[#3b302a]'}`}>
+                              <span
+                                className={`text-sm font-medium ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}
+                              >
                                 {count}
                               </span>
                             )}
@@ -109,19 +166,21 @@ const InventoryPage = () => {
                           <AlertCircle size={14} /> Low Stock
                         </span>
                       ) : (
-                        <span className="text-emerald-600 text-xs font-semibold uppercase">In Stock</span>
+                        <span className="text-emerald-600 text-xs font-semibold uppercase">
+                          In Stock
+                        </span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
                       {isEditing ? (
                         <div className="flex items-center justify-end gap-2">
-                          <button 
+                          <button
                             onClick={() => handleSave(product.id)}
                             className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-all"
                           >
                             <Check size={18} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => setEditingId(null)}
                             className="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-all"
                           >
@@ -129,7 +188,7 @@ const InventoryPage = () => {
                           </button>
                         </div>
                       ) : (
-                        <button 
+                        <button
                           onClick={() => handleStartEdit(product)}
                           className="p-2 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-lg transition-all"
                         >
@@ -144,6 +203,11 @@ const InventoryPage = () => {
           </table>
         </div>
       </div>
+      <AddProductModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onSuccess={() => window.location.reload()}
+      />
     </div>
   );
 };
