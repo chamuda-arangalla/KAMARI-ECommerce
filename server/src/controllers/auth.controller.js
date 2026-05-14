@@ -58,6 +58,53 @@ export const registerAdmin = async (req, res) => {
   }
 };
 
+// UNIFIED LOGIN — works for both admin and customer
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+
+    if (!user || !user.password) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "Account is inactive",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    return sendAuthResponse(res, 200, "Login successful", user);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Login failed",
+      error: error.message,
+    });
+  }
+};
+
 // ADMIN LOGIN
 export const loginAdmin = async (req, res) => {
   try {
@@ -113,57 +160,41 @@ export const loginAdmin = async (req, res) => {
 // CUSTOMER REGISTER
 export const registerCustomer = async (req, res) => {
   try {
-    const {
-      username,
-      firstName,
-      lastName,
-      email,
-      phone,
-      addressLine1,
-      addressLine2,
-      city,
-      district,
-      postalCode,
-    } = req.body;
+    const { email, password, firstName, lastName } = req.body;
 
-    if (!username) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Username is required",
+        message: "Email and password are required",
       });
     }
 
-    const normalizedUsername = username.trim().toLowerCase();
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
 
-    const existingUser = await User.findOne({ username: normalizedUsername });
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "Username already exists",
+        message: "An account with this email already exists",
       });
     }
 
-    // define addresses
-    const addresses = buildCustomerAddress({
-      firstName,
-      lastName,
-      phone,
-      addressLine1,
-      addressLine2,
-      city,
-      district,
-      postalCode,
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const customer = await User.create({
-      username: normalizedUsername,
+      email: normalizedEmail,
+      password: hashedPassword,
       role: "customer",
       firstName: firstName || "",
       lastName: lastName || "",
-      email: email || null,
-      phone: phone || null,
-      addresses, // now correct
     });
 
     return res.status(201).json({
@@ -190,40 +221,49 @@ export const registerCustomer = async (req, res) => {
   }
 };
 
-// CUSTOMER LOGIN - username only
+// CUSTOMER LOGIN
 export const loginCustomer = async (req, res) => {
   try {
-    const { username } = req.body;
+    const { email, password } = req.body;
 
-    if (!username) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Username is required",
+        message: "Email and password are required",
       });
     }
 
-    const normalizedUsername = username.trim().toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
 
     const customer = await User.findOne({
-      username: normalizedUsername,
+      email: normalizedEmail,
       role: "customer",
     });
 
-    if (!customer) {
+    if (!customer || !customer.password) {
       return res.status(401).json({
         success: false,
-        message: "Customer not found. Please register first.",
+        message: "Invalid email or password",
       });
     }
 
     if (!customer.isActive) {
       return res.status(403).json({
         success: false,
-        message: "Customer account is inactive",
+        message: "Your account is inactive",
       });
     }
 
-    return sendAuthResponse(res, 200, "Customer login successful", customer);
+    const isPasswordMatch = await bcrypt.compare(password, customer.password);
+
+    if (!isPasswordMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    return sendAuthResponse(res, 200, "Login successful", customer);
   } catch (error) {
     return res.status(500).json({
       success: false,

@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Search, ShoppingBag, User } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/CartContext";
@@ -21,8 +21,38 @@ const COLLECTION_ITEMS = [
 const Header = () => {
   const { totalItems, setIsDrawerOpen } = useCart();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [customer, setCustomer] = useState(null);
   const closeTimer = useRef(null);
+  const accountRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const stored = localStorage.getItem("customerUser");
+    const adminStored = localStorage.getItem("adminUser");
+    if (stored) setCustomer(JSON.parse(stored));
+    else if (adminStored) setCustomer(JSON.parse(adminStored));
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (accountRef.current && !accountRef.current.contains(e.target)) {
+        setAccountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("customerToken");
+    localStorage.removeItem("customerUser");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
+    setCustomer(null);
+    setAccountOpen(false);
+    navigate("/");
+  };
 
   const openDropdown = () => {
     clearTimeout(closeTimer.current);
@@ -70,7 +100,53 @@ const Header = () => {
 
           <div className="flex items-center gap-5 text-[#3B302A]">
             <Search size={16} strokeWidth={1.5} className="cursor-pointer" />
-            <User size={16} strokeWidth={1.5} className="cursor-pointer" />
+            {customer ? (
+              <div className="relative" ref={accountRef}>
+                <button
+                  onClick={() => setAccountOpen((v) => !v)}
+                  className="flex items-center gap-1.5 text-[#3B302A]"
+                >
+                  <div className="w-7 h-7 rounded-full bg-[#3B302A] text-[#F8F5F2] flex items-center justify-center text-[10px] font-semibold">
+                    {customer.firstName?.[0]?.toUpperCase() || customer.email?.[0]?.toUpperCase()}
+                  </div>
+                  <ChevronDown size={13} strokeWidth={1.5} className={`transition-transform ${accountOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {accountOpen && (
+                  <div className="absolute right-0 top-10 w-52 bg-white border border-[#e5ddd5] rounded-2xl shadow-xl py-2 z-50">
+                    <div className="px-4 py-3 border-b border-[#e5ddd5]">
+                      <p className="text-sm font-semibold text-[#3b302a]">
+                        {customer.firstName} {customer.lastName}
+                      </p>
+                      <p className="text-xs text-[#a3948b] truncate mt-0.5">{customer.email}</p>
+                    </div>
+
+                    {customer.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setAccountOpen(false)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                      >
+                        <LayoutDashboard size={15} />
+                        Admin Dashboard
+                      </Link>
+                    )}
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
+                    >
+                      <LogOut size={15} />
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" aria-label="Sign in">
+                <User size={16} strokeWidth={1.5} />
+              </Link>
+            )}
             <button
               onClick={() => setIsDrawerOpen(true)}
               aria-label="Open cart"
