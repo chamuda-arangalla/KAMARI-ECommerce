@@ -1,25 +1,22 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AddProductModal from "../../components/admin/AddProductModel";
 import { useAdmin } from "../../context/AdminContext";
-import { AlertCircle, Search, Edit2, Check, X, Plus } from "lucide-react";
+import { AlertCircle, Search, Edit2, Plus } from "lucide-react";
 
 const InventoryPage = () => {
-  const { products, updateStockCount } = useAdmin();
-  const [editingId, setEditingId] = useState(null);
-  const [editStock, setEditStock] = useState({});
+  const navigate = useNavigate();
+  const { products, productsLoading, productsError, refreshProducts } = useAdmin();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  const handleStartEdit = (product) => {
-    setEditingId(product.id);
-    setEditStock(product.stock);
-  };
-
-  const handleSave = (id) => {
-    Object.entries(editStock).forEach(([size, count]) => {
-      updateStockCount(id, size, count);
+  const openProductView = (product, editMode = false) => {
+    navigate(`/admin/products/${product.id}`, {
+      state: {
+        from: "/admin/inventory",
+        edit: editMode,
+      },
     });
-    setEditingId(null);
   };
 
   const filteredProducts = products.filter(
@@ -64,6 +61,16 @@ const InventoryPage = () => {
       </div>
 
       <div className="bg-white rounded-2xl border border-[#e5ddd5] overflow-hidden shadow-sm">
+        {productsError && (
+          <div className="px-6 py-3 bg-rose-50 text-rose-700 text-sm border-b border-rose-100">
+            {productsError}
+          </div>
+        )}
+        {productsLoading && (
+          <div className="px-6 py-3 bg-[#fcfaf7] text-[#6b5e55] text-sm border-b border-[#e5ddd5]">
+            Loading products...
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -92,12 +99,11 @@ const InventoryPage = () => {
                 const isLowStock = Object.values(product.stock).some(
                   (count) => count < 5,
                 );
-                const isEditing = editingId === product.id;
-
                 return (
                   <tr
                     key={product.id}
-                    className="hover:bg-[#fcfaf7] transition-colors"
+                    onClick={() => openProductView(product)}
+                    className="hover:bg-[#fcfaf7] transition-colors cursor-pointer"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-4">
@@ -123,9 +129,7 @@ const InventoryPage = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-4">
-                        {Object.entries(
-                          isEditing ? editStock : product.stock,
-                        ).map(([size, count]) => (
+                        {Object.entries(product.stock).map(([size, count]) => (
                           <div
                             key={size}
                             className="flex flex-col items-center"
@@ -133,25 +137,11 @@ const InventoryPage = () => {
                             <span className="text-[10px] text-[#a3948b] font-bold mb-1">
                               {size}
                             </span>
-                            {isEditing ? (
-                              <input
-                                type="number"
-                                value={count}
-                                onChange={(e) =>
-                                  setEditStock({
-                                    ...editStock,
-                                    [size]: e.target.value,
-                                  })
-                                }
-                                className="w-12 text-center bg-[#f8f5f2] border-none rounded p-1 text-sm focus:ring-1 focus:ring-[#c2b2a6]"
-                              />
-                            ) : (
-                              <span
-                                className={`text-sm font-medium ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}
-                              >
-                                {count}
-                              </span>
-                            )}
+                            <span
+                              className={`text-sm font-medium ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}
+                            >
+                              {count}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -172,29 +162,15 @@ const InventoryPage = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {isEditing ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleSave(product.id)}
-                            className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-all"
-                          >
-                            <Check size={18} />
-                          </button>
-                          <button
-                            onClick={() => setEditingId(null)}
-                            className="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-all"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => handleStartEdit(product)}
-                          className="p-2 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-lg transition-all"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                      )}
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openProductView(product, true);
+                        }}
+                        className="p-2 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-lg transition-all"
+                      >
+                        <Edit2 size={18} />
+                      </button>
                     </td>
                   </tr>
                 );
@@ -206,7 +182,7 @@ const InventoryPage = () => {
       <AddProductModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onSuccess={() => window.location.reload()}
+        onSuccess={refreshProducts}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { loginAdmin } from "../../services/authApi";
 
 const AdminLoginPage = () => {
@@ -20,6 +21,7 @@ const AdminLoginPage = () => {
     try {
       const data = await loginAdmin(form.username, form.password);
       localStorage.setItem("adminToken", data.token);
+      localStorage.setItem("adminUser", JSON.stringify(data.user));
       navigate("/admin");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
@@ -30,7 +32,15 @@ const AdminLoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f5f2] flex items-center justify-center px-4 font-['Poppins']">
-      <div className="bg-white w-full max-w-sm rounded-2xl border border-[#e5ddd5] shadow-xl p-8">
+      <div className="relative bg-white w-full max-w-sm rounded-3xl border border-[#e5ddd5] shadow-[0_20px_60px_rgba(59,48,42,0.12)] p-8">
+        <Link
+          to="/"
+          aria-label="Back to home"
+          className="absolute left-5 top-5 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e5ddd5] text-[#6b5e55] transition hover:bg-[#f8f5f2] hover:text-[#3b302a]"
+        >
+          <ArrowLeft size={18} strokeWidth={1.6} />
+        </Link>
+
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold text-[#3b302a] tracking-wide">KAMARI</h1>
           <p className="text-sm text-[#a3948b] mt-1">Admin Portal</p>

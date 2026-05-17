@@ -9,7 +9,10 @@ const AdminLayout = () => {
 
   return (
     <AdminProvider>
-      <div className="min-h-screen bg-[#f8f5f2] font-['Poppins']">
+      <div
+        className="min-h-screen bg-[#f8f5f2]"
+        style={{ fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif' }}
+      >
         <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         
         <div className="lg:pl-64 flex flex-col min-h-screen transition-all duration-300">

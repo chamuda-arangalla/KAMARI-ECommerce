@@ -54,6 +54,33 @@ export function CartProvider({ children }) {
   const handleRemove = (id) =>
     setItems((prev) => prev.filter((item) => item.id !== id));
 
+  const handleAddItem = (item) => {
+    const quantity = Number(item.qty || 1);
+
+    setItems((prev) => {
+      const existingItem = prev.find(
+        (cartItem) =>
+          cartItem.id === item.id &&
+          cartItem.variant === item.variant &&
+          cartItem.size === item.size,
+      );
+
+      if (existingItem) {
+        return prev.map((cartItem) =>
+          cartItem.id === item.id &&
+          cartItem.variant === item.variant &&
+          cartItem.size === item.size
+            ? { ...cartItem, qty: cartItem.qty + quantity }
+            : cartItem,
+        );
+      }
+
+      return [...prev, { ...item, qty: quantity }];
+    });
+
+    setIsDrawerOpen(true);
+  };
+
   const handlePromoChange = (value) => {
     setPromoCode(value);
     setPromoError("");
@@ -104,6 +131,7 @@ export function CartProvider({ children }) {
         deliveryFee,
         total,
         handleUpdateQty,
+        handleAddItem,
         handleRemove,
         handlePromoChange,
         handleApplyPromo,

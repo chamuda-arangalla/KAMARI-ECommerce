@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
-import { categories, products, moodImages } from "../data/homeData";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { categories, moodImages } from "../data/homeData";
+import { getProducts } from "../services/productApi";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 35 },
@@ -7,6 +10,24 @@ const fadeUp = {
 };
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+
+  useEffect(() => {
+    const loadFeatured = async () => {
+      try {
+        const response = await getProducts();
+        const products = response.data || [];
+        const featured = products.filter((product) => product.isFeatured);
+        setFeaturedProducts((featured.length ? featured : products).slice(0, 4));
+      } catch {
+        setFeaturedProducts([]);
+      }
+    };
+
+    loadFeatured();
+  }, []);
+
   return (
     <main className="bg-[#F8F5F2] text-[#3B302A]">
       {/* Hero */}
@@ -104,26 +125,38 @@ const Home = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-          {products.map((product) => (
-            <div key={product.id} className="group">
+          {featuredProducts.map((product) => {
+            const image =
+              product.colors?.flatMap((color) => color.images || [])?.[0]?.url ||
+              "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
+
+            return (
+            <div
+              key={product._id}
+              className="group cursor-pointer"
+              onClick={() => navigate(`/products/${product._id}`)}
+            >
               <div className="relative mb-4 h-[330px] overflow-hidden bg-[#E8DED6]">
-                {product.tag && (
+                {product.isFeatured && (
                   <span className="absolute left-3 top-3 z-10 bg-[#F8F5F2] px-3 py-1 text-[9px] uppercase tracking-[0.16em]">
-                    {product.tag}
+                    Best Seller
                   </span>
                 )}
 
                 <img
-                  src={product.image}
+                  src={image}
                   alt={product.name}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                 />
               </div>
 
               <h4 className="mb-1 text-sm">{product.name}</h4>
-              <p className="text-xs text-[#7D746C]">{product.price}</p>
+              <p className="text-xs text-[#7D746C]">
+                LKR {Number(product.price || 0).toLocaleString()}
+              </p>
             </div>
-          ))}
+          );
+          })}
         </div>
       </section>
 

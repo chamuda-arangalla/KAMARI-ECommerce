@@ -1,9 +1,13 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import generateToken from "../utils/generateToken.js";
-import buildCustomerAddress from "../utils/buildCustomerAddress.js";
 import sendAuthResponse from "../utils/sendAuthResponse.js";
+
+export const logout = (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Logout successful",
+  });
+};
 
 // ADMIN REGISTER
 export const registerAdmin = async (req, res) => {

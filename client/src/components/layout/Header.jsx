@@ -3,6 +3,8 @@ import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard } from 
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/CartContext";
+import ConfirmDialog from "../common/ConfirmDialog";
+import { logout } from "../../services/authApi";
 import "../../styles/Header.css";
 
 const COLLECTION_ITEMS = [
@@ -22,17 +24,16 @@ const Header = () => {
   const { totalItems, setIsDrawerOpen } = useCart();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [customer, setCustomer] = useState(null);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [customer, setCustomer] = useState(() => {
+    const stored = localStorage.getItem("customerUser");
+    const adminStored = localStorage.getItem("adminUser");
+    return stored ? JSON.parse(stored) : adminStored ? JSON.parse(adminStored) : null;
+  });
   const closeTimer = useRef(null);
   const accountRef = useRef(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const stored = localStorage.getItem("customerUser");
-    const adminStored = localStorage.getItem("adminUser");
-    if (stored) setCustomer(JSON.parse(stored));
-    else if (adminStored) setCustomer(JSON.parse(adminStored));
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -40,18 +41,36 @@ const Header = () => {
         setAccountOpen(false);
       }
     };
+    const handleUserUpdate = () => {
+      const stored = localStorage.getItem("customerUser");
+      const adminStored = localStorage.getItem("adminUser");
+      setCustomer(stored ? JSON.parse(stored) : adminStored ? JSON.parse(adminStored) : null);
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    window.addEventListener("kamari:user-updated", handleUserUpdate);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("kamari:user-updated", handleUserUpdate);
+    };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("customerToken");
-    localStorage.removeItem("customerUser");
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    setCustomer(null);
-    setAccountOpen(false);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await logout();
+    } finally {
+      localStorage.removeItem("customerToken");
+      localStorage.removeItem("customerUser");
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminUser");
+      setCustomer(null);
+      setAccountOpen(false);
+      setLogoutOpen(false);
+      setLoggingOut(false);
+      navigate("/");
+    }
   };
 
   const openDropdown = () => {
@@ -132,8 +151,22 @@ const Header = () => {
                       </Link>
                     )}
 
+                    {customer.role === "customer" && (
+                      <Link
+                        to="/profile"
+                        onClick={() => setAccountOpen(false)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                      >
+                        <User size={15} />
+                        My Profile
+                      </Link>
+                    )}
+
                     <button
-                      onClick={handleLogout}
+                      onClick={() => {
+                        setAccountOpen(false);
+                        setLogoutOpen(true);
+                      }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
                     >
                       <LogOut size={15} />
@@ -252,6 +285,17 @@ const Header = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ConfirmDialog
+        isOpen={logoutOpen}
+        title="Sign out?"
+        message="You will be signed out of your current KAMARI session."
+        confirmLabel="Sign Out"
+        type="logout"
+        loading={loggingOut}
+        onCancel={() => setLogoutOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 };

@@ -18,4 +18,7 @@ export const uploadProductImages = multer({
   limits: {
     fileSize: 5 * 1024 * 1024,
   },
-}).array("images", 20);
+}).fields([
+  { name: "images", maxCount: 30 },
+  { name: "sizeChartImage", maxCount: 1 },
+]);

@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAdmin } from '../../context/AdminContext';
-import { Plus, Edit2, Trash2, X, Upload, MoreVertical, Tag } from 'lucide-react';
+import { Eye, Loader2, Plus, Edit2, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AddProductModal from '../../components/admin/AddProductModel';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
+import { getProductById } from '../../services/productApi';
 
 const ProductManagement = () => {
-  const { products, addProduct, editProduct, deleteProduct } = useAdmin();
+  const {
+    products,
+    productsLoading,
+    productsError,
+    addProduct,
+    editProduct,
+    deleteProduct,
+    refreshProducts,
+  } = useAdmin();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState("");
   const [formData, setFormData] = useState({
     name: '',
     collection: '',
@@ -17,16 +33,7 @@ const ProductManagement = () => {
   });
 
   const openAddModal = () => {
-    setEditingProduct(null);
-    setFormData({
-      name: '',
-      collection: '',
-      price: '',
-      tags: '',
-      image: '',
-      stock: { S: 0, M: 0, L: 0, XL: 0 }
-    });
-    setIsModalOpen(true);
+    setIsAddOpen(true);
   };
 
   const openEditModal = (product) => {
@@ -36,6 +43,37 @@ const ProductManagement = () => {
       tags: product.tags.join(', ')
     });
     setIsModalOpen(true);
+  };
+
+  const openDetailsModal = async (product) => {
+    const productId = product.id;
+    const hasMongoId = /^[a-f\d]{24}$/i.test(productId);
+
+    try {
+      setDetailsLoading(true);
+      setDetailsError("");
+      setSelectedProduct(product.raw || null);
+
+      if (!hasMongoId) {
+        setDetailsError("This sample product does not have a database ID");
+        return;
+      }
+
+      const token = localStorage.getItem("adminToken");
+
+      if (!token) {
+        setDetailsError("Admin token missing. Please login again.");
+        return;
+      }
+
+      const response = await getProductById(productId, token);
+
+      setSelectedProduct(response.data);
+    } catch (error) {
+      setDetailsError(error.response?.data?.message || "Failed to load product");
+    } finally {
+      setDetailsLoading(false);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -56,9 +94,15 @@ const ProductManagement = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-      deleteProduct(id);
-    }
+    const product = products.find((item) => item.id === id);
+    setDeleteTarget(product || { id, name: "this product" });
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+
+    deleteProduct(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   return (
@@ -78,19 +122,49 @@ const ProductManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {productsError && (
+          <div className="md:col-span-2 xl:col-span-3 bg-rose-50 text-rose-700 border border-rose-100 px-4 py-3 text-sm">
+            {productsError}
+          </div>
+        )}
+        {productsLoading && (
+          <div className="md:col-span-2 xl:col-span-3 bg-white border border-[#e5ddd5] px-4 py-3 text-sm text-[#6b5e55]">
+            Loading products...
+          </div>
+        )}
         {products.map((product) => (
-          <div key={product.id} className="bg-white rounded-2xl border border-[#e5ddd5] overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div
+            key={product.id}
+            onClick={() => openDetailsModal(product)}
+            className="bg-white rounded-2xl border border-[#e5ddd5] overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+          >
             <div className="relative h-64 overflow-hidden">
               <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute top-4 right-4 flex gap-2">
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openDetailsModal(product);
+                  }}
+                  className="p-2 bg-white/90 backdrop-blur-md text-[#3b302a] rounded-full shadow-sm hover:bg-white transition-all"
+                  title="View details"
+                >
+                  <Eye size={18} />
+                </button>
                 <button 
-                  onClick={() => openEditModal(product)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openEditModal(product);
+                  }}
                   className="p-2 bg-white/90 backdrop-blur-md text-[#3b302a] rounded-full shadow-sm hover:bg-white transition-all"
                 >
                   <Edit2 size={18} />
                 </button>
                 <button 
-                  onClick={() => handleDelete(product.id)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleDelete(product.id);
+                  }}
                   className="p-2 bg-white/90 backdrop-blur-md text-rose-600 rounded-full shadow-sm hover:bg-rose-50 transition-all"
                 >
                   <Trash2 size={18} />
@@ -131,7 +205,7 @@ const ProductManagement = () => {
 
       {/* Add/Edit Modal */}
       <AnimatePresence>
-        {isModalOpen && (
+        {isModalOpen && editingProduct && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
@@ -262,8 +336,182 @@ const ProductManagement = () => {
           </div>
         )}
       </AnimatePresence>
+      <AddProductModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onSuccess={refreshProducts}
+      />
+      <ProductDetailsModal
+        product={selectedProduct}
+        loading={detailsLoading}
+        error={detailsError}
+        onClose={() => {
+          setSelectedProduct(null);
+          setDetailsError("");
+        }}
+      />
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        title="Delete product?"
+        message={`This will remove ${deleteTarget?.name || "this product"} from the catalog. This action cannot be undone.`}
+        confirmLabel="Delete Product"
+        type="delete"
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };
+
+const ProductDetailsModal = ({ product, loading, error, onClose }) => {
+  if (!product && !loading && !error) return null;
+
+  const images = product?.colors?.flatMap((color) => color.images || []) || [];
+  const mainImage =
+    images[0]?.url ||
+    "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
+  const totalStock =
+    product?.colors?.reduce(
+      (total, color) =>
+        total +
+        (color.sizes || []).reduce(
+          (sum, item) => sum + Number(item.stock || 0),
+          0,
+        ),
+      0,
+    ) || 0;
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto border border-[#e5ddd5] shadow-2xl">
+        <div className="sticky top-0 bg-white border-b border-[#e5ddd5] px-6 py-4 flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold text-[#3b302a]">Product Details</h3>
+            <p className="text-sm text-[#a3948b]">
+              {product?._id || "Loading product by ID"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 hover:bg-[#f8f5f2] text-[#6b5e55]"
+          >
+            <X size={22} />
+          </button>
+        </div>
+
+        {loading && (
+          <div className="p-10 flex items-center justify-center gap-2 text-[#6b5e55]">
+            <Loader2 size={18} className="animate-spin" />
+            Loading product...
+          </div>
+        )}
+
+        {error && (
+          <div className="m-6 bg-rose-50 border border-rose-100 text-rose-700 px-4 py-3 text-sm">
+            {error}
+          </div>
+        )}
+
+        {product && (
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+              <div className="space-y-3">
+                <img
+                  src={mainImage}
+                  alt={product.name}
+                  className="w-full aspect-square object-cover bg-[#f8f5f2] border border-[#e5ddd5]"
+                />
+                <div className="grid grid-cols-4 gap-2">
+                  {images.map((image) => (
+                    <img
+                      key={image.publicId || image.url}
+                      src={image.url}
+                      alt={product.name}
+                      className="w-full aspect-square object-cover border border-[#e5ddd5]"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs text-[#a3948b] uppercase tracking-widest font-bold">
+                    {product.collection} / {product.setName}
+                  </p>
+                  <h2 className="text-3xl font-semibold text-[#3b302a] mt-1">
+                    {product.name}
+                  </h2>
+                  <p className="text-2xl font-bold text-[#3b302a] mt-2">
+                    LKR {Number(product.price || 0).toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <DetailTile label="Total Stock" value={totalStock} />
+                  <DetailTile label="Colors" value={product.colors?.length || 0} />
+                  <DetailTile label="Featured" value={product.isFeatured ? "Yes" : "No"} />
+                  <DetailTile label="New Arrival" value={product.isNewArrival ? "Yes" : "No"} />
+                </div>
+
+                <DetailBlock label="Description" value={product.description || "No description"} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <DetailBlock label="Fabric" value={product.fabric} />
+                  <DetailBlock label="Design" value={product.design} />
+                  <DetailBlock label="Product Care" value={product.productCare} />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="text-xs font-bold text-[#a3948b] uppercase tracking-widest">
+                Colors And Size Quantity
+              </h4>
+              {product.colors?.map((color) => (
+                <div key={color._id || color.colorName} className="border border-[#e5ddd5]">
+                  <div className="px-4 py-3 bg-[#fcfaf7] flex items-center gap-3 border-b border-[#e5ddd5]">
+                    <span
+                      className="w-6 h-6 border border-[#d7ccc3]"
+                      style={{ backgroundColor: color.colorCode || "#ffffff" }}
+                    />
+                    <div>
+                      <p className="font-semibold text-[#3b302a]">{color.colorName}</p>
+                      <p className="text-xs text-[#a3948b]">{color.colorCode || "No color code"}</p>
+                    </div>
+                  </div>
+                  <div className="p-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {color.sizes?.map((item) => (
+                      <div key={item.size} className="border border-[#e5ddd5] px-3 py-2">
+                        <p className="text-xs text-[#a3948b] uppercase font-bold">{item.size}</p>
+                        <p className="text-lg font-semibold text-[#3b302a]">{item.stock}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const DetailTile = ({ label, value }) => (
+  <div className="bg-[#fcfaf7] border border-[#e5ddd5] px-4 py-3">
+    <p className="text-xs text-[#a3948b] uppercase font-bold">{label}</p>
+    <p className="text-lg font-semibold text-[#3b302a]">{value}</p>
+  </div>
+);
+
+const DetailBlock = ({ label, value }) => (
+  <div>
+    <p className="text-xs text-[#a3948b] uppercase tracking-widest font-bold mb-1">
+      {label}
+    </p>
+    <p className="text-sm text-[#4f443d] leading-6">{value || "N/A"}</p>
+  </div>
+);
 
 export default ProductManagement;

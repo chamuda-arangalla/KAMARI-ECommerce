@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authApi";
 
@@ -37,7 +38,15 @@ const CustomerLoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F5F2] flex items-center justify-center px-4 font-['Poppins']">
-      <div className="bg-white w-full max-w-sm rounded-2xl border border-[#e5ddd5] shadow-xl p-8">
+      <div className="relative bg-white w-full max-w-sm rounded-3xl border border-[#e5ddd5] shadow-[0_20px_60px_rgba(59,48,42,0.12)] p-8">
+        <Link
+          to="/"
+          aria-label="Back to home"
+          className="absolute left-5 top-5 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e5ddd5] text-[#6b5e55] transition hover:bg-[#f8f5f2] hover:text-[#3b302a]"
+        >
+          <ArrowLeft size={18} strokeWidth={1.6} />
+        </Link>
+
         <div className="mb-8 text-center">
           <Link to="/" className="text-2xl font-light tracking-[0.25em] text-[#3B302A]">
             KAMARI

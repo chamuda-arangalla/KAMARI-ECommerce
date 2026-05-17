@@ -1,13 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Grid2x2, Grid3x3 } from "lucide-react";
-import { PRODUCTS, CATEGORIES, SIZES, COLORS } from "../data/collectionsData";
+import { SIZES, COLORS } from "../data/collectionsData";
+import { getProducts, mapBackendProductToCollectionProduct } from "../services/productApi";
 import "../styles/CollectionsPage.css";
 
 const PRODUCTS_PER_PAGE = 9;
 
 export default function CollectionsPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [category, setCategory] = useState("All");
   const [selectedSizes, setSelectedSizes] = useState([]);
@@ -17,12 +19,56 @@ export default function CollectionsPage() {
   const [sortBy, setSortBy] = useState("featured");
   const [cols, setCols] = useState(3);
   const [page, setPage] = useState(1);
+  const [apiProducts, setApiProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [productsError, setProductsError] = useState("");
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        setProductsError("");
+
+        const response = await getProducts();
+        setApiProducts(
+          (response.data || []).map(mapBackendProductToCollectionProduct),
+        );
+      } catch (error) {
+        setProductsError(
+          error.response?.data?.message || "Could not load latest products",
+        );
+        setApiProducts([]);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  const products = apiProducts;
+  const categoryOptions = useMemo(
+    () => ["All", ...new Set(products.map((product) => product.category).filter(Boolean))],
+    [products],
+  );
+  const colorOptions = useMemo(() => {
+    const productColors = products.flatMap((product) => product.colors || []);
+    const uniqueColors = new Map(COLORS.map((color) => [color.name, color]));
+
+    productColors.forEach((color) => {
+      if (color.name && !uniqueColors.has(color.name)) {
+        uniqueColors.set(color.name, color);
+      }
+    });
+
+    return [...uniqueColors.values()];
+  }, [products]);
 
   // Read category/sort from URL params set by the header dropdown
   useEffect(() => {
     const cat = searchParams.get("category");
     const sort = searchParams.get("sort");
-    if (cat && CATEGORIES.includes(cat)) { setCategory(cat); setPage(1); }
+    if (cat) { setCategory(cat); setPage(1); }
     if (sort) { setSortBy(sort); setPage(1); }
   }, [searchParams]);
 
@@ -47,7 +93,7 @@ export default function CollectionsPage() {
   };
 
   const filtered = useMemo(() => {
-    let list = [...PRODUCTS];
+    let list = [...products];
 
     if (category !== "All") list = list.filter((p) => p.category === category);
     if (inStockOnly) list = list.filter((p) => p.inStock);
@@ -62,7 +108,7 @@ export default function CollectionsPage() {
     else if (sortBy === "best-selling") list.sort((a, b) => (b.badge === "BEST SELLER") - (a.badge === "BEST SELLER"));
 
     return list;
-  }, [category, inStockOnly, selectedSizes, selectedColors, maxPrice, sortBy]);
+  }, [products, category, inStockOnly, selectedSizes, selectedColors, maxPrice, sortBy]);
 
   const totalPages = Math.ceil(filtered.length / PRODUCTS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * PRODUCTS_PER_PAGE, page * PRODUCTS_PER_PAGE);
@@ -92,7 +138,7 @@ export default function CollectionsPage() {
           <div className="filter-section">
             <p className="filter-title">Category</p>
             <div className="filter-category-list">
-              {CATEGORIES.map((cat) => (
+              {categoryOptions.map((cat) => (
                 <button
                   key={cat}
                   className={`filter-category-btn ${category === cat ? "active" : ""}`}
@@ -158,7 +204,7 @@ export default function CollectionsPage() {
           <div className="filter-section">
             <p className="filter-title">Color</p>
             <div className="filter-colors">
-              {COLORS.map((c) => (
+              {colorOptions.map((c) => (
                 <button
                   key={c.name}
                   className={`filter-color-btn ${selectedColors.includes(c.name) ? "active" : ""}`}
@@ -183,7 +229,9 @@ export default function CollectionsPage() {
           {/* Top bar */}
           <div className="collections-topbar">
             <span className="collections-count">
-              {filtered.length} {filtered.length === 1 ? "product" : "products"}
+              {loadingProducts
+                ? "Loading products..."
+                : `${filtered.length} ${filtered.length === 1 ? "product" : "products"}`}
             </span>
 
             <div className="collections-topbar-right">
@@ -217,6 +265,13 @@ export default function CollectionsPage() {
             </div>
           </div>
 
+          {productsError && (
+            <div className="collections-empty" style={{ marginBottom: "24px" }}>
+              <p className="collections-empty-title">Products unavailable</p>
+              <p className="collections-empty-sub">{productsError}</p>
+            </div>
+          )}
+
           {/* Grid */}
           {paginated.length === 0 ? (
             <div className="collections-empty">
@@ -227,7 +282,11 @@ export default function CollectionsPage() {
           ) : (
             <div className={`product-grid cols-${cols}`}>
               {paginated.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onOpen={() => navigate(`/products/${product.id}`)}
+                />
               ))}
             </div>
           )}
@@ -269,11 +328,11 @@ export default function CollectionsPage() {
   );
 }
 
-function ProductCard({ product }) {
+function ProductCard({ product, onOpen }) {
   const installment = Math.round(product.price / 3).toLocaleString();
 
   return (
-    <div className="product-card">
+    <div className="product-card" onClick={onOpen}>
       <div className="product-card-img-wrap">
 
         {/* Images */}
