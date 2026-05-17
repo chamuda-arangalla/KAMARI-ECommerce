@@ -1,0 +1,25 @@
+import streamifier from "streamifier";
+import cloudinary from "../config/cloudinary.js";
+
+const uploadToCloudinary = (file, folder = "kamari/products") => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error) return reject(error);
+
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id,
+        });
+      }
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+  });
+};
+
+export default uploadToCloudinary;

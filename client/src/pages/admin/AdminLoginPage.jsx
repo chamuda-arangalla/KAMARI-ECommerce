@@ -1,0 +1,88 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginAdmin } from "../../services/authApi";
+
+const AdminLoginPage = () => {
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const data = await loginAdmin(form.username, form.password);
+      localStorage.setItem("adminToken", data.token);
+      navigate("/admin");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f8f5f2] flex items-center justify-center px-4 font-['Poppins']">
+      <div className="bg-white w-full max-w-sm rounded-2xl border border-[#e5ddd5] shadow-xl p-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold text-[#3b302a] tracking-wide">KAMARI</h1>
+          <p className="text-sm text-[#a3948b] mt-1">Admin Portal</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-[#a3948b] uppercase tracking-wider mb-2">
+              Username
+            </label>
+            <input
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              required
+              autoComplete="username"
+              className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#a3948b] uppercase tracking-wider mb-2">
+              Password
+            </label>
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              autoComplete="current-password"
+              className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+            />
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 rounded-xl bg-[#3b302a] text-white text-sm hover:bg-[#2e2622] disabled:opacity-60 mt-2"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLoginPage;
