@@ -1,30 +1,29 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Package, 
-  Users, 
-  BarChart3, 
-  Settings, 
+import { NavLink, Link } from 'react-router-dom';
+import {
+  Package,
+  Users,
+  BarChart3,
+  Settings,
   ShoppingBag,
   MapPin,
+  X,
+  Layers,
   Image,
-  Menu,
-  X
 } from 'lucide-react';
 
 const SidebarLink = ({ to, icon: Icon, label }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
-      `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+      `flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium transition-all duration-200 ${
         isActive
-          ? 'bg-[#e5ddd5] text-[#3b302a] font-medium shadow-sm'
+          ? 'bg-[#e5ddd5] text-[#3b302a] shadow-sm'
           : 'text-[#6b5e55] hover:bg-[#f3ede8] hover:text-[#3b302a]'
       }`
     }
   >
-    <Icon size={20} />
+    <Icon size={22} />
     <span>{label}</span>
   </NavLink>
 );
@@ -32,9 +31,8 @@ const SidebarLink = ({ to, icon: Icon, label }) => (
 const AdminSidebar = ({ isOpen, setIsOpen }) => {
   return (
     <>
-      {/* Mobile Backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
@@ -47,27 +45,28 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       `}>
         <div className="flex flex-col h-full p-6">
           <div className="flex items-center justify-between mb-10">
-            <h1 className="text-2xl font-semibold tracking-wider text-[#3b302a]">KAMARI</h1>
+            <Link to="/" className="text-3xl font-bold tracking-wider text-[#3b302a] hover:opacity-70 transition-opacity">
+              KAMARI
+            </Link>
             <button className="lg:hidden" onClick={() => setIsOpen(false)}>
-              <X size={24} />
+              <X size={26} />
             </button>
           </div>
 
-          <nav className="flex-1 space-y-2">
-            <SidebarLink to="/admin/orders" icon={ShoppingBag} label="Orders" />
-            <SidebarLink to="/admin/tracking" icon={MapPin} label="Order Tracking" />
-            <SidebarLink to="/admin/inventory" icon={Package} label="Inventory" />
-            <SidebarLink to="/admin/customers" icon={Users} label="Customers" />
-            <SidebarLink to="/admin/analytics" icon={BarChart3} label="Analytics" />
-            <SidebarLink to="/admin/products" icon={Settings} label="Product Management" />
-            <SidebarLink to="/admin/home-images" icon={Image} label="Home Images" />
+          <nav className="flex-1 space-y-1.5">
+            <SidebarLink to="/admin/orders"      icon={ShoppingBag} label="Orders" />
+            <SidebarLink to="/admin/tracking"    icon={MapPin}      label="Order Tracking" />
+            <SidebarLink to="/admin/inventory"   icon={Package}     label="Inventory" />
+            <SidebarLink to="/admin/customers"   icon={Users}       label="Customers" />
+            <SidebarLink to="/admin/analytics"   icon={BarChart3}   label="Analytics" />
+            <SidebarLink to="/admin/products"    icon={Settings}    label="Product Management" />
+            <SidebarLink to="/admin/collections" icon={Layers}      label="Collections" />
+            <SidebarLink to="/admin/home-images" icon={Image}       label="Home Images" />
           </nav>
 
           <div className="pt-6 border-t border-[#e5ddd5]">
-            <p className="text-xs text-[#a3948b] uppercase tracking-widest font-semibold mb-4">Support</p>
-            <div className="text-sm text-[#6b5e55]">
-              <p>v1.0.0 Stable</p>
-            </div>
+            <p className="text-sm text-[#a3948b] uppercase tracking-widest font-semibold mb-3">Support</p>
+            <p className="text-base text-[#6b5e55]">v1.0.0 Stable</p>
           </div>
         </div>
       </aside>

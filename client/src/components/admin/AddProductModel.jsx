@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ImagePlus,
   Loader2,
@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { createProduct } from "../../services/productApi";
+import { getCollectionsAdmin } from "../../services/collectionApi";
 
 const initialForm = {
   name: "",
@@ -42,6 +43,15 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
   const [sizeChartFile, setSizeChartFile] = useState(null);
   const [colors, setColors] = useState([createColor()]);
   const [loading, setLoading] = useState(false);
+  const [collections, setCollections] = useState([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const token = localStorage.getItem("adminToken");
+    getCollectionsAdmin(token)
+      .then((res) => setCollections(res.data || []))
+      .catch(() => setCollections([]));
+  }, [isOpen]);
 
   const imageIndexById = useMemo(
     () => new Map(images.map((image, index) => [image.id, index])),
@@ -58,6 +68,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
     setSizeChartFile(null);
     setColors([createColor()]);
   };
+
 
   const handleClose = () => {
     if (loading) return;
@@ -271,21 +282,20 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-black/35 backdrop-blur-sm flex items-center justify-center px-4 py-6">
       <div className="bg-white w-full max-w-6xl border border-[#e5ddd5] shadow-2xl max-h-[92vh] overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#e5ddd5] bg-[#fcfaf7]">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-[#e5ddd5] bg-[#fcfaf7]">
           <div>
-            <h3 className="text-xl font-semibold text-[#3b302a]">Add Product</h3>
-            <p className="text-sm text-[#8c7d73]">
+            <h3 className="text-2xl font-bold text-[#3b302a]">Add Product</h3>
+            <p className="text-base text-[#8c7d73] mt-1">
               Build colors, assign images, and enter size stock.
             </p>
           </div>
-
           <button
             type="button"
             onClick={handleClose}
-            className="p-2 text-[#8c7d73] hover:text-[#3b302a] hover:bg-white border border-transparent hover:border-[#e5ddd5]"
+            className="p-2.5 text-[#8c7d73] hover:text-[#3b302a] hover:bg-white border border-transparent hover:border-[#e5ddd5] rounded-xl"
             aria-label="Close"
           >
-            <X size={20} />
+            <X size={24} />
           </button>
         </div>
 
@@ -296,9 +306,30 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
                 <SectionTitle title="Product Details" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input label="Product Name" name="name" value={form.name} onChange={handleChange} />
-                  <Input label="Collection" name="collection" value={form.collection} onChange={handleChange} />
-                  <Input label="Set Name" name="setName" value={form.setName} onChange={handleChange} />
-                  <Input label="Price" name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} />
+
+                  <div>
+                    <SmallLabel>Collection</SmallLabel>
+                    <select
+                      required
+                      value={form.setName}
+                      onChange={(e) => {
+                        const selected = collections.find((c) => c.name === e.target.value);
+                        setForm((prev) => ({
+                          ...prev,
+                          setName: selected ? selected.name : "",
+                          collection: selected ? selected.name : "",
+                        }));
+                      }}
+                      className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+                    >
+                      <option value="">Select a collection</option>
+                      {collections.map((col) => (
+                        <option key={col._id} value={col.name}>{col.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <Input label="Price (LKR)" name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} />
                 </div>
 
                 <Textarea label="Description" name="description" value={form.description} onChange={handleChange} required={false} />
@@ -345,10 +376,10 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
                   <button
                     type="button"
                     onClick={addColor}
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-[#3b302a] text-white text-sm hover:bg-[#2e2622]"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#3b302a] text-white text-base font-medium rounded-lg hover:bg-[#2e2622]"
                   >
-                    <Plus size={16} />
-                    Color
+                    <Plus size={18} />
+                    Add Color
                   </button>
                 </div>
 
@@ -376,9 +407,9 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
               <SectionTitle title="Uploaded Images" />
 
               <label className="flex flex-col items-center justify-center border border-dashed border-[#b8a99f] bg-white p-8 cursor-pointer hover:border-[#3b302a] transition">
-                <Upload size={24} className="text-[#6b5e55] mb-2" />
-                <span className="text-sm font-medium text-[#3b302a]">Upload product images</span>
-                <span className="text-xs text-[#8c7d73] mt-1">JPG, PNG, or WEBP up to 5MB</span>
+                <Upload size={28} className="text-[#6b5e55] mb-3" />
+                <span className="text-base font-semibold text-[#3b302a]">Upload product images</span>
+                <span className="text-sm text-[#8c7d73] mt-1">JPG, PNG, or WEBP up to 5MB</span>
                 <input
                   type="file"
                   multiple
@@ -420,22 +451,21 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
             </aside>
           </div>
 
-          <div className="sticky bottom-0 bg-white border-t border-[#e5ddd5] px-6 py-4 flex justify-end gap-3">
+          <div className="sticky bottom-0 bg-white border-t border-[#e5ddd5] px-8 py-5 flex justify-end gap-4">
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
-              className="px-5 py-2.5 border border-[#d7ccc3] text-sm text-[#6b5e55] hover:bg-[#f8f5f2] disabled:opacity-60"
+              className="px-6 py-3 rounded-xl border border-[#d7ccc3] text-base font-medium text-[#6b5e55] hover:bg-[#f8f5f2] disabled:opacity-60"
             >
               Cancel
             </button>
-
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#3b302a] text-white text-sm hover:bg-[#2e2622] disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-60"
             >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
               {loading ? "Saving..." : "Add Product"}
             </button>
           </div>
@@ -458,15 +488,15 @@ const ColorEditor = ({
   canRemoveColor,
 }) => (
   <div className="border border-[#e5ddd5] bg-white">
-    <div className="flex items-center justify-between gap-4 px-4 py-3 border-b border-[#f0e8e1]">
+    <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-[#f0e8e1]">
       <div className="flex items-center gap-3">
         <span
-          className="w-7 h-7 border border-[#d7ccc3]"
+          className="w-8 h-8 border border-[#d7ccc3] rounded"
           style={{ backgroundColor: color.colorCode || "#ffffff" }}
         />
         <div>
-          <p className="text-sm font-semibold text-[#3b302a]">Color {colorIndex + 1}</p>
-          <p className="text-xs text-[#8c7d73]">{color.imageIds.length} image(s) assigned</p>
+          <p className="text-base font-semibold text-[#3b302a]">Color {colorIndex + 1}</p>
+          <p className="text-sm text-[#8c7d73]">{color.imageIds.length} image(s) assigned</p>
         </div>
       </div>
 
@@ -474,10 +504,10 @@ const ColorEditor = ({
         type="button"
         onClick={() => onRemoveColor(color.id)}
         disabled={!canRemoveColor}
-        className="p-2 text-rose-600 hover:bg-rose-50 disabled:opacity-30 disabled:hover:bg-transparent"
+        className="p-2.5 text-rose-600 hover:bg-rose-50 disabled:opacity-30 disabled:hover:bg-transparent rounded-lg"
         aria-label="Remove color"
       >
-        <Trash2 size={16} />
+        <Trash2 size={18} />
       </button>
     </div>
 
@@ -579,13 +609,13 @@ const ColorEditor = ({
 );
 
 const SectionTitle = ({ title }) => (
-  <h4 className="text-xs font-bold text-[#8c7d73] uppercase tracking-wider">
+  <h4 className="text-sm font-bold text-[#8c7d73] uppercase tracking-wider">
     {title}
   </h4>
 );
 
 const SmallLabel = ({ children }) => (
-  <label className="block text-xs font-semibold text-[#8c7d73] uppercase tracking-wider mb-2">
+  <label className="block text-sm font-semibold text-[#8c7d73] uppercase tracking-wider mb-2">
     {children}
   </label>
 );
@@ -596,7 +626,7 @@ const Input = ({ label, required = true, ...props }) => (
     <input
       required={required}
       {...props}
-      className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+      className="w-full px-4 py-3 bg-white border border-[#e5ddd5] text-base focus:ring-1 focus:ring-[#c2b2a6] outline-none"
     />
   </div>
 );
@@ -608,17 +638,17 @@ const Textarea = ({ label, required = true, ...props }) => (
       required={required}
       rows={3}
       {...props}
-      className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none resize-none"
+      className="w-full px-4 py-3 bg-white border border-[#e5ddd5] text-base focus:ring-1 focus:ring-[#c2b2a6] outline-none resize-none"
     />
   </div>
 );
 
 const Checkbox = ({ label, ...props }) => (
-  <label className="inline-flex items-center gap-2 text-sm text-[#3b302a]">
+  <label className="inline-flex items-center gap-3 text-base text-[#3b302a]">
     <input
       type="checkbox"
       {...props}
-      className="h-4 w-4 accent-[#3b302a]"
+      className="h-5 w-5 accent-[#3b302a]"
     />
     {label}
   </label>

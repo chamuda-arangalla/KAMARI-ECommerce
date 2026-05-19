@@ -5,23 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/CartContext";
 import ConfirmDialog from "../common/ConfirmDialog";
 import { logout } from "../../services/authApi";
+import { getCollections } from "../../services/collectionApi";
 import "../../styles/Header.css";
-
-const COLLECTION_ITEMS = [
-  { name: "Flow Set",   sub: "Light & effortless",  img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300&q=80" },
-  { name: "Ease Set",   sub: "Relaxed & refined",   img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300&q=80" },
-  { name: "Bold Set",   sub: "Confident & sleek",   img: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=300&q=80" },
-  { name: "Breeze Set", sub: "Soft & airy",         img: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&q=80" },
-  { name: "Luxe Set",   sub: "Premium & polished",  img: "https://images.unsplash.com/photo-1551803091-e20673f15770?w=300&q=80" },
-  { name: "Dusk Set",   sub: "Evening elegance",    img: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=300&q=80" },
-  { name: "Dawn Set",   sub: "Morning comfort",     img: "https://images.unsplash.com/photo-1616627988047-1f1a28aa25a9?w=300&q=80" },
-  { name: "Muse Set",   sub: "Artistic & free",     img: "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?w=300&q=80" },
-  { name: "Grace Set",  sub: "Timeless & tailored", img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300&q=80" },
-  { name: "Lush Set",   sub: "Rich & vibrant",      img: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=300&q=80" },
-];
 
 const Header = () => {
   const { totalItems, setIsDrawerOpen } = useCart();
+  const [collections, setCollections] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -34,6 +23,12 @@ const Header = () => {
   const closeTimer = useRef(null);
   const accountRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getCollections()
+      .then((res) => setCollections(res.data || []))
+      .catch(() => setCollections([]));
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -227,9 +222,9 @@ const Header = () => {
 
                 {/* All 10 categories in 2 columns */}
                 <div className="collections-dropdown-links">
-                  {COLLECTION_ITEMS.map((col) => (
+                  {collections.map((col) => (
                     <button
-                      key={col.name}
+                      key={col._id}
                       className="collections-dropdown-link"
                       onClick={() => handleCollectionClick(col.name)}
                     >
@@ -260,23 +255,23 @@ const Header = () => {
                 </div>
               </div>
 
-              {/* Right — 4 featured image cards */}
+              {/* Right — featured image cards */}
               <div className="collections-dropdown-right">
-                {COLLECTION_ITEMS.slice(0, 4).map((col) => (
+                {collections.map((col) => (
                   <div
-                    key={col.name}
+                    key={col._id}
                     className="collections-dropdown-card"
                     onClick={() => handleCollectionClick(col.name)}
                   >
                     <div className="collections-dropdown-card-img-wrap">
                       <img
-                        src={col.img}
+                        src={col.image?.url}
                         alt={col.name}
                         className="collections-dropdown-card-img"
                       />
                     </div>
                     <p className="collections-dropdown-card-name">{col.name}</p>
-                    <p className="collections-dropdown-card-sub">{col.sub}</p>
+                    <p className="collections-dropdown-card-sub">{col.subtitle}</p>
                   </div>
                 ))}
               </div>

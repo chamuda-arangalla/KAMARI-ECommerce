@@ -55,6 +55,8 @@ export const mapBackendProductToCollectionProduct = (product) => {
     product.colors?.map((color) => ({
       name: color.colorName,
       hex: color.colorCode || "#d7ccc3",
+      img: color.images?.[0]?.url || null,
+      img2: color.images?.[1]?.url || color.images?.[0]?.url || null,
     })) || [];
   const totalStock = Object.values(getProductStock(product)).reduce(
     (sum, count) => sum + count,

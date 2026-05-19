@@ -347,12 +347,12 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
       <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-[#3b302a]/25 backdrop-blur-sm" onClick={onClose} />
         <div className="relative bg-white w-full max-w-6xl max-h-[92vh] overflow-y-auto border border-[#e5ddd5] shadow-xl rounded-3xl">
-        <div className="sticky top-0 z-10 bg-[#fcfaf7] border-b border-[#e5ddd5] px-6 py-4 flex items-center justify-between rounded-t-3xl">
+        <div className="sticky top-0 z-10 bg-[#fcfaf7] border-b border-[#e5ddd5] px-8 py-5 flex items-center justify-between rounded-t-3xl">
           <div>
-            <h3 className="text-xl font-semibold text-[#3b302a]">
+            <h3 className="text-2xl font-bold text-[#3b302a]">
               {product?.name || "Product View"}
             </h3>
-            <p className="text-sm text-[#a3948b]">{productId}</p>
+            <p className="text-base text-[#a3948b] mt-0.5">{productId}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -362,18 +362,18 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                   type="button"
                   onClick={() => setEditMode((value) => !value)}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#d8ccc2] bg-white text-sm text-[#5f5149] hover:bg-[#f8f5f2] hover:text-[#3b302a]"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#d8ccc2] bg-white text-base font-medium text-[#5f5149] hover:bg-[#f8f5f2] hover:text-[#3b302a]"
                 >
-                  <Edit2 size={16} />
+                  <Edit2 size={18} />
                   {editMode ? "Cancel Edit" : "Edit"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setDeleteOpen(true)}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-rose-100 bg-rose-50 text-rose-700 text-sm hover:bg-rose-100 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-rose-100 bg-rose-50 text-rose-700 text-base font-medium hover:bg-rose-100 disabled:opacity-60"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={18} />
                   Delete
                 </button>
               </>
@@ -381,22 +381,22 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-white text-[#6b5e55]"
+              className="p-2.5 rounded-xl hover:bg-white text-[#6b5e55]"
             >
-              <X size={22} />
+              <X size={24} />
             </button>
           </div>
         </div>
 
         {loading && (
-          <div className="p-10 flex items-center justify-center gap-2 text-[#6b5e55]">
-            <Loader2 size={18} className="animate-spin" />
+          <div className="p-12 flex items-center justify-center gap-3 text-base text-[#6b5e55]">
+            <Loader2 size={22} className="animate-spin" />
             Loading product...
           </div>
         )}
 
         {error && (
-          <div className="m-6 bg-rose-50 border border-rose-100 text-rose-700 px-4 py-3 text-sm">
+          <div className="m-6 bg-rose-50 border border-rose-100 text-rose-700 px-5 py-4 text-base rounded-xl">
             {error}
           </div>
         )}
@@ -436,16 +436,16 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
 
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-3">
-                <h4 className="text-xs font-bold text-[#a3948b] uppercase tracking-widest">
+                <h4 className="text-sm font-bold text-[#a3948b] uppercase tracking-widest">
                   Colors And Size Quantity
                 </h4>
                 {editMode && (
                   <button
                     type="button"
                     onClick={addColor}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#8d7667] text-white text-xs hover:bg-[#735f53] shadow-sm"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8d7667] text-white text-base font-medium hover:bg-[#735f53] shadow-sm"
                   >
-                    <Plus size={14} />
+                    <Plus size={18} />
                     Add Color
                   </button>
                 )}
@@ -620,14 +620,14 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             </div>
 
             {editMode && (
-              <div className="sticky bottom-0 bg-white border-t border-[#e5ddd5] px-1 py-4 flex justify-end">
+              <div className="sticky bottom-0 bg-white border-t border-[#e5ddd5] px-2 py-5 flex justify-end">
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#8d7667] text-white text-sm hover:bg-[#735f53] disabled:opacity-60 shadow-sm"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#8d7667] text-white text-base font-semibold hover:bg-[#735f53] disabled:opacity-60 shadow-sm"
                 >
-                  {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                   Save Changes
                 </button>
               </div>
@@ -730,57 +730,57 @@ const ProductSummary = ({ product, totalStock }) => (
 
 const Field = ({ label, type = "text", value, onChange }) => (
   <label className="block">
-    <span className="block text-xs text-[#a3948b] uppercase tracking-widest font-bold mb-1">
+    <span className="block text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-2">
       {label}
     </span>
     <input
       type={type}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-xl border border-[#e5ddd5] px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#c2b2a6]"
+      className="w-full rounded-xl border border-[#e5ddd5] px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6]"
     />
   </label>
 );
 
 const Area = ({ label, value, onChange }) => (
   <label className="block">
-    <span className="block text-xs text-[#a3948b] uppercase tracking-widest font-bold mb-1">
+    <span className="block text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-2">
       {label}
     </span>
     <textarea
       rows={3}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-xl border border-[#e5ddd5] px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#c2b2a6] resize-none"
+      className="w-full rounded-xl border border-[#e5ddd5] px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6] resize-none"
     />
   </label>
 );
 
 const CheckField = ({ label, checked, onChange }) => (
-  <label className="inline-flex items-center gap-2 text-sm text-[#3b302a]">
+  <label className="inline-flex items-center gap-3 text-base text-[#3b302a]">
     <input
       type="checkbox"
       checked={checked}
       onChange={(event) => onChange(event.target.checked)}
-      className="h-4 w-4 accent-[#3b302a]"
+      className="h-5 w-5 accent-[#3b302a]"
     />
     {label}
   </label>
 );
 
 const DetailTile = ({ label, value }) => (
-  <div className="bg-[#fcfaf7] border border-[#e5ddd5] px-4 py-3">
-    <p className="text-xs text-[#a3948b] uppercase font-bold">{label}</p>
-    <p className="text-lg font-semibold text-[#3b302a]">{value}</p>
+  <div className="bg-[#fcfaf7] border border-[#e5ddd5] px-4 py-4 rounded-xl">
+    <p className="text-sm text-[#a3948b] uppercase font-bold mb-1">{label}</p>
+    <p className="text-xl font-bold text-[#3b302a]">{value}</p>
   </div>
 );
 
 const DetailBlock = ({ label, value }) => (
   <div>
-    <p className="text-xs text-[#a3948b] uppercase tracking-widest font-bold mb-1">
+    <p className="text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-1">
       {label}
     </p>
-    <p className="text-sm text-[#4f443d] leading-6">{value || "N/A"}</p>
+    <p className="text-base text-[#4f443d] leading-relaxed">{value || "N/A"}</p>
   </div>
 );
 

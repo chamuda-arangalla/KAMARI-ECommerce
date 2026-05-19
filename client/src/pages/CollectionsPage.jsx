@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Grid2x2, Grid3x3 } from "lucide-react";
 import { SIZES, COLORS } from "../data/collectionsData";
@@ -15,7 +15,7 @@ export default function CollectionsPage() {
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(12000);
+  const [maxPrice, setMaxPrice] = useState(100000);
   const [sortBy, setSortBy] = useState("featured");
   const [cols, setCols] = useState(3);
   const [page, setPage] = useState(1);
@@ -47,6 +47,16 @@ export default function CollectionsPage() {
   }, []);
 
   const products = apiProducts;
+
+  const maxProductPrice = useMemo(() => {
+    if (!products.length) return 100000;
+    return Math.ceil(Math.max(...products.map((p) => p.price || 0)) / 1000) * 1000;
+  }, [products]);
+
+  useEffect(() => {
+    if (products.length) setMaxPrice(maxProductPrice);
+  }, [maxProductPrice]);
+
   const categoryOptions = useMemo(
     () => ["All", ...new Set(products.map((product) => product.category).filter(Boolean))],
     [products],
@@ -87,7 +97,7 @@ export default function CollectionsPage() {
     setSelectedSizes([]);
     setSelectedColors([]);
     setInStockOnly(false);
-    setMaxPrice(12000);
+    setMaxPrice(maxProductPrice);
     setSortBy("featured");
     setPage(1);
   };
@@ -171,15 +181,15 @@ export default function CollectionsPage() {
               <input
                 type="range"
                 className="price-range-slider"
-                min={2000}
-                max={12000}
-                step={500}
-                value={maxPrice}
+                min={0}
+                max={maxProductPrice}
+                step={1000}
+                value={Math.min(maxPrice, maxProductPrice)}
                 onChange={(e) => { setMaxPrice(Number(e.target.value)); setPage(1); }}
               />
               <div className="price-range-values">
-                <span>LKR 2,000</span>
-                <span>Up to LKR {maxPrice.toLocaleString()}</span>
+                <span>LKR 0</span>
+                <span>Up to LKR {Math.min(maxPrice, maxProductPrice).toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -329,18 +339,33 @@ export default function CollectionsPage() {
 }
 
 function ProductCard({ product, onOpen }) {
+  const [hoveredColorIndex, setHoveredColorIndex] = useState(null);
   const installment = Math.round(product.price / 3).toLocaleString();
+
+  const activeColor = hoveredColorIndex !== null ? product.colors[hoveredColorIndex] : null;
+  const frontImg = activeColor?.img || product.img;
+  const backImg = activeColor?.img2 || product.img2;
+
+  const handleColorEnter = useCallback((e, i) => {
+    e.stopPropagation();
+    setHoveredColorIndex(i);
+  }, []);
+
+  const handleColorLeave = useCallback((e) => {
+    e.stopPropagation();
+    setHoveredColorIndex(null);
+  }, []);
 
   return (
     <div className="product-card" onClick={onOpen}>
       <div className="product-card-img-wrap">
 
         {/* Images */}
-        <img src={product.img} alt={product.name} className="product-card-img front" />
-        <img src={product.img2} alt={product.name} className="product-card-img back" />
+        <img src={frontImg} alt={product.name} className="product-card-img front" />
+        <img src={backImg} alt={product.name} className="product-card-img back" />
 
         {/* Badge */}
-        {product.badge && !product.inStock === false && (
+        {product.badge && product.inStock && (
           <span className={`product-badge ${product.badge === "BEST SELLER" ? "best-seller" : "new"}`}>
             {product.badge}
           </span>
@@ -355,21 +380,28 @@ function ProductCard({ product, onOpen }) {
 
         {/* Quick add */}
         {product.inStock && (
-          <button className="product-quick-add">Add to Bag</button>
+          <button className="product-quick-add" onClick={(e) => { e.stopPropagation(); onOpen(); }}>
+            View Product
+          </button>
         )}
       </div>
 
       {/* Info */}
       <div className="product-card-info">
+        {product.category && (
+          <p className="product-card-category">{product.category}</p>
+        )}
         <p className="product-card-name">{product.name}</p>
 
         <div className="product-card-colors">
-          {product.colors.slice(0, 4).map((c) => (
+          {product.colors.slice(0, 4).map((c, i) => (
             <span
               key={c.name}
-              className="product-color-dot"
+              className={`product-color-dot ${hoveredColorIndex === i ? "active" : ""}`}
               style={{ backgroundColor: c.hex }}
               title={c.name}
+              onMouseEnter={(e) => handleColorEnter(e, i)}
+              onMouseLeave={handleColorLeave}
             />
           ))}
           {product.colors.length > 4 && (
