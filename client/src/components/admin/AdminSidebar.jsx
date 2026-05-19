@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
   Package,
   Users,
@@ -44,7 +44,9 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       `}>
         <div className="flex flex-col h-full p-6">
           <div className="flex items-center justify-between mb-10">
-            <h1 className="text-3xl font-bold tracking-wider text-[#3b302a]">KAMARI</h1>
+            <Link to="/" className="text-3xl font-bold tracking-wider text-[#3b302a] hover:opacity-70 transition-opacity">
+              KAMARI
+            </Link>
             <button className="lg:hidden" onClick={() => setIsOpen(false)}>
               <X size={26} />
             </button>

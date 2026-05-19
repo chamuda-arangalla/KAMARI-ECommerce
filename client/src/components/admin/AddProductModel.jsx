@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ImagePlus,
   Loader2,
@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { createProduct } from "../../services/productApi";
+import { getCollectionsAdmin } from "../../services/collectionApi";
 
 const initialForm = {
   name: "",
@@ -42,6 +43,15 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
   const [sizeChartFile, setSizeChartFile] = useState(null);
   const [colors, setColors] = useState([createColor()]);
   const [loading, setLoading] = useState(false);
+  const [collections, setCollections] = useState([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const token = localStorage.getItem("adminToken");
+    getCollectionsAdmin(token)
+      .then((res) => setCollections(res.data || []))
+      .catch(() => setCollections([]));
+  }, [isOpen]);
 
   const imageIndexById = useMemo(
     () => new Map(images.map((image, index) => [image.id, index])),
@@ -58,6 +68,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
     setSizeChartFile(null);
     setColors([createColor()]);
   };
+
 
   const handleClose = () => {
     if (loading) return;
@@ -296,9 +307,30 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
                 <SectionTitle title="Product Details" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input label="Product Name" name="name" value={form.name} onChange={handleChange} />
-                  <Input label="Collection" name="collection" value={form.collection} onChange={handleChange} />
-                  <Input label="Set Name" name="setName" value={form.setName} onChange={handleChange} />
-                  <Input label="Price" name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} />
+
+                  <div>
+                    <SmallLabel>Collection</SmallLabel>
+                    <select
+                      required
+                      value={form.setName}
+                      onChange={(e) => {
+                        const selected = collections.find((c) => c.name === e.target.value);
+                        setForm((prev) => ({
+                          ...prev,
+                          setName: selected ? selected.name : "",
+                          collection: selected ? selected.name : "",
+                        }));
+                      }}
+                      className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+                    >
+                      <option value="">Select a collection</option>
+                      {collections.map((col) => (
+                        <option key={col._id} value={col.name}>{col.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <Input label="Price (LKR)" name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} />
                 </div>
 
                 <Textarea label="Description" name="description" value={form.description} onChange={handleChange} required={false} />

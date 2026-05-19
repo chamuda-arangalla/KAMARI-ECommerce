@@ -15,10 +15,14 @@ const fileFilter = (req, file, cb) => {
 export const uploadProductImages = multer({
   storage,
   fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
+  limits: { fileSize: 5 * 1024 * 1024 },
 }).fields([
   { name: "images", maxCount: 30 },
   { name: "sizeChartImage", maxCount: 1 },
 ]);
+
+export const uploadCollectionImage = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("image");
