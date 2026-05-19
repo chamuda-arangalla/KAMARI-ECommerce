@@ -8,6 +8,7 @@ import {
   Settings, 
   ShoppingBag,
   MapPin,
+  Image,
   Menu,
   X
 } from 'lucide-react';
@@ -59,6 +60,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
             <SidebarLink to="/admin/customers" icon={Users} label="Customers" />
             <SidebarLink to="/admin/analytics" icon={BarChart3} label="Analytics" />
             <SidebarLink to="/admin/products" icon={Settings} label="Product Management" />
+            <SidebarLink to="/admin/home-images" icon={Image} label="Home Images" />
           </nav>
 
           <div className="pt-6 border-t border-[#e5ddd5]">
