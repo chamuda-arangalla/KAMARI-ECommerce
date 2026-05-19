@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { categories, moodImages } from "../data/homeData";
+import { getHomeContent } from "../services/homeContentApi";
 import { getProducts } from "../services/productApi";
 
 const fadeUp = {
@@ -9,9 +10,42 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
+const softReveal = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const imageReveal = {
+  hidden: { opacity: 0, scale: 1.04 },
+  visible: { opacity: 1, scale: 1 },
+};
+
+const staggerGroup = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [homeContent, setHomeContent] = useState({
+    heroImage: {
+      url: "https://images.unsplash.com/photo-1602810317536-5d5e8a552d95?auto=format&fit=crop&w=1800&q=90",
+    },
+    collectionImage: { url: categories[0]?.image },
+    brandStoryImage: {
+      url: "https://images.unsplash.com/photo-1600421684555-707fae8df4fd?auto=format&fit=crop&w=1000&q=85",
+    },
+    categories: categories.map((item) => ({
+      ...item,
+      image: { url: item.image },
+    })),
+    moodImages: moodImages.map((url) => ({ url })),
+  });
 
   useEffect(() => {
     const loadFeatured = async () => {
@@ -28,12 +62,28 @@ const Home = () => {
     loadFeatured();
   }, []);
 
+  useEffect(() => {
+    const loadHomeContent = async () => {
+      try {
+        const response = await getHomeContent();
+        setHomeContent((prev) => normalizeHomeContent(response.data, prev));
+      } catch {
+        // Keep local fallback images if the CMS endpoint is unavailable.
+      }
+    };
+
+    loadHomeContent();
+  }, []);
+
   return (
     <main className="bg-[#F8F5F2] text-[#3B302A]">
       {/* Hero */}
       <section className="relative h-screen min-h-[620px] overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1602810317536-5d5e8a552d95?auto=format&fit=crop&w=1800&q=90"
+        <motion.img
+          initial={{ scale: 1.08, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.4, ease: "easeOut" }}
+          src={homeContent.heroImage.url}
           alt="KAMARI hero"
           className="h-full w-full object-cover"
         />
@@ -52,16 +102,26 @@ const Home = () => {
           <p className="mb-7 text-sm tracking-[0.12em]">
             Glow even in the dark.
           </p>
-          <button className="rounded-full bg-[#E8DED6] px-8 py-3 text-[11px] uppercase tracking-[0.18em] transition hover:bg-[#d8c9bd]">
-            Shop the Collection
-          </button>
+          <motion.button
+            whileHover={{ y: -2, scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate("/shop")}
+            className="rounded-full bg-[#E8DED6] px-8 py-3 text-[11px] uppercase tracking-[0.18em] transition hover:bg-[#d8c9bd]"
+          >
+            Shop Now
+          </motion.button>
         </motion.div>
       </section>
 
       {/* New Collection */}
       <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 py-10 md:grid-cols-2">
-        <img
-          src="https://www.freepik.com/free-photos-vectors/short-night-dress"
+        <motion.img
+          variants={imageReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          src={homeContent.collectionImage.url}
           alt="New collection"
           className="h-[420px] w-full object-cover"
         />
@@ -83,24 +143,47 @@ const Home = () => {
             <p className="mb-6 max-w-sm text-sm leading-7 text-[#6E625C]">
               Softness that lingers beyond the night.
             </p>
-            <button className="rounded-full bg-[#E8DED6] px-7 py-3 text-[11px] uppercase tracking-[0.16em] transition hover:bg-[#d8c9bd]">
+            <motion.button
+              whileHover={{ y: -2, scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="rounded-full bg-[#E8DED6] px-7 py-3 text-[11px] uppercase tracking-[0.16em] transition hover:bg-[#d8c9bd]"
+            >
               Explore Collection
-            </button>
+            </motion.button>
           </motion.div>
         </div>
       </section>
 
       {/* Shop by Set */}
-      <section className="mx-auto max-w-7xl px-6 py-8">
+      <motion.section
+        variants={softReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.18 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="mx-auto max-w-7xl px-6 py-8"
+      >
         <h3 className="mb-7 text-center text-[12px] uppercase tracking-[0.24em]">
           Shop by Set
         </h3>
 
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
-          {categories.map((item) => (
-            <div key={item.id} className="group relative h-[260px] overflow-hidden">
+        <motion.div
+          variants={staggerGroup}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-2 gap-5 md:grid-cols-4"
+        >
+          {homeContent.categories.map((item) => (
+            <motion.div
+              key={item.id}
+              variants={softReveal}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              className="group relative h-[260px] overflow-hidden"
+            >
               <img
-                src={item.image}
+                src={item.image.url}
                 alt={item.name}
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
@@ -108,13 +191,20 @@ const Home = () => {
               <h4 className="absolute bottom-6 left-0 w-full text-center text-sm font-light tracking-[0.22em] text-white">
                 {item.name}
               </h4>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* Best Sellers */}
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <motion.section
+        variants={softReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.18 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="mx-auto max-w-7xl px-6 py-12"
+      >
         <div className="mb-7 flex items-center justify-between">
           <h3 className="text-[12px] uppercase tracking-[0.24em]">
             Best Sellers
@@ -124,15 +214,24 @@ const Home = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+        <motion.div
+          variants={staggerGroup}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.18 }}
+          className="grid grid-cols-2 gap-6 md:grid-cols-4"
+        >
           {featuredProducts.map((product) => {
             const image =
               product.colors?.flatMap((color) => color.images || [])?.[0]?.url ||
               "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
 
             return (
-            <div
+            <motion.div
               key={product._id}
+              variants={softReveal}
+              whileHover={{ y: -6 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
               className="group cursor-pointer"
               onClick={() => navigate(`/products/${product._id}`)}
             >
@@ -154,15 +253,22 @@ const Home = () => {
               <p className="text-xs text-[#7D746C]">
                 LKR {Number(product.price || 0).toLocaleString()}
               </p>
-            </div>
+            </motion.div>
           );
           })}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* Brand Story */}
       <section className="mx-auto grid max-w-7xl grid-cols-1 px-6 py-10 md:grid-cols-2">
-        <div className="flex min-h-[360px] items-center justify-center bg-[#EFE7DF] px-8 text-center">
+        <motion.div
+          variants={softReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="flex min-h-[360px] items-center justify-center bg-[#EFE7DF] px-8 text-center"
+        >
           <div>
             <h3 className="mb-5 text-3xl font-light italic">
               More than just sleepwear, <br /> it’s a feeling.
@@ -171,39 +277,71 @@ const Home = () => {
               At Kamari, we create pieces that embrace your softest moments and
               empower your everyday calm. Made for comfort, designed for you.
             </p>
-            <button className="rounded-full border border-[#3B302A]/30 px-7 py-3 text-[11px] uppercase tracking-[0.16em] transition hover:bg-[#3B302A] hover:text-[#F8F5F2]">
+            <motion.button
+              whileHover={{ y: -2, scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="rounded-full border border-[#3B302A]/30 px-7 py-3 text-[11px] uppercase tracking-[0.16em] transition hover:bg-[#3B302A] hover:text-[#F8F5F2]"
+            >
               Discover KAMARI
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
-        <img
-          src="https://images.unsplash.com/photo-1600421684555-707fae8df4fd?auto=format&fit=crop&w=1000&q=85"
+        <motion.img
+          variants={imageReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          src={homeContent.brandStoryImage.url}
           alt="Brand story"
           className="h-[360px] w-full object-cover"
         />
       </section>
 
       {/* Mood Strip */}
-      <section className="mx-auto max-w-7xl px-6 py-8">
+      <motion.section
+        variants={softReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="mx-auto max-w-7xl px-6 py-8"
+      >
         <h3 className="mb-5 text-center text-[11px] uppercase tracking-[0.22em]">
           @KAMARISLEEPWEAR
         </h3>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-          {moodImages.map((img, index) => (
-            <img
+        <motion.div
+          variants={staggerGroup}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-2 gap-3 md:grid-cols-5"
+        >
+          {homeContent.moodImages.map((img, index) => (
+            <motion.img
               key={index}
-              src={img}
+              variants={imageReveal}
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              src={img.url}
               alt="Kamari mood"
               className="h-[180px] w-full object-cover"
             />
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* Newsletter */}
-      <section className="mx-auto max-w-7xl px-6 py-8">
+      <motion.section
+        variants={softReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="mx-auto max-w-7xl px-6 py-8"
+      >
         <div className="flex flex-col items-center justify-between gap-5 bg-[#E8DED6] px-8 py-8 md:flex-row">
           <div>
             <h3 className="mb-2 text-lg font-light">Stay close to KAMARI</h3>
@@ -218,12 +356,16 @@ const Home = () => {
               placeholder="Enter your email"
               className="w-full bg-[#F8F5F2] px-5 py-3 text-sm outline-none"
             />
-            <button className="bg-[#3B302A] px-8 py-3 text-xs uppercase tracking-[0.16em] text-[#F8F5F2]">
+            <motion.button
+              whileHover={{ backgroundColor: "#2a221d" }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-[#3B302A] px-8 py-3 text-xs uppercase tracking-[0.16em] text-[#F8F5F2]"
+            >
               Join
-            </button>
+            </motion.button>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <footer className="mx-auto max-w-7xl px-6 py-12">
@@ -257,3 +399,22 @@ const FooterColumn = ({ title, items }) => {
 };
 
 export default Home;
+
+const normalizeHomeContent = (data = {}, fallback) => ({
+  ...fallback,
+  ...data,
+  heroImage: data.heroImage || fallback.heroImage,
+  collectionImage: data.collectionImage || fallback.collectionImage,
+  brandStoryImage: data.brandStoryImage || fallback.brandStoryImage,
+  categories: (data.categories?.length ? data.categories : fallback.categories).map((item, index) => ({
+    id: item.id || index + 1,
+    name: item.name || fallback.categories[index]?.name || `Category ${index + 1}`,
+    image:
+      typeof item.image === "string"
+        ? { url: item.image }
+        : item.image || fallback.categories[index]?.image,
+  })),
+  moodImages: (data.moodImages?.length ? data.moodImages : fallback.moodImages).map((item, index) =>
+    typeof item === "string" ? { url: item } : item || fallback.moodImages[index],
+  ),
+});

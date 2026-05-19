@@ -21,6 +21,7 @@ import ProductManagement from "./pages/admin/ProductManagement";
 import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
+import HomeImagesPage from "./pages/admin/HomeImagesPage";
 
 const AdminGuard = ({ children }) => {
   const token = localStorage.getItem("adminToken");
@@ -52,6 +53,7 @@ function App() {
             <Route path="products" element={<ProductManagement />} />
             <Route path="products/:id" element={<ProductDetailsPage />} />
             <Route path="collections" element={<CollectionsManagement />} />
+            <Route path="home-images" element={<HomeImagesPage />} />
           </Route>
         </Routes>
       </CartProvider>
