@@ -1,420 +1,473 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { categories, moodImages } from "../data/homeData";
-import { getHomeContent } from "../services/homeContentApi";
+import { useNavigate, Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { getCollections } from "../services/collectionApi";
 import { getProducts } from "../services/productApi";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 35 },
-  visible: { opacity: 1, y: 0 },
-};
+const FALLBACK_IMG = "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
+const HERO_IMG = "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1800&q=90";
+const BRAND_IMG = "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=1000&q=85";
 
-const softReveal = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
+const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+const fadeIn  = { hidden: { opacity: 0 },        visible: { opacity: 1 } };
+const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
-const imageReveal = {
-  hidden: { opacity: 0, scale: 1.04 },
-  visible: { opacity: 1, scale: 1 },
-};
+const getProductImg = (product) =>
+  product?.colors?.flatMap((c) => c.images || [])?.[0]?.url || FALLBACK_IMG;
 
-const staggerGroup = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.08,
-    },
-  },
-};
-
-const Home = () => {
+export default function Home() {
   const navigate = useNavigate();
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [homeContent, setHomeContent] = useState({
-    heroImage: {
-      url: "https://images.unsplash.com/photo-1602810317536-5d5e8a552d95?auto=format&fit=crop&w=1800&q=90",
-    },
-    collectionImage: { url: categories[0]?.image },
-    brandStoryImage: {
-      url: "https://images.unsplash.com/photo-1600421684555-707fae8df4fd?auto=format&fit=crop&w=1000&q=85",
-    },
-    categories: categories.map((item) => ({
-      ...item,
-      image: { url: item.image },
-    })),
-    moodImages: moodImages.map((url) => ({ url })),
-  });
+
+  const [collections, setCollections]   = useState([]);
+  const [newArrivals, setNewArrivals]   = useState([]);
+  const [bestSellers, setBestSellers]   = useState([]);
 
   useEffect(() => {
-    const loadFeatured = async () => {
-      try {
-        const response = await getProducts();
-        const products = response.data || [];
-        const featured = products.filter((product) => product.isFeatured);
-        setFeaturedProducts((featured.length ? featured : products).slice(0, 4));
-      } catch {
-        setFeaturedProducts([]);
-      }
-    };
+    // Load collections from DB
+    getCollections()
+      .then((res) => setCollections(res.data || []))
+      .catch(() => setCollections([]));
 
-    loadFeatured();
-  }, []);
-
-  useEffect(() => {
-    const loadHomeContent = async () => {
-      try {
-        const response = await getHomeContent();
-        setHomeContent((prev) => normalizeHomeContent(response.data, prev));
-      } catch {
-        // Keep local fallback images if the CMS endpoint is unavailable.
-      }
-    };
-
-    loadHomeContent();
+    // Load products from DB
+    getProducts()
+      .then((res) => {
+        const products = res.data || [];
+        setNewArrivals(products.filter((p) => p.isNewArrival && !p.isSoldOut).slice(0, 4));
+        const featured = products.filter((p) => p.isFeatured && !p.isSoldOut);
+        setBestSellers((featured.length ? featured : products.filter((p) => !p.isSoldOut)).slice(0, 4));
+      })
+      .catch(() => {});
   }, []);
 
   return (
-    <main className="bg-[#F8F5F2] text-[#3B302A]">
-      {/* Hero */}
-      <section className="relative h-screen min-h-[620px] overflow-hidden">
+    <main className="bg-[#F8F5F2] text-[#3B302A]" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
+
+      {/* ── Hero ─────────────────────────────────────── */}
+      <section className="relative h-screen min-h-[600px] overflow-hidden">
         <motion.img
           initial={{ scale: 1.08, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.4, ease: "easeOut" }}
-          src={homeContent.heroImage.url}
-          alt="KAMARI hero"
-          className="h-full w-full object-cover"
+          src={HERO_IMG}
+          alt="KAMARI"
+          className="h-full w-full object-cover object-top"
         />
-        <div className="absolute inset-0 bg-[#3B302A]/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#3B302A]/60 via-[#3B302A]/20 to-transparent" />
 
         <motion.div
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          transition={{ duration: 0.8 }}
-          className="absolute left-[8%] top-1/2 -translate-y-1/2"
+          transition={{ duration: 0.9, delay: 0.3 }}
+          className="absolute left-[8%] top-1/2 -translate-y-1/2 max-w-lg"
         >
-          <h2 className="mb-4 text-5xl font-light tracking-[0.22em] md:text-7xl">
+          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#E8DED6]">New Season</p>
+          <h1 className="mb-5 text-6xl font-light tracking-[0.18em] text-white md:text-7xl leading-tight">
             KAMARI
-          </h2>
-          <p className="mb-7 text-sm tracking-[0.12em]">
-            Glow even in the dark.
+          </h1>
+          <p className="mb-8 text-base tracking-[0.08em] text-[#E8DED6] leading-relaxed">
+            Contemporary women's fashion for everyday elegance.
           </p>
-          <motion.button
-            whileHover={{ y: -2, scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigate("/shop")}
-            className="rounded-full bg-[#E8DED6] px-8 py-3 text-[11px] uppercase tracking-[0.18em] transition hover:bg-[#d8c9bd]"
-          >
-            Shop Now
-          </motion.button>
+          <div className="flex gap-4">
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate("/shop")}
+              className="rounded-full bg-white px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#F8F5F2]"
+            >
+              Shop Now
+            </motion.button>
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate("/collections")}
+              className="rounded-full border border-white/60 px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-white transition hover:border-white"
+            >
+              Collections
+            </motion.button>
+          </div>
         </motion.div>
       </section>
 
-      {/* New Collection */}
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 py-10 md:grid-cols-2">
-        <motion.img
-          variants={imageReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          src={homeContent.collectionImage.url}
-          alt="New collection"
-          className="h-[420px] w-full object-cover"
-        />
-
-        <div className="flex items-center justify-center bg-[#F8F5F2] px-8">
+      {/* ── Shop by Collection ───────────────────────── */}
+      {collections.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 py-16">
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            className="mb-10 flex items-end justify-between"
           >
-            <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#7D746C]">
-              New Collection
-            </p>
-            <h3 className="mb-4 text-4xl font-light leading-tight">
-              Introducing <br /> The Flow Collection
-            </h3>
-            <p className="mb-6 max-w-sm text-sm leading-7 text-[#6E625C]">
-              Softness that lingers beyond the night.
-            </p>
-            <motion.button
-              whileHover={{ y: -2, scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="rounded-full bg-[#E8DED6] px-7 py-3 text-[11px] uppercase tracking-[0.16em] transition hover:bg-[#d8c9bd]"
+            <div>
+              <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#7D746C]">Browse</p>
+              <h2 className="text-3xl font-light tracking-wide">Shop by Collection</h2>
+            </div>
+            <Link
+              to="/collections"
+              className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[#7D746C] transition hover:text-[#3B302A]"
             >
-              Explore Collection
-            </motion.button>
+              View All <ArrowRight size={14} />
+            </Link>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Shop by Set */}
-      <motion.section
-        variants={softReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.18 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="mx-auto max-w-7xl px-6 py-8"
-      >
-        <h3 className="mb-7 text-center text-[12px] uppercase tracking-[0.24em]">
-          Shop by Set
-        </h3>
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
+          >
+            {collections.map((col) => (
+              <motion.div
+                key={col._id}
+                variants={fadeUp}
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.3 }}
+                className="group cursor-pointer"
+                onClick={() => navigate(`/collections?category=${encodeURIComponent(col.name)}`)}
+              >
+                <div className="relative mb-3 overflow-hidden rounded-xl bg-[#E8DED6]" style={{ aspectRatio: "3/4" }}>
+                  {col.image?.url ? (
+                    <img
+                      src={col.image.url}
+                      alt={col.name}
+                      className="h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-[#E8DED6]" />
+                  )}
+                  <div className="absolute inset-0 bg-[#3B302A]/20 transition duration-300 group-hover:bg-[#3B302A]/10" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3B302A]/70 p-4">
+                    <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-white">
+                      {col.name}
+                    </p>
+                    {col.subtitle && (
+                      <p className="mt-1 text-center text-[10px] text-white/70">{col.subtitle}</p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+      )}
 
-        <motion.div
-          variants={staggerGroup}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-2 gap-5 md:grid-cols-4"
-        >
-          {homeContent.categories.map((item) => (
+      {/* ── New Arrivals ─────────────────────────────── */}
+      {newArrivals.length > 0 && (
+        <section className="bg-white py-16">
+          <div className="mx-auto max-w-7xl px-6">
             <motion.div
-              key={item.id}
-              variants={softReveal}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="group relative h-[260px] overflow-hidden"
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mb-10 flex items-end justify-between"
             >
-              <img
-                src={item.image.url}
-                alt={item.name}
-                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-[#3B302A]/25" />
-              <h4 className="absolute bottom-6 left-0 w-full text-center text-sm font-light tracking-[0.22em] text-white">
-                {item.name}
-              </h4>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.section>
-
-      {/* Best Sellers */}
-      <motion.section
-        variants={softReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.18 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="mx-auto max-w-7xl px-6 py-12"
-      >
-        <div className="mb-7 flex items-center justify-between">
-          <h3 className="text-[12px] uppercase tracking-[0.24em]">
-            Best Sellers
-          </h3>
-          <button className="text-[11px] uppercase tracking-[0.18em]">
-            View All
-          </button>
-        </div>
-
-        <motion.div
-          variants={staggerGroup}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.18 }}
-          className="grid grid-cols-2 gap-6 md:grid-cols-4"
-        >
-          {featuredProducts.map((product) => {
-            const image =
-              product.colors?.flatMap((color) => color.images || [])?.[0]?.url ||
-              "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
-
-            return (
-            <motion.div
-              key={product._id}
-              variants={softReveal}
-              whileHover={{ y: -6 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="group cursor-pointer"
-              onClick={() => navigate(`/products/${product._id}`)}
-            >
-              <div className="relative mb-4 h-[330px] overflow-hidden bg-[#E8DED6]">
-                {product.isFeatured && (
-                  <span className="absolute left-3 top-3 z-10 bg-[#F8F5F2] px-3 py-1 text-[9px] uppercase tracking-[0.16em]">
-                    Best Seller
-                  </span>
-                )}
-
-                <img
-                  src={image}
-                  alt={product.name}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#7D746C]">Just In</p>
+                <h2 className="text-3xl font-light tracking-wide">New Arrivals</h2>
               </div>
-
-              <h4 className="mb-1 text-sm">{product.name}</h4>
-              <p className="text-xs text-[#7D746C]">
-                LKR {Number(product.price || 0).toLocaleString()}
-              </p>
+              <Link
+                to="/collections?sort=newest"
+                className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[#7D746C] transition hover:text-[#3B302A]"
+              >
+                View All <ArrowRight size={14} />
+              </Link>
             </motion.div>
-          );
-          })}
-        </motion.div>
-      </motion.section>
 
-      {/* Brand Story */}
-      <section className="mx-auto grid max-w-7xl grid-cols-1 px-6 py-10 md:grid-cols-2">
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              className="grid grid-cols-2 gap-6 md:grid-cols-4"
+            >
+              {newArrivals.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  badge="New"
+                  onClick={() => navigate(`/products/${product._id}`)}
+                />
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Feature Banner ───────────────────────────── */}
+      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-0 px-6 py-16 md:grid-cols-2 md:gap-8">
         <motion.div
-          variants={softReveal}
+          variants={fadeIn}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="flex min-h-[360px] items-center justify-center bg-[#EFE7DF] px-8 text-center"
+          transition={{ duration: 0.9 }}
+          className="relative overflow-hidden rounded-xl"
+          style={{ height: "420px" }}
+        >
+          <img
+            src={BRAND_IMG}
+            alt="KAMARI style"
+            className="h-full w-full object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#3B302A]/60 via-transparent" />
+          <div className="absolute bottom-8 left-8">
+            <p className="mb-1 text-xs uppercase tracking-[0.2em] text-white/70">Collections</p>
+            <h3 className="text-2xl font-light text-white">Smart Casuals</h3>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.7 }}
+          className="flex items-center justify-center rounded-xl bg-[#EFE7DF] px-10 py-12 text-center"
         >
           <div>
-            <h3 className="mb-5 text-3xl font-light italic">
-              More than just sleepwear, <br /> it’s a feeling.
+            <p className="mb-4 text-xs uppercase tracking-[0.24em] text-[#7D746C]">About KAMARI</p>
+            <h3 className="mb-5 text-3xl font-light leading-snug">
+              Everyday style, <br />effortlessly Sri Lankan.
             </h3>
-            <p className="mx-auto mb-7 max-w-md text-sm leading-7 text-[#6E625C]">
-              At Kamari, we create pieces that embrace your softest moments and
-              empower your everyday calm. Made for comfort, designed for you.
+            <p className="mx-auto mb-8 max-w-sm text-sm leading-7 text-[#6E625C]">
+              We design modern women's clothing for the Sri Lankan lifestyle — comfortable, versatile and beautifully made for every occasion.
             </p>
             <motion.button
-              whileHover={{ y: -2, scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="rounded-full border border-[#3B302A]/30 px-7 py-3 text-[11px] uppercase tracking-[0.16em] transition hover:bg-[#3B302A] hover:text-[#F8F5F2]"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate("/collections")}
+              className="rounded-full border border-[#3B302A]/40 px-8 py-3 text-xs uppercase tracking-[0.16em] transition hover:bg-[#3B302A] hover:text-[#F8F5F2] hover:border-[#3B302A]"
             >
-              Discover KAMARI
+              Explore All Collections
             </motion.button>
           </div>
         </motion.div>
+      </section>
 
-        <motion.img
-          variants={imageReveal}
+      {/* ── Best Sellers ─────────────────────────────── */}
+      {bestSellers.length > 0 && (
+        <section className="bg-[#F8F5F2] py-16">
+          <div className="mx-auto max-w-7xl px-6">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mb-10 flex items-end justify-between"
+            >
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#7D746C]">Popular</p>
+                <h2 className="text-3xl font-light tracking-wide">Best Sellers</h2>
+              </div>
+              <Link
+                to="/shop"
+                className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[#7D746C] transition hover:text-[#3B302A]"
+              >
+                View All <ArrowRight size={14} />
+              </Link>
+            </motion.div>
+
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              className="grid grid-cols-2 gap-6 md:grid-cols-4"
+            >
+              {bestSellers.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  badge="Best Seller"
+                  onClick={() => navigate(`/products/${product._id}`)}
+                />
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Product Mood Grid ─────────────────────────── */}
+      <MoodGrid products={[...newArrivals, ...bestSellers]} navigate={navigate} />
+
+      {/* ── Newsletter ───────────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <motion.div
+          variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          src={homeContent.brandStoryImage.url}
-          alt="Brand story"
-          className="h-[360px] w-full object-cover"
-        />
-      </section>
-
-      {/* Mood Strip */}
-      <motion.section
-        variants={softReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="mx-auto max-w-7xl px-6 py-8"
-      >
-        <h3 className="mb-5 text-center text-[11px] uppercase tracking-[0.22em]">
-          @KAMARISLEEPWEAR
-        </h3>
-
-        <motion.div
-          variants={staggerGroup}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-2 gap-3 md:grid-cols-5"
+          transition={{ duration: 0.6 }}
+          className="rounded-2xl bg-[#3B302A] px-8 py-12 text-center text-white"
         >
-          {homeContent.moodImages.map((img, index) => (
-            <motion.img
-              key={index}
-              variants={imageReveal}
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              src={img.url}
-              alt="Kamari mood"
-              className="h-[180px] w-full object-cover"
-            />
-          ))}
-        </motion.div>
-      </motion.section>
-
-      {/* Newsletter */}
-      <motion.section
-        variants={softReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.25 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="mx-auto max-w-7xl px-6 py-8"
-      >
-        <div className="flex flex-col items-center justify-between gap-5 bg-[#E8DED6] px-8 py-8 md:flex-row">
-          <div>
-            <h3 className="mb-2 text-lg font-light">Stay close to KAMARI</h3>
-            <p className="text-sm text-[#6E625C]">
-              Be the first to know about new drops, exclusive offers, and more.
-            </p>
-          </div>
-
-          <div className="flex w-full max-w-md">
+          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#E8DED6]">Stay Connected</p>
+          <h3 className="mb-3 text-2xl font-light">Stay close to KAMARI</h3>
+          <p className="mb-8 text-sm text-[#c5b8b0]">
+            Be the first to know about new arrivals, exclusive offers and style tips.
+          </p>
+          <div className="mx-auto flex max-w-md overflow-hidden rounded-full border border-white/20">
             <input
               type="email"
-              placeholder="Enter your email"
-              className="w-full bg-[#F8F5F2] px-5 py-3 text-sm outline-none"
+              placeholder="Enter your email address"
+              className="w-full bg-white/10 px-6 py-3.5 text-sm text-white placeholder-white/40 outline-none"
             />
-            <motion.button
-              whileHover={{ backgroundColor: "#2a221d" }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-[#3B302A] px-8 py-3 text-xs uppercase tracking-[0.16em] text-[#F8F5F2]"
-            >
+            <button className="flex-shrink-0 rounded-full bg-white px-7 py-3.5 text-xs uppercase tracking-[0.16em] text-[#3B302A] transition hover:bg-[#F8F5F2]">
               Join
-            </motion.button>
+            </button>
           </div>
-        </div>
-      </motion.section>
+        </motion.div>
+      </section>
 
-      {/* Footer */}
-      <footer className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid grid-cols-2 gap-8 border-t border-[#3B302A]/10 pt-10 md:grid-cols-5">
-          <div className="col-span-2 md:col-span-1">
-            <h2 className="mb-4 text-2xl font-light tracking-[0.22em]">KAMARI</h2>
-            <p className="text-xs text-[#7D746C]">© 2026 KAMARI. All rights reserved.</p>
+      {/* ── Footer ───────────────────────────────────── */}
+      <footer className="border-t border-[#3B302A]/10 bg-[#F8F5F2]">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
+            <div className="col-span-2 md:col-span-1">
+              <h2 className="mb-3 text-xl font-light tracking-[0.22em]">KAMARI</h2>
+              <p className="text-xs leading-relaxed text-[#7D746C]">
+                Contemporary women's fashion for everyday Sri Lankan life.
+              </p>
+              <p className="mt-4 text-xs text-[#a3948b]">© 2026 KAMARI. All rights reserved.</p>
+            </div>
+            <FooterCol title="Shop"     links={[{ label: "All Products", to: "/shop" }, { label: "Collections", to: "/collections" }]} />
+            <FooterCol title="Discover" links={[{ label: "New Arrivals", to: "/collections?sort=newest" }, { label: "Best Sellers", to: "/shop" }]} />
+            <FooterCol title="Help"     links={[{ label: "Size Guide", to: "#" }, { label: "Shipping", to: "#" }, { label: "Returns", to: "#" }]} />
+            <FooterCol title="Support"  links={[{ label: "FAQ", to: "#" }, { label: "Contact Us", to: "/contact" }, { label: "Privacy Policy", to: "#" }]} />
           </div>
-
-          <FooterColumn title="Shop" items={["All Products", "Collections"]} />
-          <FooterColumn title="Info" items={["About", "Contact"]} />
-          <FooterColumn title="Help" items={["Size Guide", "Shipping", "Returns"]} />
-          <FooterColumn title="Customer Care" items={["FAQ", "Track Your Order", "Privacy Policy"]} />
         </div>
       </footer>
     </main>
   );
-};
+}
 
-const FooterColumn = ({ title, items }) => {
+/* ── Product Card ───────────────────────────────────────────── */
+function ProductCard({ product, badge, onClick }) {
+  const img1 = getProductImg(product);
+  const img2 = product?.colors?.flatMap((c) => c.images || [])?.[1]?.url || img1;
+  const colors = product.colors || [];
+
+  return (
+    <motion.div
+      variants={fadeUp}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.3 }}
+      className="group cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="relative mb-3 overflow-hidden rounded-xl bg-[#f8f8f8]" style={{ aspectRatio: "3/4" }}>
+        <img src={img1} alt={product.name} className="absolute inset-0 h-full w-full object-cover object-top transition duration-700 group-hover:opacity-0" />
+        <img src={img2} alt={product.name} className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition duration-700 group-hover:opacity-100" />
+
+        {badge && (
+          <span className={`absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+            badge === "New" ? "bg-[#F8F5F2] text-[#3B302A] border border-[#3B302A]" : "bg-[#3B302A] text-[#F8F5F2]"
+          }`}>
+            {badge}
+          </span>
+        )}
+
+        <button className="absolute inset-x-3 bottom-3 z-10 rounded-lg bg-[#3B302A] py-3 text-xs font-medium uppercase tracking-[0.12em] text-white opacity-0 transition duration-300 group-hover:opacity-100">
+          Add to Bag
+        </button>
+      </div>
+
+      <p className="mb-0.5 text-xs uppercase tracking-[0.1em] text-[#a3948b]">
+        {product.setName || product.collection}
+      </p>
+      <h4 className="mb-2 text-sm font-medium text-[#3B302A] leading-snug">{product.name}</h4>
+
+      <div className="mb-2 flex gap-1.5">
+        {colors.slice(0, 4).map((c) => (
+          <span
+            key={c._id || c.colorName}
+            className="inline-block h-3.5 w-3.5 rounded-full border border-black/10"
+            style={{ backgroundColor: c.colorCode || "#ccc" }}
+            title={c.colorName}
+          />
+        ))}
+        {colors.length > 4 && <span className="text-[11px] text-[#7D746C]">+{colors.length - 4}</span>}
+      </div>
+
+      <p className="text-sm text-[#3B302A]">LKR {Number(product.price || 0).toLocaleString()}</p>
+    </motion.div>
+  );
+}
+
+/* ── Mood Grid ─────────────────────────────────────────────── */
+function MoodGrid({ products, navigate }) {
+  const allImages = products
+    .flatMap((p) => (p.colors || []).flatMap((c) => (c.images || []).map((img) => ({ url: img.url, productId: p._id }))))
+    .filter((img) => img.url)
+    .slice(0, 5);
+
+  if (allImages.length < 3) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-6 py-8">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mb-6 text-center"
+      >
+        <p className="text-xs uppercase tracking-[0.28em] text-[#7D746C]">Style Gallery</p>
+      </motion.div>
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="grid grid-cols-3 gap-3 md:grid-cols-5"
+      >
+        {allImages.map((img, i) => (
+          <motion.div
+            key={i}
+            variants={fadeIn}
+            whileHover={{ scale: 1.03 }}
+            transition={{ duration: 0.3 }}
+            className="cursor-pointer overflow-hidden rounded-xl"
+            style={{ aspectRatio: "1/1" }}
+            onClick={() => navigate(`/products/${img.productId}`)}
+          >
+            <img
+              src={img.url}
+              alt="KAMARI style"
+              className="h-full w-full object-cover object-top transition duration-500 hover:scale-110"
+            />
+          </motion.div>
+        ))}
+      </motion.div>
+    </section>
+  );
+}
+
+/* ── Footer Column ─────────────────────────────────────────── */
+function FooterCol({ title, links }) {
+  const navigate = useNavigate();
   return (
     <div>
-      <h4 className="mb-4 text-[11px] uppercase tracking-[0.2em]">{title}</h4>
-      <ul className="space-y-3 text-sm text-[#6E625C]">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
+      <h4 className="mb-4 text-xs uppercase tracking-[0.22em] text-[#3B302A]">{title}</h4>
+      <ul className="space-y-3">
+        {links.map(({ label, to }) => (
+          <li key={label}>
+            <button
+              onClick={() => navigate(to)}
+              className="text-sm text-[#6E625C] transition hover:text-[#3B302A]"
+            >
+              {label}
+            </button>
+          </li>
         ))}
       </ul>
     </div>
   );
-};
-
-export default Home;
-
-const normalizeHomeContent = (data = {}, fallback) => ({
-  ...fallback,
-  ...data,
-  heroImage: data.heroImage || fallback.heroImage,
-  collectionImage: data.collectionImage || fallback.collectionImage,
-  brandStoryImage: data.brandStoryImage || fallback.brandStoryImage,
-  categories: (data.categories?.length ? data.categories : fallback.categories).map((item, index) => ({
-    id: item.id || index + 1,
-    name: item.name || fallback.categories[index]?.name || `Category ${index + 1}`,
-    image:
-      typeof item.image === "string"
-        ? { url: item.image }
-        : item.image || fallback.categories[index]?.image,
-  })),
-  moodImages: (data.moodImages?.length ? data.moodImages : fallback.moodImages).map((item, index) =>
-    typeof item === "string" ? { url: item } : item || fallback.moodImages[index],
-  ),
-});
+}
