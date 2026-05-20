@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Edit2, Loader2, Mail, MapPin, Phone, Plus, Search, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
-import { useAdmin } from "../../context/AdminContext";
+import { useAdmin } from "../../context/useAdmin";
 
 const createCustomerDraft = (customer) => ({
   firstName:    customer?.firstName || "",

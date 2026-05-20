@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import CartHeader from "../components/cart/CartHeader";
 import CartItems from "../components/cart/CartItems";
 import Checkout from "../components/cart/Checkout";

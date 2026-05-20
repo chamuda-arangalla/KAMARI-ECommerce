@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ChevronRight, Minus, Plus, ShoppingBag, Zap, Package, RotateCcw, Shield } from "lucide-react";
 import { getProductById, getProducts } from "../services/productApi";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import "../styles/ProductDetails.css";
 
 const FALLBACK = "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=900&q=80";

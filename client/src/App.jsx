@@ -9,6 +9,8 @@ import Cart from "./pages/Cart";
 import CheckoutPage from "./pages/CheckoutPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
+import CustomerOrderDetailsPage from "./pages/CustomerOrderDetailsPage";
+import CustomerOrdersPage from "./pages/CustomerOrdersPage";
 import CustomerProfilePage from "./pages/CustomerProfilePage";
 import CustomerRegisterPage from "./pages/CustomerRegisterPage";
 import AboutPage from "./pages/AboutPage";
@@ -44,8 +46,10 @@ function App() {
           <Route path="/checkout" element={<><Header /><CartDrawer /><CheckoutPage /></>} />
           <Route path="/collections" element={<><Header /><CartDrawer /><CollectionsPage /></>} />
           <Route path="/profile" element={<><Header /><CartDrawer /><CustomerProfilePage /></>} />
-          <Route path="/about"   element={<><Header /><CartDrawer /><AboutPage /></>} />
-          <Route path="/contact" element={<><Header /><CartDrawer /><ContactPage /></>} />
+          <Route path="/about"      element={<><Header /><CartDrawer /><AboutPage /></>} />
+          <Route path="/contact"    element={<><Header /><CartDrawer /><ContactPage /></>} />
+          <Route path="/orders"     element={<><Header /><CartDrawer /><CustomerOrdersPage /></>} />
+          <Route path="/orders/:id" element={<><Header /><CartDrawer /><CustomerOrderDetailsPage /></>} />
           <Route path="/login" element={<CustomerLoginPage />} />
           <Route path="/register" element={<CustomerRegisterPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />

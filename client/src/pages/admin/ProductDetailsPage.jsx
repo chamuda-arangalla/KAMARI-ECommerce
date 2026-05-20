@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ProductViewModal from "../../components/admin/ProductViewModal";
-import { useAdmin } from "../../context/AdminContext";
+import { useAdmin } from "../../context/useAdmin";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();

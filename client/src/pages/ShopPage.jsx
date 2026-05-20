@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SlidersHorizontal, X } from "lucide-react";
 import { getProducts } from "../services/productApi";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import "../styles/ShopPage.css";
 
 const FALLBACK =

@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
-import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard, PackageSearch } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/useCart";
 import ConfirmDialog from "../common/ConfirmDialog";
 import { logout } from "../../services/authApi";
 import { getCollections } from "../../services/collectionApi";
@@ -147,14 +147,24 @@ const Header = () => {
                     )}
 
                     {customer.role === "customer" && (
-                      <Link
-                        to="/profile"
-                        onClick={() => setAccountOpen(false)}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
-                      >
-                        <User size={15} />
-                        My Profile
-                      </Link>
+                      <>
+                        <Link
+                          to="/profile"
+                          onClick={() => setAccountOpen(false)}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                        >
+                          <User size={15} />
+                          My Profile
+                        </Link>
+                        <Link
+                          to="/orders"
+                          onClick={() => setAccountOpen(false)}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                        >
+                          <PackageSearch size={15} />
+                          My Orders
+                        </Link>
+                      </>
                     )}
 
                     <button
