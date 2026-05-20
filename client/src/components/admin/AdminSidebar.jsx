@@ -10,6 +10,8 @@ import {
   X,
   Layers,
   Image,
+  Info,
+  Phone,
 } from 'lucide-react';
 
 const SidebarLink = ({ to, icon: Icon, label }) => (
@@ -60,8 +62,10 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
             <SidebarLink to="/admin/customers"   icon={Users}       label="Customers" />
             <SidebarLink to="/admin/analytics"   icon={BarChart3}   label="Analytics" />
             <SidebarLink to="/admin/products"    icon={Settings}    label="Product Management" />
-            <SidebarLink to="/admin/collections" icon={Layers}      label="Collections" />
-            <SidebarLink to="/admin/home-images" icon={Image}       label="Home Images" />
+            <SidebarLink to="/admin/collections"     icon={Layers}  label="Collections" />
+            <SidebarLink to="/admin/home-images"     icon={Image}   label="Home Images" />
+            <SidebarLink to="/admin/about-content"   icon={Info}    label="About Page" />
+            <SidebarLink to="/admin/contact-content" icon={Phone}   label="Contact Page" />
           </nav>
 
           <div className="pt-6 border-t border-[#e5ddd5]">

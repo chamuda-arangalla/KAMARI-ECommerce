@@ -13,6 +13,8 @@ import CustomerOrderDetailsPage from "./pages/CustomerOrderDetailsPage";
 import CustomerOrdersPage from "./pages/CustomerOrdersPage";
 import CustomerProfilePage from "./pages/CustomerProfilePage";
 import CustomerRegisterPage from "./pages/CustomerRegisterPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import AdminLayout from "./components/admin/AdminLayout";
 import OrdersPage from "./pages/admin/OrdersPage";
 import OrderTracking from "./pages/admin/OrderTracking";
@@ -22,6 +24,8 @@ import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import ProductManagement from "./pages/admin/ProductManagement";
 import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
+import AboutContentPage from "./pages/admin/AboutContentPage";
+import ContactContentPage from "./pages/admin/ContactContentPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import HomeImagesPage from "./pages/admin/HomeImagesPage";
 
@@ -42,7 +46,9 @@ function App() {
           <Route path="/checkout" element={<><Header /><CartDrawer /><CheckoutPage /></>} />
           <Route path="/collections" element={<><Header /><CartDrawer /><CollectionsPage /></>} />
           <Route path="/profile" element={<><Header /><CartDrawer /><CustomerProfilePage /></>} />
-          <Route path="/orders" element={<><Header /><CartDrawer /><CustomerOrdersPage /></>} />
+          <Route path="/about"      element={<><Header /><CartDrawer /><AboutPage /></>} />
+          <Route path="/contact"    element={<><Header /><CartDrawer /><ContactPage /></>} />
+          <Route path="/orders"     element={<><Header /><CartDrawer /><CustomerOrdersPage /></>} />
           <Route path="/orders/:id" element={<><Header /><CartDrawer /><CustomerOrderDetailsPage /></>} />
           <Route path="/login" element={<CustomerLoginPage />} />
           <Route path="/register" element={<CustomerRegisterPage />} />
@@ -58,6 +64,8 @@ function App() {
             <Route path="products/:id" element={<ProductDetailsPage />} />
             <Route path="collections" element={<CollectionsManagement />} />
             <Route path="home-images" element={<HomeImagesPage />} />
+            <Route path="about-content"   element={<AboutContentPage />} />
+            <Route path="contact-content" element={<ContactContentPage />} />
           </Route>
         </Routes>
       </CartProvider>

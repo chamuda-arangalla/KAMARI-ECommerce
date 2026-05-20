@@ -108,8 +108,8 @@ const Header = () => {
               </button>
             </div>
 
-            <Link to="/about">About</Link>
-            <Link to="/contact">Contact</Link>
+            <Link to="/about"   className="transition hover:text-[#7D746C]">About</Link>
+            <Link to="/contact" className="transition hover:text-[#7D746C]">Contact</Link>
           </nav>
 
           <div className="flex items-center gap-5 text-[#3B302A]">
