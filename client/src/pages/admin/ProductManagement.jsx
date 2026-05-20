@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAdmin } from '../../context/AdminContext';
+import { useAdmin } from '../../context/useAdmin';
 import { Eye, Loader2, Plus, Edit2, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AddProductModal from '../../components/admin/AddProductModel';

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronDown, Minus, Plus } from "lucide-react";
 import { getProductById, getProducts } from "../services/productApi";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import "../styles/ProductDetails.css";
 
 const fallbackImage =

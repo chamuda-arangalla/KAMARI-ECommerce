@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddProductModal from "../../components/admin/AddProductModel";
-import { useAdmin } from "../../context/AdminContext";
+import { useAdmin } from "../../context/useAdmin";
 import { AlertCircle, Search, Edit2, Plus } from "lucide-react";
 
 const InventoryPage = () => {

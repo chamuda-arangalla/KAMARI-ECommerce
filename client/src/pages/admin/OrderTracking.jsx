@@ -1,52 +1,70 @@
-import React, { useState } from 'react';
-import { useAdmin } from '../../context/AdminContext';
-import { Check, Clock, Truck, Package, Search, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Check, ChevronRight, Clock, Loader2, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAdmin } from '../../context/useAdmin';
 
 const OrderTracking = () => {
-  const { orders, updateOrderStatus } = useAdmin();
-  const [selectedOrderId, setSelectedOrderId] = useState(orders[0]?.id || '');
+  const { orders, ordersLoading, ordersError, updateOrderStatus } = useAdmin();
+  const [selectedOrderId, setSelectedOrderId] = useState('');
   const [newStatus, setNewStatus] = useState('');
   const [statusNote, setStatusNote] = useState('');
 
-  const selectedOrder = orders.find(o => o.id === selectedOrderId);
+  const activeOrderId = selectedOrderId || orders[0]?.id || '';
+  const selectedOrder = orders.find((order) => order.id === activeOrderId);
 
   const stages = [
     { id: 'Pending', icon: Clock, label: 'Pending' },
-    { id: 'Processing', icon: Package, label: 'Processing' },
-    { id: 'Shipped', icon: Truck, label: 'Shipped' },
-    { id: 'Delivered', icon: Check, label: 'Delivered' }
+    { id: 'Complete', icon: Check, label: 'Complete' },
   ];
 
   const handleUpdateStatus = (e) => {
     e.preventDefault();
     if (!newStatus) return;
-    updateOrderStatus(selectedOrderId, newStatus, statusNote || `Status updated to ${newStatus}`);
+    updateOrderStatus(activeOrderId, newStatus, statusNote || `Status updated to ${newStatus}`);
     setNewStatus('');
     setStatusNote('');
   };
 
-  const currentStageIndex = stages.findIndex(s => s.id === selectedOrder?.status);
+  const currentStageIndex = Math.max(
+    stages.findIndex((stage) => stage.id === selectedOrder?.status),
+    0,
+  );
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-3xl font-semibold text-[#3b302a]">Order Tracking</h2>
-        <p className="text-[#a3948b] mt-1">Monitor and update delivery progress</p>
+        <p className="text-[#a3948b] mt-1">Monitor and update order progress</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Order Selector */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
             <h3 className="text-sm font-semibold text-[#3b302a] uppercase tracking-widest mb-4">Select Order</h3>
             <div className="space-y-3">
-              {orders.map(order => (
+              {ordersLoading && (
+                <div className="flex items-center gap-2 py-8 text-sm text-[#6b5e55]">
+                  <Loader2 size={16} className="animate-spin" />
+                  Loading orders...
+                </div>
+              )}
+
+              {!ordersLoading && ordersError && (
+                <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                  {ordersError}
+                </p>
+              )}
+
+              {!ordersLoading && !ordersError && orders.length === 0 && (
+                <p className="py-8 text-sm text-[#a3948b]">No orders found.</p>
+              )}
+
+              {!ordersLoading && !ordersError && orders.map((order) => (
                 <button
                   key={order.id}
                   onClick={() => setSelectedOrderId(order.id)}
                   className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                    selectedOrderId === order.id
+                    activeOrderId === order.id
                       ? 'bg-[#fcfaf7] border-[#c2b2a6] shadow-sm'
                       : 'bg-white border-[#f3ede8] hover:border-[#e5ddd5]'
                   }`}
@@ -55,7 +73,7 @@ const OrderTracking = () => {
                     <p className="font-medium text-[#3b302a]">{order.orderNumber}</p>
                     <p className="text-xs text-[#a3948b]">{order.customerName}</p>
                   </div>
-                  <ChevronRight size={18} className={selectedOrderId === order.id ? 'text-[#3b302a]' : 'text-[#a3948b]'} />
+                  <ChevronRight size={18} className={activeOrderId === order.id ? 'text-[#3b302a]' : 'text-[#a3948b]'} />
                 </button>
               ))}
             </div>
@@ -66,30 +84,33 @@ const OrderTracking = () => {
             <form onSubmit={handleUpdateStatus} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-[#a3948b] uppercase mb-1.5">New Status</label>
-                <select 
+                <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
                   className="w-full bg-[#f8f5f2] border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
                   required
+                  disabled={!selectedOrder}
                 >
                   <option value="">Select Stage</option>
-                  {stages.map(s => (
-                    <option key={s.id} value={s.id}>{s.label}</option>
+                  {stages.map((stage) => (
+                    <option key={stage.id} value={stage.id}>{stage.label}</option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-[#a3948b] uppercase mb-1.5">Note (Optional)</label>
-                <textarea 
+                <textarea
                   value={statusNote}
                   onChange={(e) => setStatusNote(e.target.value)}
-                  placeholder="E.g., Out for delivery"
+                  placeholder="E.g., Payment completed"
                   className="w-full bg-[#f8f5f2] border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none h-24 resize-none"
+                  disabled={!selectedOrder}
                 />
               </div>
-              <button 
+              <button
                 type="submit"
-                className="w-full py-3 bg-[#3b302a] text-white rounded-lg font-medium hover:bg-[#2a221d] transition-all"
+                disabled={!selectedOrder}
+                className="w-full py-3 bg-[#3b302a] text-white rounded-lg font-medium hover:bg-[#2a221d] transition-all disabled:opacity-60"
               >
                 Update Timeline
               </button>
@@ -97,7 +118,6 @@ const OrderTracking = () => {
           </div>
         </div>
 
-        {/* Timeline View */}
         <div className="lg:col-span-2 space-y-6">
           {selectedOrder ? (
             <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
@@ -111,21 +131,20 @@ const OrderTracking = () => {
                 </span>
               </div>
 
-              {/* Visual Progress Bar */}
               <div className="relative mb-20">
                 <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#f3ede8] -translate-y-1/2"></div>
-                <motion.div 
+                <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${(currentStageIndex / (stages.length - 1)) * 100}%` }}
                   className="absolute top-1/2 left-0 h-1 bg-[#d4a373] -translate-y-1/2"
                 />
-                
+
                 <div className="relative flex justify-between">
                   {stages.map((stage, idx) => {
                     const Icon = stage.icon;
                     const isCompleted = idx <= currentStageIndex;
                     const isCurrent = idx === currentStageIndex;
-                    
+
                     return (
                       <div key={stage.id} className="flex flex-col items-center">
                         <div className={`
@@ -144,13 +163,12 @@ const OrderTracking = () => {
                 </div>
               </div>
 
-              {/* Timeline List */}
               <div className="space-y-8">
                 <h4 className="text-sm font-semibold text-[#3b302a] uppercase tracking-widest">History</h4>
                 <div className="space-y-6 relative">
                   <div className="absolute left-2.5 top-2 bottom-2 w-px bg-[#f3ede8]"></div>
                   {[...selectedOrder.trackingTimeline].reverse().map((event, idx) => (
-                    <div key={idx} className="relative pl-10">
+                    <div key={`${event.status}-${idx}`} className="relative pl-10">
                       <div className="absolute left-0 top-1 w-5 h-5 rounded-full bg-white border-2 border-[#d4a373] z-10"></div>
                       <div>
                         <p className="text-[#3b302a] font-semibold">{event.status}</p>
