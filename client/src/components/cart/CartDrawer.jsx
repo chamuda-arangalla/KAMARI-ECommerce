@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/useCart";
 import "../../styles/CartDrawer.css";
 
 const FREE_DELIVERY_THRESHOLD = 10000;

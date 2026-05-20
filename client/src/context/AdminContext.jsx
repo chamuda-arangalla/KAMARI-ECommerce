@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { mockOrders } from '../data/adminMockData';
+import { useEffect, useState } from 'react';
 import {
   createCustomer as createCustomerRequest,
   deleteCustomer as deleteCustomerRequest,
@@ -7,15 +6,79 @@ import {
   mapBackendCustomerToAdminCustomer,
   updateCustomer as updateCustomerRequest,
 } from '../services/customerApi';
+import { getAllOrders } from '../services/orderApi';
 import { getProducts, mapBackendProductToAdminProduct } from '../services/productApi';
+import { AdminContext } from './adminContextValue';
 
-const AdminContext = createContext();
+const formatOrderDate = (value) =>
+  value
+    ? new Date(value).toLocaleDateString("en-LK", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "N/A";
+
+const formatTimelineDate = (value) =>
+  value
+    ? new Date(value).toLocaleString("en-LK", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "N/A";
+
+const normalizeOrderStatus = (paymentStatus) => {
+  if (!paymentStatus) return "Pending";
+  return String(paymentStatus).charAt(0).toUpperCase() + String(paymentStatus).slice(1).toLowerCase();
+};
+
+const mapBackendOrderToAdminOrder = (order) => {
+  const receiver = order.receiverDetails || {};
+  const location = receiver.location || {};
+  const items = order.productDetails || [];
+
+  return {
+    id: order._id,
+    orderNumber: order.orderId || order._id,
+    customerName: [receiver.firstName, receiver.lastName].filter(Boolean).join(" ") || "Customer",
+    items: items.map((item) => ({
+      name: item.productName,
+      quantity: Number(item.quantity || 0),
+      price: Number(item.unitPrice || 0),
+      colour: item.colour,
+      size: item.size,
+    })),
+    totalAmount: Number(order.pricing?.grandTotal || 0),
+    deliveryAddress: [
+      location.address,
+      location.district,
+      location.province,
+      location.postalCode,
+      location.country,
+    ].filter(Boolean).join(", "),
+    status: normalizeOrderStatus(order.paymentStatus),
+    date: formatOrderDate(order.createdAt),
+    trackingTimeline: [
+      {
+        status: normalizeOrderStatus(order.paymentStatus),
+        date: formatTimelineDate(order.createdAt),
+        description: "Order created",
+      },
+    ],
+    raw: order,
+  };
+};
 
 export const AdminProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
   const [productsError, setProductsError] = useState("");
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState("");
   const [customers, setCustomers] = useState([]);
   const [customersLoading, setCustomersLoading] = useState(false);
   const [customersError, setCustomersError] = useState("");
@@ -38,6 +101,24 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const refreshOrders = async () => {
+    try {
+      setOrdersLoading(true);
+      setOrdersError("");
+
+      const token = localStorage.getItem("adminToken");
+      const response = await getAllOrders(token);
+
+      setOrders((response.data || []).map(mapBackendOrderToAdminOrder));
+    } catch (error) {
+      setOrdersError(
+        error.response?.data?.message || "Failed to load orders",
+      );
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
   const refreshCustomers = async () => {
     try {
       setCustomersLoading(true);
@@ -57,8 +138,13 @@ export const AdminProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    refreshProducts();
-    refreshCustomers();
+    const timeoutId = setTimeout(() => {
+      refreshProducts();
+      refreshOrders();
+      refreshCustomers();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const updateOrderStatus = (orderId, newStatus, description) => {
@@ -135,10 +221,13 @@ export const AdminProvider = ({ children }) => {
       productsLoading,
       productsError,
       orders,
+      ordersLoading,
+      ordersError,
       customers,
       customersLoading,
       customersError,
       refreshProducts,
+      refreshOrders,
       refreshCustomers,
       updateOrderStatus,
       updateStockCount,
@@ -152,12 +241,4 @@ export const AdminProvider = ({ children }) => {
       {children}
     </AdminContext.Provider>
   );
-};
-
-export const useAdmin = () => {
-  const context = useContext(AdminContext);
-  if (!context) {
-    throw new Error('useAdmin must be used within an AdminProvider');
-  }
-  return context;
 };
