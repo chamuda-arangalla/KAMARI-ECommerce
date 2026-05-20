@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Grid2x2, Grid3x3 } from "lucide-react";
-import { SIZES, COLORS } from "../data/collectionsData";
 import { getProducts, mapBackendProductToCollectionProduct } from "../services/productApi";
 import "../styles/CollectionsPage.css";
 
@@ -62,16 +61,27 @@ export default function CollectionsPage() {
     [products],
   );
   const colorOptions = useMemo(() => {
-    const productColors = products.flatMap((product) => product.colors || []);
-    const uniqueColors = new Map(COLORS.map((color) => [color.name, color]));
-
-    productColors.forEach((color) => {
+    const uniqueColors = new Map();
+    products.flatMap((product) => product.colors || []).forEach((color) => {
       if (color.name && !uniqueColors.has(color.name)) {
         uniqueColors.set(color.name, color);
       }
     });
-
     return [...uniqueColors.values()];
+  }, [products]);
+
+  const sizeOptions = useMemo(() => {
+    const ORDER = ["Free Size", "XS", "S", "M", "L", "XL", "XXL"];
+    const seen = new Set();
+    products.flatMap((p) => p.sizes || []).forEach((s) => seen.add(s));
+    return [...seen].sort((a, b) => {
+      const ai = ORDER.indexOf(a);
+      const bi = ORDER.indexOf(b);
+      if (ai === -1 && bi === -1) return a.localeCompare(b);
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
   }, [products]);
 
   // Read category/sort from URL params set by the header dropdown
@@ -198,7 +208,7 @@ export default function CollectionsPage() {
           <div className="filter-section">
             <p className="filter-title">Size</p>
             <div className="filter-sizes">
-              {SIZES.map((s) => (
+              {sizeOptions.map((s) => (
                 <button
                   key={s}
                   className={`filter-size-btn ${selectedSizes.includes(s) ? "active" : ""}`}
