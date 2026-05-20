@@ -1,4 +1,5 @@
 import SiteContent from "../models/SiteContent.js";
+import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 
 export const getPageContent = async (req, res) => {
   try {
@@ -8,6 +9,16 @@ export const getPageContent = async (req, res) => {
     return res.status(200).json({ success: true, data: doc.content });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Failed to fetch content", error: error.message });
+  }
+};
+
+export const uploadContentImage = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: "No image file provided" });
+    const result = await uploadToCloudinary(req.file, "kamari/site-content");
+    return res.status(200).json({ success: true, url: result.url, publicId: result.publicId });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Image upload failed", error: error.message });
   }
 };
 

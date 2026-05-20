@@ -33,16 +33,8 @@ const DEFAULTS = {
     { number: "1000+", label: "Happy Customers" },
     { number: "2024",  label: "Est. in Sri Lanka" },
   ],
-  team: [
-    { name: "Anjana Tharanga",   role: "Founder & Creative Director", imageUrl: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80" },
-    { name: "Chamuda Arangalla", role: "Head of Design",              imageUrl: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80" },
-    { name: "Dilani Perera",     role: "Operations Manager",          imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80" },
-  ],
   ctaTitle: "Find your perfect style",
   ctaSubtitle: "Browse our full range of women's fashion — from everyday casuals to smart formals, all designed for you.",
-  brandStoryTitle: "Everyday style, effortlessly Sri Lankan.",
-  brandStoryText: "We design modern women's clothing for the Sri Lankan lifestyle — comfortable, versatile and beautifully made for every occasion.",
-  brandStoryImage: "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=1000&q=85",
 };
 
 export default function AboutPage() {
@@ -61,14 +53,14 @@ export default function AboutPage() {
       style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", paddingTop: "70px" }}
     >
       {/* ── Hero ─────────────────────────────────────── */}
-      <section className="relative h-[65vh] min-h-[460px] overflow-hidden">
+      <section className="relative overflow-hidden" style={{ height: "65vh", minHeight: 460 }}>
         <motion.img
           initial={{ scale: 1.06, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.3, ease: "easeOut" }}
-          src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1800&q=85"
+          src={data.heroImage}
           alt="About KAMARI"
-          className="h-full w-full object-cover object-top"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#3B302A]/50 via-[#3B302A]/30 to-[#3B302A]/60" />
         <motion.div
@@ -87,21 +79,24 @@ export default function AboutPage() {
       {/* ── Story Section ────────────────────────────── */}
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:items-center">
+
+          {/* Story image — natural proportions, no cropping */}
           <motion.div
             variants={fadeIn}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.9 }}
-            className="overflow-hidden rounded-2xl"
+            className="overflow-hidden rounded-2xl bg-[#f0ebe5]"
           >
             <img
               src={data.storyImage}
               alt="KAMARI story"
-              className="h-[500px] w-full object-cover object-top"
+              className="w-full h-auto object-contain"
             />
           </motion.div>
 
+          {/* Story text */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -114,7 +109,6 @@ export default function AboutPage() {
             <div className="space-y-4 text-sm leading-8 text-[#6E625C]">
               {(data.storyParagraphs || []).map((p, i) => <p key={i}>{p}</p>)}
             </div>
-
             <motion.button
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.97 }}
@@ -183,39 +177,6 @@ export default function AboutPage() {
             ))}
           </motion.div>
         </div>
-      </section>
-
-      {/* ── Team ─────────────────────────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-14 text-center"
-        >
-          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#7D746C]">The People Behind KAMARI</p>
-          <h2 className="text-4xl font-light">Meet Our Team</h2>
-        </motion.div>
-
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-1 gap-10 sm:grid-cols-3"
-        >
-          {(data.team || []).map(({ name, role, imageUrl }) => (
-            <motion.div key={name} variants={fadeUp} className="text-center">
-              <div className="mx-auto mb-5 h-48 w-48 overflow-hidden rounded-full border-4 border-[#EFE7DF]">
-                <img src={imageUrl} alt={name} className="h-full w-full object-cover object-top" />
-              </div>
-              <h3 className="mb-1 text-base font-semibold">{name}</h3>
-              <p className="text-sm text-[#7D746C]">{role}</p>
-            </motion.div>
-          ))}
-        </motion.div>
       </section>
 
       {/* ── CTA Banner ───────────────────────────────── */}

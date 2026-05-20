@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Save, Loader2 } from "lucide-react";
 import { getSiteContent, updateSiteContent } from "../../services/siteContentApi";
+import ImageUploadField from "../../components/admin/ImageUploadField";
 
 const token = () => localStorage.getItem("adminToken");
 
 const EMPTY_VALUE = { title: "", description: "" };
 const EMPTY_STAT  = { number: "", label: "" };
-const EMPTY_MEMBER = { name: "", role: "", imageUrl: "" };
 const EMPTY_PARA  = "";
 
 export default function AboutContentPage() {
@@ -66,15 +66,13 @@ export default function AboutContentPage() {
       <Section title="Hero Section">
         <Field label="Hero Title"    value={data.heroTitle}    onChange={(v) => set("heroTitle", v)} />
         <Field label="Hero Subtitle" value={data.heroSubtitle} onChange={(v) => set("heroSubtitle", v)} />
-        <Field label="Hero Image URL" value={data.heroImage}   onChange={(v) => set("heroImage", v)} />
-        {data.heroImage && <img src={data.heroImage} alt="hero preview" className="mt-2 h-32 rounded-xl object-cover w-full" />}
+        <ImageUploadField label="Hero Image" value={data.heroImage} onChange={(v) => set("heroImage", v)} />
       </Section>
 
       {/* Brand Story */}
       <Section title="Brand Story Section">
-        <Field label="Story Title"     value={data.storyTitle} onChange={(v) => set("storyTitle", v)} />
-        <Field label="Story Image URL" value={data.storyImage} onChange={(v) => set("storyImage", v)} />
-        {data.storyImage && <img src={data.storyImage} alt="story preview" className="mt-2 h-32 rounded-xl object-cover" />}
+        <Field label="Story Title" value={data.storyTitle} onChange={(v) => set("storyTitle", v)} />
+        <ImageUploadField label="Story Image" value={data.storyImage} onChange={(v) => set("storyImage", v)} />
         <div>
           <Label>Story Paragraphs</Label>
           {(data.storyParagraphs || []).map((para, i) => (
@@ -132,24 +130,6 @@ export default function AboutContentPage() {
         <AddBtn onClick={() => set("stats", [...(data.stats || []), { ...EMPTY_STAT }])} label="Add Stat" />
       </Section>
 
-      {/* Team */}
-      <Section title="Team Members">
-        {(data.team || []).map((m, i) => (
-          <div key={i} className="border border-[#e5ddd5] rounded-xl p-5 space-y-3 mb-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-[#3b302a]">Member {i + 1}</span>
-              <button onClick={() => set("team", (data.team || []).filter((_, j) => j !== i))} className="text-red-400"><Trash2 size={18} /></button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Name" value={m.name} onChange={(val) => { const arr = [...(data.team || [])]; arr[i] = { ...m, name: val }; set("team", arr); }} />
-              <Field label="Role" value={m.role} onChange={(val) => { const arr = [...(data.team || [])]; arr[i] = { ...m, role: val }; set("team", arr); }} />
-            </div>
-            <Field label="Photo URL" value={m.imageUrl} onChange={(val) => { const arr = [...(data.team || [])]; arr[i] = { ...m, imageUrl: val }; set("team", arr); }} />
-            {m.imageUrl && <img src={m.imageUrl} alt={m.name} className="h-20 w-20 rounded-full object-cover border-2 border-[#e5ddd5]" />}
-          </div>
-        ))}
-        <AddBtn onClick={() => set("team", [...(data.team || []), { ...EMPTY_MEMBER }])} label="Add Team Member" />
-      </Section>
 
       {/* CTA */}
       <Section title="CTA Section">
