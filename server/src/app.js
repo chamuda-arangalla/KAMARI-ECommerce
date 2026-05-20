@@ -6,6 +6,7 @@ import productRoutes from "./routes/product.routes.js";
 import customerRoutes from "./routes/customer.routes.js";
 import collectionRoutes from "./routes/collection.routes.js";
 import homeContentRoutes from "./routes/homeContent.routes.js";
+import siteContentRoutes from "./routes/siteContent.routes.js";
 
 const app = express();
 
@@ -34,5 +35,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/collections", collectionRoutes);
 app.use("/api/home-content", homeContentRoutes);
+app.use("/api/site-content", siteContentRoutes);
 
 export default app;
