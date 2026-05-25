@@ -170,9 +170,10 @@ export default function ShopPage() {
 
       {/* ── Product Grid ─────────────────────────────── */}
       {loading ? (
-        <div className="shop-state">
-          <div className="shop-spinner" />
-          <p>Loading products...</p>
+        <div className="shop-grid">
+          {Array.from({ length: PER_PAGE }).map((_, i) => (
+            <ShopCardSkeleton key={i} />
+          ))}
         </div>
       ) : error ? (
         <div className="shop-state">
@@ -228,6 +229,27 @@ export default function ShopPage() {
         </div>
       )}
     </main>
+  );
+}
+
+function ShopCardSkeleton() {
+  return (
+    <article className="shop-card shop-card-skeleton">
+      <div className="shop-card-img-wrap">
+        <div className="skeleton skeleton-img" />
+      </div>
+      <div className="shop-card-info">
+        <div className="skeleton skeleton-text short" />
+        <div className="skeleton skeleton-text medium" />
+        <div className="skeleton-swatches">
+          <div className="skeleton skeleton-swatch" />
+          <div className="skeleton skeleton-swatch" />
+          <div className="skeleton skeleton-swatch" />
+        </div>
+        <div className="skeleton skeleton-text short" />
+        <div className="skeleton skeleton-text medium" />
+      </div>
+    </article>
   );
 }
 
