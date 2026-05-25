@@ -250,7 +250,7 @@ export default function CollectionsPage() {
           <div className="collections-topbar">
             <span className="collections-count">
               {loadingProducts
-                ? "Loading products..."
+                ? ""
                 : `${filtered.length} ${filtered.length === 1 ? "product" : "products"}`}
             </span>
 
@@ -293,7 +293,13 @@ export default function CollectionsPage() {
           )}
 
           {/* Grid */}
-          {paginated.length === 0 ? (
+          {loadingProducts ? (
+            <div className={`product-grid cols-${cols}`}>
+              {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : paginated.length === 0 ? (
             <div className="collections-empty">
               <p className="collections-empty-title">No products found</p>
               <p className="collections-empty-sub">Try adjusting your filters.</p>
@@ -343,6 +349,27 @@ export default function CollectionsPage() {
           )}
 
         </main>
+      </div>
+    </div>
+  );
+}
+
+function ProductCardSkeleton() {
+  return (
+    <div className="product-card product-card-skeleton">
+      <div className="product-card-img-wrap">
+        <div className="skeleton skeleton-img" />
+      </div>
+      <div className="product-card-info">
+        <div className="skeleton skeleton-text short" />
+        <div className="skeleton skeleton-text medium" />
+        <div className="skeleton-colors">
+          <div className="skeleton skeleton-dot" />
+          <div className="skeleton skeleton-dot" />
+          <div className="skeleton skeleton-dot" />
+        </div>
+        <div className="skeleton skeleton-text short" />
+        <div className="skeleton skeleton-text medium" />
       </div>
     </div>
   );

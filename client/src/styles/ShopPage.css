@@ -376,6 +376,44 @@
   margin-bottom: 12px;
 }
 
+/* ── Skeleton card ─────────────────────────── */
+.shop-card-skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
+.shop-card-skeleton .shop-card-img-wrap {
+  background: none;
+}
+
+.skeleton-img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  height: 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.skeleton-text.short  { width: 50%; }
+.skeleton-text.medium { width: 75%; }
+.skeleton-text.full   { width: 100%; }
+
+.skeleton-swatches {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.skeleton-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
 .shop-empty-title {
   font-size: 20px;
   font-weight: 300;
