@@ -28,6 +28,7 @@ import AboutContentPage from "./pages/admin/AboutContentPage";
 import ContactContentPage from "./pages/admin/ContactContentPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import HomeImagesPage from "./pages/admin/HomeImagesPage";
+import OAuthCallbackPage from "./pages/OAuthCallbackPage";
 
 const AdminGuard = ({ children }) => {
   const token = localStorage.getItem("adminToken");
@@ -52,6 +53,7 @@ function App() {
           <Route path="/orders/:id" element={<><Header /><CartDrawer /><CustomerOrderDetailsPage /></>} />
           <Route path="/login" element={<CustomerLoginPage />} />
           <Route path="/register" element={<CustomerRegisterPage />} />
+          <Route path="/auth/callback" element={<OAuthCallbackPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
             <Route index element={<Navigate to="/admin/orders" replace />} />
