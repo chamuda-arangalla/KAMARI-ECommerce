@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import sendAuthResponse from "../utils/sendAuthResponse.js";
+import validateEmail from "../utils/validateEmail.js";
+import generateToken from "../utils/generateToken.js";
 
 export const logout = (req, res) => {
   return res.status(200).json({
@@ -182,6 +184,14 @@ export const registerCustomer = async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
+    const emailCheck = await validateEmail(normalizedEmail);
+    if (!emailCheck.valid) {
+      return res.status(400).json({
+        success: false,
+        message: emailCheck.reason,
+      });
+    }
+
     const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
@@ -275,4 +285,28 @@ export const loginCustomer = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+// OAUTH CALLBACK — Google & Facebook
+export const handleOAuthCallback = (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
+  }
+
+  const token = generateToken(user);
+  const userJson = encodeURIComponent(
+    JSON.stringify({
+      id: user._id,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      addresses: user.addresses,
+      isActive: user.isActive,
+    })
+  );
+
+  res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&user=${userJson}`);
 };
