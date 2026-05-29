@@ -3,6 +3,7 @@ import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
+import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 
 const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 350);
 
@@ -341,6 +342,40 @@ export const updateOrder = async (req, res) => {
     return res.status(error.statusCode || 500).json({
       success: false,
       message: "Failed to update order",
+      error: error.message,
+    });
+  }
+};
+
+export const uploadPaymentSlip = async (req, res) => {
+  try {
+    const order = await Order.findOne(getOrderFilter(req.params.id));
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    if (!isAdmin(req) && !isOrderOwner(req, order)) {
+      return res.status(403).json({ success: false, message: "Not authorized" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    const result = await uploadToCloudinary(req.file, "kamari/payment-slips");
+    order.paymentSlip = { url: result.url, publicId: result.publicId };
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment slip uploaded successfully",
+      data: order.paymentSlip,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to upload payment slip",
       error: error.message,
     });
   }

@@ -64,6 +64,10 @@ const orderSchema = new mongoose.Schema(
       enum: Object.values(PAYMENT_STATUS),
       default: PAYMENT_STATUS.PENDING,
     },
+    paymentSlip: {
+      url:      { type: String, default: "" },
+      publicId: { type: String, default: "" },
+    },
   },
   { timestamps: true }
 );

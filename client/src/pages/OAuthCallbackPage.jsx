@@ -13,6 +13,9 @@ const OAuthCallbackPage = () => {
     const token = params.get("token");
     const userRaw = params.get("user");
     const error = params.get("error");
+    const redirect = params.get("redirect");
+    const REDIRECT_MAP = { checkout: "/checkout", cart: "/cart" };
+    const redirectTo = REDIRECT_MAP[redirect] || "/";
 
     if (error || !token || !userRaw) {
       navigate(`/login?error=${error || "oauth_failed"}`, { replace: true });
@@ -30,7 +33,7 @@ const OAuthCallbackPage = () => {
         localStorage.setItem("customerUser", JSON.stringify(user));
       }
 
-      navigate("/", { replace: true });
+      navigate(user.role === "admin" ? "/" : redirectTo, { replace: true });
     } catch {
       navigate("/login?error=oauth_failed", { replace: true });
     }

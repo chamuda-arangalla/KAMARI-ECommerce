@@ -23,8 +23,6 @@ import CustomersPage from "./pages/admin/CustomersPage";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
-import AboutContentPage from "./pages/admin/AboutContentPage";
-import ContactContentPage from "./pages/admin/ContactContentPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import HomeImagesPage from "./pages/admin/HomeImagesPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
@@ -65,8 +63,6 @@ function App() {
             <Route path="products/:id" element={<ProductDetailsPage />} />
             <Route path="collections" element={<CollectionsManagement />} />
             <Route path="home-images" element={<HomeImagesPage />} />
-            <Route path="about-content"   element={<AboutContentPage />} />
-            <Route path="contact-content" element={<ContactContentPage />} />
           </Route>
         </Routes>
       </CartProvider>

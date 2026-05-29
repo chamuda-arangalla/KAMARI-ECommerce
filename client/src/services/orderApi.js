@@ -41,3 +41,21 @@ export const getOrderById = async (orderId, token) => {
 
   return response.data;
 };
+
+export const uploadPaymentSlip = async (orderId, file, token) => {
+  const formData = new FormData();
+  formData.append("paymentSlip", file);
+
+  const response = await axios.post(
+    `${API_URL}/api/orders/${orderId}/payment-slip`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};

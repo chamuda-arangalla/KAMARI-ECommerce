@@ -61,6 +61,7 @@ const mapBackendOrderToAdminOrder = (order) => {
     ].filter(Boolean).join(", "),
     status: normalizeOrderStatus(order.paymentStatus),
     date: formatOrderDate(order.createdAt),
+    paymentSlip: order.paymentSlip || null,
     trackingTimeline: [
       {
         status: normalizeOrderStatus(order.paymentStatus),
