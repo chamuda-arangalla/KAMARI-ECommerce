@@ -13,15 +13,33 @@ import orderRoutes from "./routes/order.routes.js";
 
 const app = express();
 
+const getAllowedOrigins = () =>
+  [process.env.CLIENT_URL, process.env.CORS_ORIGINS]
+    .filter(Boolean)
+    .flatMap((origin) => origin.split(","))
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const isLocalhostOrigin = (origin) => {
+  try {
+    const { hostname } = new URL(origin);
+    return ["localhost", "127.0.0.1"].includes(hostname);
+  } catch {
+    return false;
+  }
+};
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (getAllowedOrigins().includes(origin)) return true;
+  return process.env.NODE_ENV !== "production" && isLocalhostOrigin(origin);
+};
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow any localhost port in development, plus the configured CLIENT_URL
-      if (!origin || /^http:\/\/localhost:\d+$/.test(origin) || origin === process.env.CLIENT_URL) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS: origin ${origin} not allowed`));
-      }
+      if (isAllowedOrigin(origin)) return callback(null, true);
+      return callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
   })

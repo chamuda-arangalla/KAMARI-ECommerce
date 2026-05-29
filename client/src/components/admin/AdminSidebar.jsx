@@ -4,7 +4,6 @@ import {
   Package,
   Users,
   BarChart3,
-  Settings,
   ShoppingBag,
   MapPin,
   X,
@@ -59,7 +58,6 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
             <SidebarLink to="/admin/inventory"   icon={Package}     label="Inventory" />
             <SidebarLink to="/admin/customers"   icon={Users}       label="Customers" />
             <SidebarLink to="/admin/analytics"   icon={BarChart3}   label="Analytics" />
-            <SidebarLink to="/admin/products"    icon={Settings}    label="Product Management" />
             <SidebarLink to="/admin/collections"     icon={Layers}  label="Collections" />
             <SidebarLink to="/admin/home-images"     icon={Image}   label="Home Images" />
           </nav>

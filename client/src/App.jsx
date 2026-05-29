@@ -21,7 +21,6 @@ import OrderTracking from "./pages/admin/OrderTracking";
 import InventoryPage from "./pages/admin/InventoryPage";
 import CustomersPage from "./pages/admin/CustomersPage";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
-import ProductManagement from "./pages/admin/ProductManagement";
 import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
@@ -60,7 +59,7 @@ function App() {
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="products" element={<ProductManagement />} />
+            <Route path="products" element={<Navigate to="/admin/inventory" replace />} />
             <Route path="products/:id" element={<ProductDetailsPage />} />
             <Route path="collections" element={<CollectionsManagement />} />
             <Route path="home-images" element={<HomeImagesPage />} />

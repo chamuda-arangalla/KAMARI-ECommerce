@@ -5,6 +5,7 @@ import {
   getProductById,
   updateProduct,
 } from "../../services/productApi";
+import { getCollectionsAdmin } from "../../services/collectionApi";
 import ConfirmDialog from "../common/ConfirmDialog";
 
 const fallbackImage =
@@ -61,6 +62,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [localImageUploads, setLocalImageUploads] = useState([]);
   const [sizeChartUpload, setSizeChartUpload] = useState(null);
+  const [collections, setCollections] = useState([]);
 
   useEffect(() => {
     if (!productId) return;
@@ -87,6 +89,15 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
 
     loadProduct();
   }, [productId, startInEdit]);
+
+  useEffect(() => {
+    if (!editMode) return;
+
+    const token = localStorage.getItem("adminToken");
+    getCollectionsAdmin(token)
+      .then((response) => setCollections(response.data || []))
+      .catch(() => setCollections([]));
+  }, [editMode]);
 
   if (!productId) return null;
 
@@ -425,6 +436,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
               {editMode ? (
                 <EditForm
                   draft={draft}
+                  collections={collections}
                   sizeChartUpload={sizeChartUpload}
                   onSizeChartUpload={handleSizeChartUpload}
                   updateDraft={updateDraft}
@@ -651,12 +663,19 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
   );
 };
 
-const EditForm = ({ draft, sizeChartUpload, onSizeChartUpload, updateDraft }) => (
+const EditForm = ({ draft, collections, sizeChartUpload, onSizeChartUpload, updateDraft }) => (
   <div className="space-y-4">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <Field label="Name" value={draft.name} onChange={(value) => updateDraft("name", value)} />
-      <Field label="Collection" value={draft.collection} onChange={(value) => updateDraft("collection", value)} />
-      <Field label="Set Name" value={draft.setName} onChange={(value) => updateDraft("setName", value)} />
+      <CollectionSelect
+        collections={collections}
+        value={draft.setName || draft.collection}
+        onChange={(value) => {
+          const selected = collections.find((collection) => collection.name === value);
+          updateDraft("setName", selected ? selected.name : "");
+          updateDraft("collection", selected ? selected.name : "");
+        }}
+      />
       <Field label="Price" type="number" value={draft.price} onChange={(value) => updateDraft("price", value)} />
     </div>
     <Area label="Description" value={draft.description} onChange={(value) => updateDraft("description", value)} />
@@ -698,6 +717,27 @@ const EditForm = ({ draft, sizeChartUpload, onSizeChartUpload, updateDraft }) =>
       <CheckField label="Sold Out" checked={draft.isSoldOut} onChange={(value) => updateDraft("isSoldOut", value)} />
     </div>
   </div>
+);
+
+const CollectionSelect = ({ collections, value, onChange }) => (
+  <label className="block">
+    <span className="block text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-2">
+      Collection
+    </span>
+    <select
+      required
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="w-full rounded-xl border border-[#e5ddd5] bg-white px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6]"
+    >
+      <option value="">Select a collection</option>
+      {collections.map((collection) => (
+        <option key={collection._id} value={collection.name}>
+          {collection.name}
+        </option>
+      ))}
+    </select>
+  </label>
 );
 
 const ProductSummary = ({ product, totalStock }) => (
