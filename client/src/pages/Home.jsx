@@ -1,12 +1,13 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { getCollections } from "../services/collectionApi";
 import { getProducts } from "../services/productApi";
+import homeHeroImg from "../assets/images/Home.jpg";
 
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
-const HERO_IMG = "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1800&q=90";
+const HERO_IMG = homeHeroImg;
 const BRAND_IMG = "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=1000&q=85";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
@@ -18,10 +19,21 @@ const getProductImg = (product) =>
 
 export default function Home() {
   const navigate = useNavigate();
+  const collectionSliderRef = useRef(null);
 
   const [collections, setCollections]   = useState([]);
   const [newArrivals, setNewArrivals]   = useState([]);
   const [bestSellers, setBestSellers]   = useState([]);
+
+  const scrollCollections = (direction) => {
+    const slider = collectionSliderRef.current;
+    if (!slider) return;
+
+    slider.scrollBy({
+      left: direction * Math.min(slider.clientWidth, 420),
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     // Load collections from DB
@@ -105,53 +117,69 @@ export default function Home() {
               <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#7D746C]">Browse</p>
               <h2 className="text-3xl font-light tracking-wide">Shop by Collection</h2>
             </div>
-            <Link
-              to="/collections"
-              className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[#7D746C] transition hover:text-[#3B302A]"
-            >
-              View All <ArrowRight size={14} />
-            </Link>
           </motion.div>
 
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
-          >
-            {collections.map((col) => (
-              <motion.div
-                key={col._id}
-                variants={fadeUp}
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.3 }}
-                className="group cursor-pointer"
-                onClick={() => navigate(`/collections?category=${encodeURIComponent(col.name)}`)}
+          <div className="relative">
+            <div className="absolute -right-1 -top-16 hidden gap-2 sm:flex">
+              <button
+                type="button"
+                aria-label="Previous collections"
+                onClick={() => scrollCollections(-1)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#3B302A]/15 bg-white/70 text-[#3B302A] shadow-sm backdrop-blur transition hover:bg-white"
               >
-                <div className="relative mb-3 overflow-hidden rounded-xl bg-[#E8DED6]" style={{ aspectRatio: "3/4" }}>
-                  {col.image?.url ? (
-                    <img
-                      src={col.image.url}
-                      alt={col.name}
-                      className="h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-[#E8DED6]" />
-                  )}
-                  <div className="absolute inset-0 bg-[#3B302A]/20 transition duration-300 group-hover:bg-[#3B302A]/10" />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3B302A]/70 p-4">
-                    <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-white">
-                      {col.name}
-                    </p>
-                    {col.subtitle && (
-                      <p className="mt-1 text-center text-[10px] text-white/70">{col.subtitle}</p>
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                type="button"
+                aria-label="Next collections"
+                onClick={() => scrollCollections(1)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#3B302A]/15 bg-white/70 text-[#3B302A] shadow-sm backdrop-blur transition hover:bg-white"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+
+            <motion.div
+              ref={collectionSliderRef}
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {collections.map((col) => (
+                <motion.div
+                  key={col._id}
+                  variants={fadeUp}
+                  whileHover={{ y: -6 }}
+                  transition={{ duration: 0.3 }}
+                  className="group w-[70vw] max-w-[260px] flex-shrink-0 snap-start cursor-pointer sm:w-[42vw] md:w-[30vw] lg:w-[220px] xl:w-[235px]"
+                  onClick={() => navigate(`/collections?category=${encodeURIComponent(col.name)}`)}
+                >
+                  <div className="relative mb-3 overflow-hidden rounded-xl bg-[#E8DED6]" style={{ aspectRatio: "3/4" }}>
+                    {col.image?.url ? (
+                      <img
+                        src={col.image.url}
+                        alt={col.name}
+                        className="h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-[#E8DED6]" />
                     )}
+                    <div className="absolute inset-0 bg-[#3B302A]/20 transition duration-300 group-hover:bg-[#3B302A]/10" />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3B302A]/70 p-4">
+                      <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-white">
+                        {col.name}
+                      </p>
+                      {col.subtitle && (
+                        <p className="mt-1 text-center text-[10px] text-white/70">{col.subtitle}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
         </section>
       )}
 

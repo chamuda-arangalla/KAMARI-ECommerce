@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ChevronRight, Minus, Plus, ShoppingBag, Zap, Package, RotateCcw, Shield } from "lucide-react";
+import { ChevronRight, Minus, Plus, Package, RotateCcw, Shield } from "lucide-react";
 import { getProductById, getProducts } from "../services/productApi";
 import { useCart } from "../context/useCart";
 import "../styles/ProductDetails.css";
@@ -26,6 +26,8 @@ export default function ProductDetails() {
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState("");
   const [addedMsg, setAddedMsg]             = useState(false);
+  const [sizeChartOpen, setSizeChartOpen]   = useState(false);
+  const sizeChartRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -45,6 +47,7 @@ export default function ProductDetails() {
         setSelSize(loaded.colors?.[0]?.sizes?.find(hasStock)?.size || loaded.colors?.[0]?.sizes?.[0]?.size || "");
         setQty(1);
         setMainIdx(0);
+        setSizeChartOpen(false);
       } catch (e) {
         setError(e.response?.data?.message || "Failed to load product");
       } finally {
@@ -91,6 +94,13 @@ export default function ProductDetails() {
   };
 
   const buyNow = () => { addToCart(); navigate("/checkout"); };
+
+  const showSizeChart = () => {
+    setSizeChartOpen(true);
+    window.setTimeout(() => {
+      sizeChartRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  };
 
   if (loading) {
     return (
@@ -216,6 +226,11 @@ export default function ProductDetails() {
               {selStock > 0 && selStock <= 3 && (
                 <strong className="pd-low-stock-warn">Only {selStock} left!</strong>
               )}
+              {product.sizeChartImage && (
+                <button type="button" className="pd-size-chart-link" onClick={showSizeChart}>
+                  Size Chart
+                </button>
+              )}
             </div>
             <div className="pd-sizes">
               {selColor?.sizes?.map((s) => (
@@ -258,7 +273,6 @@ export default function ProductDetails() {
               disabled={!selStock || !inStock}
               onClick={addToCart}
             >
-              <ShoppingBag size={16} />
               {addedMsg ? "Added to Bag ✓" : "Add to Cart"}
             </button>
             <button
@@ -267,7 +281,6 @@ export default function ProductDetails() {
               disabled={!selStock || !inStock}
               onClick={buyNow}
             >
-              <Zap size={16} />
               Buy Now
             </button>
           </div>
@@ -301,6 +314,25 @@ export default function ProductDetails() {
               {product.design  && <p><strong>Design: </strong>{product.design}</p>}
             </div>
           </details>
+
+          {product.sizeChartImage && (
+            <details
+              ref={sizeChartRef}
+              className="pd-accordion"
+              id="size-chart"
+              open={sizeChartOpen}
+              onToggle={(event) => setSizeChartOpen(event.currentTarget.open)}
+            >
+              <summary>Size Chart</summary>
+              <div className="pd-accordion-body">
+                <img
+                  src={product.sizeChartImage}
+                  alt={`${product.name} size chart`}
+                  className="pd-size-chart-img"
+                />
+              </div>
+            </details>
+          )}
 
           <details className="pd-accordion">
             <summary>Care Instructions</summary>

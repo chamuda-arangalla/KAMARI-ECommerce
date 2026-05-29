@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddProductModal from "../../components/admin/AddProductModel";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { useAdmin } from "../../context/useAdmin";
-import { AlertCircle, Search, Edit2, Plus } from "lucide-react";
+import { deleteProduct } from "../../services/productApi";
+import { AlertCircle, Search, Edit2, Plus, Trash2 } from "lucide-react";
 
 const InventoryPage = () => {
   const navigate = useNavigate();
   const { products, productsLoading, productsError, refreshProducts } = useAdmin();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const openProductView = (product, editMode = false) => {
     navigate(`/admin/products/${product.id}`, {
@@ -19,8 +24,26 @@ const InventoryPage = () => {
   const filteredProducts = products.filter(
     (p) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.collection.toLowerCase().includes(searchTerm.toLowerCase()),
+      p.collection?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const confirmDeleteProduct = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      setDeleting(true);
+      setDeleteError("");
+
+      const token = localStorage.getItem("adminToken");
+      await deleteProduct(deleteTarget.id, token);
+      setDeleteTarget(null);
+      refreshProducts();
+    } catch (error) {
+      setDeleteError(error.response?.data?.message || "Failed to delete product");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -56,6 +79,11 @@ const InventoryPage = () => {
         {productsError && (
           <div className="px-6 py-4 bg-rose-50 text-rose-700 text-base border-b border-rose-100">
             {productsError}
+          </div>
+        )}
+        {deleteError && (
+          <div className="px-6 py-4 bg-rose-50 text-rose-700 text-base border-b border-rose-100">
+            {deleteError}
           </div>
         )}
         {productsLoading && (
@@ -127,13 +155,28 @@ const InventoryPage = () => {
                         <span className="text-emerald-600 text-sm font-semibold uppercase">In Stock</span>
                       )}
                     </td>
-                    <td className="px-6 py-5 text-right">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); openProductView(product, true); }}
-                        className="p-2.5 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-xl transition-all"
-                      >
-                        <Edit2 size={20} />
-                      </button>
+                    <td className="px-6 py-5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openProductView(product, true)}
+                          aria-label={`Edit ${product.name}`}
+                          className="p-2.5 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-xl transition-all"
+                        >
+                          <Edit2 size={20} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeleteError("");
+                            setDeleteTarget(product);
+                          }}
+                          aria-label={`Delete ${product.name}`}
+                          className="p-2.5 text-[#a3948b] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -147,6 +190,20 @@ const InventoryPage = () => {
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         onSuccess={refreshProducts}
+      />
+
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        title="Delete product?"
+        message={`"${deleteTarget?.name || "This product"}" will be permanently removed from inventory.`}
+        confirmLabel="Delete Product"
+        type="delete"
+        loading={deleting}
+        onCancel={() => {
+          if (deleting) return;
+          setDeleteTarget(null);
+        }}
+        onConfirm={confirmDeleteProduct}
       />
     </div>
   );
