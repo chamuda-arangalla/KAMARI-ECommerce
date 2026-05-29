@@ -25,17 +25,13 @@ export const getCollectionsAdmin = async (token) => {
 
 export const createCollection = async (payload, imageFile, token) => {
   const fd = toFormData(payload, imageFile);
-  const res = await axios.post(`${API_URL}/api/collections`, fd, {
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
-  });
+  const res = await axios.post(`${API_URL}/api/collections`, fd, authHeader(token));
   return res.data;
 };
 
 export const updateCollection = async (id, payload, imageFile, token) => {
   const fd = toFormData(payload, imageFile);
-  const res = await axios.put(`${API_URL}/api/collections/${id}`, fd, {
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
-  });
+  const res = await axios.put(`${API_URL}/api/collections/${id}`, fd, authHeader(token));
   return res.data;
 };
 
