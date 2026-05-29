@@ -60,11 +60,6 @@ export default function ShopPage() {
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-  const heroTiles = useMemo(() => {
-    const source = products.filter((p) => p.isNewArrival);
-    const featured = (source.length ? source : products).slice(0, 4);
-    return Array.from({ length: 4 }, (_, i) => featured[i] || null);
-  }, [products]);
 
   const handleTabChange = (t) => { setTab(t); setPage(1); };
   const handleCollectionChange = (c) => { setCollection(c); setPage(1); };
@@ -92,29 +87,6 @@ export default function ShopPage() {
     <main className="shop-page">
 
       {/* ── Page Header ──────────────────────────────── */}
-      <section className="shop-hero" aria-label="New arrivals">
-        {heroTiles.map((product, index) => {
-          const images = product ? getProductImages(product) : [];
-          const img = images[index % Math.max(images.length, 1)]?.url || images[0]?.url || SHOP_IMAGE_FALLBACK;
-          return (
-            <button
-              type="button"
-              key={product?._id || `hero-${index}`}
-              className="shop-hero-tile"
-              onClick={() => (product ? navigate(`/products/${product._id}`) : handleTabChange("new"))}
-            >
-              <img src={img} alt={product?.name || "New arrival"} />
-              {index === 0 && (
-                <span className="shop-hero-copy">
-                  <span className="shop-hero-title">New Arrival</span>
-                  <span className="shop-hero-link">View All</span>
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </section>
-
       {/* ── Tabs + Controls ──────────────────────────── */}
       <div className="shop-controls">
         {/* Tabs */}
@@ -233,6 +205,26 @@ export default function ShopPage() {
         </div>
       )}
     </main>
+  );
+}
+
+function ShopCardSkeleton() {
+  return (
+    <article className="shop-card shop-card-skeleton" aria-hidden="true">
+      <div className="shop-card-img-wrap">
+        <div className="skeleton-img" />
+      </div>
+      <div className="shop-card-info">
+        <div className="skeleton-text medium" />
+        <div className="skeleton-text full" />
+        <div className="skeleton-swatches">
+          <span className="skeleton-swatch" />
+          <span className="skeleton-swatch" />
+          <span className="skeleton-swatch" />
+        </div>
+        <div className="skeleton-text short" />
+      </div>
+    </article>
   );
 }
 
