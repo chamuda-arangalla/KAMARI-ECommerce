@@ -26,6 +26,7 @@ const buildCheckoutAddress = ({
   addressLine2,
   city,
   district,
+  province,
   postalCode,
   country,
 }) => ({
@@ -35,6 +36,7 @@ const buildCheckoutAddress = ({
   addressLine2: addressLine2 || "",
   city,
   district,
+  province: province || "",
   postalCode: postalCode || "",
   country: country || "Sri Lanka",
   isDefault: true,
@@ -49,6 +51,7 @@ export const updateCheckoutAddress = async (req, res) => {
       addressLine2,
       city,
       district,
+      province,
       postalCode,
       country,
     } = req.body;
@@ -60,10 +63,10 @@ export const updateCheckoutAddress = async (req, res) => {
       });
     }
 
-    if (!phone || !addressLine1 || !city || !district) {
+    if (!phone || !addressLine1 || !district) {
       return res.status(400).json({
         success: false,
-        message: "Phone, address line 1, city, and district are required",
+        message: "Phone, address line 1, and district are required",
       });
     }
 
@@ -87,8 +90,9 @@ export const updateCheckoutAddress = async (req, res) => {
       phone,
       addressLine1,
       addressLine2,
-      city,
+      city: city || district,
       district,
+      province,
       postalCode,
       country,
     });

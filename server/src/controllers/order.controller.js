@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
@@ -158,6 +159,46 @@ const createOrderWithUniqueOrderId = async (body) => {
   throw new Error("Failed to generate unique order ID");
 };
 
+const saveReceiverAddressToCustomer = async (userId, receiverDetails) => {
+  const location = receiverDetails?.location || {};
+  const addressLine1 = location.address?.trim();
+  const phone = receiverDetails?.phoneNumber?.trim();
+
+  if (!userId || !addressLine1 || !phone) return null;
+
+  const customer = await User.findOne({
+    _id: userId,
+    role: "customer",
+    isActive: true,
+  });
+
+  if (!customer) return null;
+
+  const checkoutAddress = {
+    fullName: `${receiverDetails.firstName || ""} ${receiverDetails.lastName || ""}`.trim(),
+    phone,
+    addressLine1,
+    addressLine2: "",
+    city: location.city || location.district || "",
+    district: location.district || "",
+    province: location.province || "",
+    postalCode: location.postalCode || "",
+    country: location.country || "Sri Lanka",
+    isDefault: true,
+  };
+
+  customer.firstName = receiverDetails.firstName || customer.firstName;
+  customer.lastName = receiverDetails.lastName || customer.lastName;
+  customer.phone = phone;
+  customer.addresses = [
+    checkoutAddress,
+    ...customer.addresses.filter((address) => !address.isDefault),
+  ];
+
+  await customer.save();
+  return customer;
+};
+
 export const createOrder = async (req, res) => {
   try {
     const { productDetails, receiverDetails } = req.body;
@@ -185,11 +226,26 @@ export const createOrder = async (req, res) => {
     };
 
     const order = await createOrderWithUniqueOrderId(orderBody);
+    const updatedCustomer = !isAdmin(req)
+      ? await saveReceiverAddressToCustomer(req.user.id, orderBody.receiverDetails)
+      : null;
 
     return res.status(201).json({
       success: true,
       message: "Order created successfully",
       data: order,
+      user: updatedCustomer
+        ? {
+            id: updatedCustomer._id,
+            role: updatedCustomer.role,
+            firstName: updatedCustomer.firstName,
+            lastName: updatedCustomer.lastName,
+            email: updatedCustomer.email,
+            phone: updatedCustomer.phone,
+            addresses: updatedCustomer.addresses,
+            isActive: updatedCustomer.isActive,
+          }
+        : undefined,
     });
   } catch (error) {
     return res.status(error.statusCode || 500).json({

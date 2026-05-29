@@ -159,6 +159,35 @@ const buildOrderPayload = (items, receiverDetails) => ({
   },
 });
 
+const buildUpdatedCustomer = (receiverDetails, updatedUser) => {
+  const customer = updatedUser || JSON.parse(localStorage.getItem("customerUser") || "{}");
+  const existingAddresses = Array.isArray(customer.addresses) ? customer.addresses : [];
+  const address = {
+    fullName: `${receiverDetails.firstName || ""} ${receiverDetails.lastName || ""}`.trim(),
+    phone: receiverDetails.phoneNumber,
+    addressLine1: receiverDetails.address,
+    addressLine2: "",
+    city: receiverDetails.district,
+    district: receiverDetails.district,
+    province: receiverDetails.province,
+    postalCode: receiverDetails.postalCode,
+    country: receiverDetails.country || "Sri Lanka",
+    isDefault: true,
+  };
+
+  return {
+    ...customer,
+    ...updatedUser,
+    firstName: receiverDetails.firstName,
+    lastName: receiverDetails.lastName,
+    phone: receiverDetails.phoneNumber,
+    addresses: [
+      address,
+      ...existingAddresses.filter((item) => !item.isDefault),
+    ],
+  };
+};
+
 export default function CheckoutPage() {
   const {
     items,
@@ -219,9 +248,14 @@ export default function CheckoutPage() {
         buildOrderPayload(items, receiverDetails),
         token,
       );
+      const order = response?.data || response;
+      const updatedUser = response?.user;
+      const updatedCustomer = buildUpdatedCustomer(receiverDetails, updatedUser);
 
       setOrderTotal(total);
-      setCreatedOrder(response.data);
+      setCreatedOrder(order);
+      localStorage.setItem("customerUser", JSON.stringify(updatedCustomer));
+      window.dispatchEvent(new Event("kamari:user-updated"));
       clearCart();
     } catch (submitError) {
       setError(
@@ -599,7 +633,7 @@ export default function CheckoutPage() {
 
           <div className="order-total-row total">
             <span>Total</span>
-            <span>LKR {orderTotal.toLocaleString()}</span>
+            <span>LKR {(createdOrder ? orderTotal : total).toLocaleString()}</span>
           </div>
         </div>
       </div>

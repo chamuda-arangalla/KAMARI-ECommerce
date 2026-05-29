@@ -79,37 +79,30 @@ export default function ProductDetails() {
 
   const isLoggedIn = () => !!localStorage.getItem("customerToken");
 
+  const selectedCartItem = () => ({
+    id: `${product._id}-${selColor.colorName}-${selSize}`,
+    productId: product._id,
+    name: product.name,
+    variant: selColor.colorName,
+    size: selSize,
+    price: Number(product.price || 0),
+    qty,
+    img: mainImages[0]?.url || FALLBACK,
+  });
+
   const addToCart = () => {
     if (!product || !selColor || !selSize || !selStock) return;
+    handleAddItem(selectedCartItem());
     if (!isLoggedIn()) { navigate("/login?redirect=cart"); return; }
-    handleAddItem({
-      id: `${product._id}-${selColor.colorName}-${selSize}`,
-      productId: product._id,
-      name: product.name,
-      variant: selColor.colorName,
-      size: selSize,
-      price: Number(product.price || 0),
-      qty,
-      img: mainImages[0]?.url || FALLBACK,
-    });
     setAddedMsg(true);
     setTimeout(() => setAddedMsg(false), 2500);
   };
 
   const buyNow = () => {
     if (!product || !selColor || !selSize || !selStock) return;
+    handleAddItem(selectedCartItem());
+    setIsDrawerOpen(false);
     if (!isLoggedIn()) { navigate("/login?redirect=checkout"); return; }
-    handleAddItem({
-      id: `${product._id}-${selColor.colorName}-${selSize}`,
-      productId: product._id,
-      name: product.name,
-      variant: selColor.colorName,
-      size: selSize,
-      price: Number(product.price || 0),
-      qty,
-      img: mainImages[0]?.url || FALLBACK,
-    });
-    setIsDrawerOpen(true);
     navigate("/checkout");
   };
 

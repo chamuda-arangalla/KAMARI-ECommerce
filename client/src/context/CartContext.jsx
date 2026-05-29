@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CartContext } from "./cartContextValue";
 
 const FREE_DELIVERY_THRESHOLD = 10000;
 const DELIVERY_FEE = 350;
+const CART_STORAGE_KEY = "kamariCartItems";
+
+const getStoredItems = () => {
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(getStoredItems);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
 
   const handleUpdateQty = (id, delta) =>
     setItems((prev) =>

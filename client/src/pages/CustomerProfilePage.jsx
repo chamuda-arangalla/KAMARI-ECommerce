@@ -7,7 +7,7 @@ const emptyProfile = {
   firstName: "", lastName: "", email: "", phone: "",
   currentPassword: "", password: "",
   addressLine1: "", addressLine2: "", city: "", district: "",
-  postalCode: "", country: "Sri Lanka",
+  province: "", postalCode: "", country: "Sri Lanka",
 };
 
 const createProfileDraft = (profile) => {
@@ -23,37 +23,62 @@ const createProfileDraft = (profile) => {
     addressLine2: address?.addressLine2 || "",
     city:         address?.city         || "",
     district:     address?.district     || "",
+    province:     address?.province     || "",
     postalCode:   address?.postalCode   || "",
     country:      address?.country      || "Sri Lanka",
   };
 };
 
-const buildProfilePayload = (draft) => ({
-  firstName: draft.firstName,
-  lastName:  draft.lastName,
-  email:     draft.email,
-  phone:     draft.phone,
-  currentPassword: draft.currentPassword,
-  password:  draft.password,
-  addresses:
-    draft.addressLine1 || draft.city || draft.district
-      ? [{
-          fullName:     `${draft.firstName} ${draft.lastName}`.trim(),
-          phone:        draft.phone,
-          addressLine1: draft.addressLine1,
-          addressLine2: draft.addressLine2,
-          city:         draft.city,
-          district:     draft.district,
-          postalCode:   draft.postalCode,
-          country:      draft.country || "Sri Lanka",
-          isDefault:    true,
-        }]
+const buildProfilePayload = (draft, currentProfile) => {
+  const existingAddresses = Array.isArray(currentProfile?.addresses) ? currentProfile.addresses : [];
+  const defaultAddressIndex = existingAddresses.findIndex((item) => item.isDefault);
+  const addressToReplaceIndex = defaultAddressIndex >= 0 ? defaultAddressIndex : 0;
+  const existingDefaultAddress = existingAddresses[addressToReplaceIndex] || {};
+  const hasAddress = [
+    draft.addressLine1,
+    draft.addressLine2,
+    draft.city,
+    draft.district,
+    draft.province,
+    draft.postalCode,
+  ].some((value) => value.trim());
+
+  const defaultAddress = hasAddress
+    ? {
+        ...existingDefaultAddress,
+        fullName:     `${draft.firstName} ${draft.lastName}`.trim(),
+        phone:        draft.phone,
+        addressLine1: draft.addressLine1,
+        addressLine2: draft.addressLine2,
+        city:         draft.city,
+        district:     draft.district,
+        province:     draft.province,
+        postalCode:   draft.postalCode,
+        country:      draft.country || "Sri Lanka",
+        isDefault:    true,
+      }
+    : null;
+
+  return {
+    firstName: draft.firstName,
+    lastName:  draft.lastName,
+    email:     draft.email,
+    phone:     draft.phone,
+    currentPassword: draft.currentPassword,
+    password:  draft.password,
+    addresses: defaultAddress
+      ? [
+          defaultAddress,
+          ...existingAddresses.filter((_, index) => index !== addressToReplaceIndex),
+        ]
       : [],
-});
+  };
+};
 
 const CustomerProfilePage = () => {
   const token = localStorage.getItem("customerToken");
   const [draft, setDraft]     = useState(emptyProfile);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
   const [error, setError]     = useState("");
@@ -66,6 +91,7 @@ const CustomerProfilePage = () => {
         setLoading(true);
         setError("");
         const response = await getMyProfile(token);
+        setProfile(response.data);
         setDraft(createProfileDraft(response.data));
         localStorage.setItem("customerUser", JSON.stringify(response.data));
         window.dispatchEvent(new Event("kamari:user-updated"));
@@ -91,7 +117,8 @@ const CustomerProfilePage = () => {
       setSaving(true);
       setError("");
       setSuccess("");
-      const response = await updateMyProfile(buildProfilePayload(draft), token);
+      const response = await updateMyProfile(buildProfilePayload(draft, profile), token);
+      setProfile(response.data);
       setDraft(createProfileDraft(response.data));
       localStorage.setItem("customerUser", JSON.stringify(response.data));
       window.dispatchEvent(new Event("kamari:user-updated"));
@@ -141,6 +168,7 @@ const CustomerProfilePage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <Field label="City"        name="city"       value={draft.city}       onChange={handleChange} />
                   <Field label="District"    name="district"   value={draft.district}   onChange={handleChange} />
+                  <Field label="Province"    name="province"   value={draft.province}   onChange={handleChange} />
                   <Field label="Postal Code" name="postalCode" value={draft.postalCode} onChange={handleChange} />
                   <Field label="Country"     name="country"    value={draft.country}    onChange={handleChange} />
                 </div>
