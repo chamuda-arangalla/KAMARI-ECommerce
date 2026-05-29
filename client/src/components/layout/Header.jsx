@@ -6,6 +6,8 @@ import { useCart } from "../../context/useCart";
 import ConfirmDialog from "../common/ConfirmDialog";
 import { logout } from "../../services/authApi";
 import { getCollections } from "../../services/collectionApi";
+import { getProducts } from "../../services/productApi";
+import { getProductImages } from "../../utils/shopProduct";
 import "../../styles/Header.css";
 
 const Header = () => {
@@ -25,9 +27,38 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCollections()
-      .then((res) => setCollections(res.data || []))
-      .catch(() => setCollections([]));
+    const loadCollections = async () => {
+      try {
+        const res = await getCollections();
+        const collectionData = res.data || [];
+
+        if (collectionData.length > 0) {
+          setCollections(collectionData);
+          return;
+        }
+
+        const productRes = await getProducts();
+        const productCollections = new Map();
+
+        (productRes.data || []).forEach((product) => {
+          const name = product.setName || product.collection;
+          if (!name || productCollections.has(name)) return;
+
+          productCollections.set(name, {
+            _id: `product-${name}`,
+            name,
+            subtitle: product.collection || "",
+            image: { url: getProductImages(product)[0]?.url || "" },
+          });
+        });
+
+        setCollections([...productCollections.values()]);
+      } catch {
+        setCollections([]);
+      }
+    };
+
+    loadCollections();
   }, []);
 
   useEffect(() => {
@@ -274,11 +305,15 @@ const Header = () => {
                     onClick={() => handleCollectionClick(col.name)}
                   >
                     <div className="collections-dropdown-card-img-wrap">
-                      <img
-                        src={col.image?.url}
-                        alt={col.name}
-                        className="collections-dropdown-card-img"
-                      />
+                      {col.image?.url ? (
+                        <img
+                          src={col.image.url}
+                          alt={col.name}
+                          className="collections-dropdown-card-img"
+                        />
+                      ) : (
+                        <div className="collections-dropdown-card-placeholder" />
+                      )}
                     </div>
                     <p className="collections-dropdown-card-name">{col.name}</p>
                     <p className="collections-dropdown-card-sub">{col.subtitle}</p>

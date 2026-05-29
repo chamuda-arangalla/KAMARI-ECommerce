@@ -131,6 +131,12 @@
   transition: transform 0.4s ease;
 }
 
+.collections-dropdown-card-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f1ece7;
+}
+
 .collections-dropdown-card:hover .collections-dropdown-card-img {
   transform: scale(1.04);
 }

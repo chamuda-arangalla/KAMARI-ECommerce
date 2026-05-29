@@ -3,9 +3,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, Leaf, Award, Users } from "lucide-react";
 import { getSiteContent } from "../services/siteContentApi";
+import aboutHeroImg from "../assets/images/About-Hero.png";
+import aboutSubImg from "../assets/images/About-sub.png";
 
 const fadeUp  = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 const fadeIn  = { hidden: { opacity: 0 },         visible: { opacity: 1 } };
+const heroText = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
 
 const VALUE_ICONS = [Heart, Leaf, Award, Users];
@@ -13,9 +16,9 @@ const VALUE_ICONS = [Heart, Leaf, Award, Users];
 const DEFAULTS = {
   heroTitle: "About KAMARI",
   heroSubtitle: "Contemporary women's fashion for the modern Sri Lankan lifestyle.",
-  heroImage: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1800&q=85",
+  heroImage: aboutHeroImg,
   storyTitle: "Dressing the modern Sri Lankan woman",
-  storyImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=900&q=85",
+  storyImage: aboutSubImg,
   storyParagraphs: [
     "KAMARI was born from a simple belief — that every woman deserves clothing that is both beautiful and practical.",
     "From casual t-shirts and comfortable trousers to elegant frocks and co-ord sets, our collections are thoughtfully designed for the Sri Lankan climate, culture and lifestyle.",
@@ -43,7 +46,7 @@ export default function AboutPage() {
 
   useEffect(() => {
     getSiteContent("about")
-      .then((res) => setData({ ...DEFAULTS, ...res.data }))
+      .then((res) => setData({ ...DEFAULTS, ...res.data, heroImage: aboutHeroImg, storyImage: aboutSubImg }))
       .catch(() => setData(DEFAULTS));
   }, []);
 
@@ -55,24 +58,35 @@ export default function AboutPage() {
       {/* ── Hero ─────────────────────────────────────── */}
       <section className="relative overflow-hidden" style={{ height: "65vh", minHeight: 460 }}>
         <motion.img
-          initial={{ scale: 1.06, opacity: 0 }}
+          initial={{ scale: 1.08, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.3, ease: "easeOut" }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
           src={data.heroImage}
           alt="About KAMARI"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#3B302A]/50 via-[#3B302A]/30 to-[#3B302A]/60" />
         <motion.div
-          variants={fadeUp}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.1, delay: 0.2 }}
+          className="absolute inset-0 bg-gradient-to-b from-[#3B302A]/50 via-[#3B302A]/24 to-[#3B302A]/64"
+        />
+        <motion.div
+          variants={stagger}
           initial="hidden"
           animate="visible"
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ delayChildren: 0.35, staggerChildren: 0.14 }}
           className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6"
         >
-          <p className="mb-3 text-xs uppercase tracking-[0.3em] text-white/70">Our Story</p>
-          <h1 className="mb-4 text-5xl font-light tracking-[0.15em] md:text-6xl">{data.heroTitle}</h1>
-          <p className="max-w-xl text-base leading-relaxed text-white/80">{data.heroSubtitle}</p>
+          <motion.p variants={heroText} className="mb-3 text-xs uppercase tracking-[0.3em] text-white/70">
+            Our Story
+          </motion.p>
+          <motion.h1 variants={heroText} className="mb-4 text-5xl font-light tracking-[0.15em] md:text-6xl">
+            {data.heroTitle}
+          </motion.h1>
+          <motion.p variants={heroText} className="max-w-xl text-base leading-relaxed text-white/80">
+            {data.heroSubtitle}
+          </motion.p>
         </motion.div>
       </section>
 
