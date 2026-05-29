@@ -5,10 +5,11 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { getCollections } from "../services/collectionApi";
 import { getProducts } from "../services/productApi";
 import homeHeroImg from "../assets/images/Home.jpg";
+import content01Img from "../assets/images/Content01.png";
 
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
 const HERO_IMG = homeHeroImg;
-const BRAND_IMG = "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=1000&q=85";
+const BRAND_IMG = content01Img;
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 const fadeIn  = { hidden: { opacity: 0 },        visible: { opacity: 1 } };
@@ -246,7 +247,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#3B302A]/60 via-transparent" />
           <div className="absolute bottom-8 left-8">
             <p className="mb-1 text-xs uppercase tracking-[0.2em] text-white/70">Collections</p>
-            <h3 className="text-2xl font-light text-white">Smart Casuals</h3>
+            {/* <h3 className="text-2xl font-light text-white">Smart Casuals</h3> */}
           </div>
         </motion.div>
 
