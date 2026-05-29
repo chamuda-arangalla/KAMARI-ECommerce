@@ -516,6 +516,28 @@
   margin-bottom: 24px;
 }
 
+/* ── Skeleton card ─────────────────────────────── */
+.product-card-skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
+.product-card-skeleton .product-card-img-wrap {
+  background: none;
+}
+
+.skeleton-colors {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.skeleton-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
 /* ── Pagination ───────────────────────────────── */
 .collections-pagination {
   display: flex;

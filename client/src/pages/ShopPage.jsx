@@ -174,9 +174,10 @@ export default function ShopPage() {
 
       {/* ── Product Grid ─────────────────────────────── */}
       {loading ? (
-        <div className="shop-state">
-          <div className="shop-spinner" />
-          <p>Loading products...</p>
+        <div className="shop-grid">
+          {Array.from({ length: PER_PAGE }).map((_, i) => (
+            <ShopCardSkeleton key={i} />
+          ))}
         </div>
       ) : error ? (
         <div className="shop-state">
