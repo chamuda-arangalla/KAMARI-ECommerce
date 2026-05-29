@@ -33,6 +33,12 @@ export const uploadSingleImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 }).single("image");
 
+export const uploadPaymentSlip = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("paymentSlip");
+
 export const uploadHomeImages = multer({
   storage,
   fileFilter,

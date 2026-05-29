@@ -213,6 +213,39 @@ const OrdersPage = () => {
                   </div>
                 </div>
 
+                {/* Payment Slip */}
+                <div>
+                  <h4 className="text-base font-bold text-[#3b302a] uppercase tracking-widest mb-3">Payment Slip</h4>
+                  {selectedOrder.paymentSlip?.url ? (
+                    <div className="space-y-3">
+                      <a
+                        href={selectedOrder.paymentSlip.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block overflow-hidden rounded-xl border border-[#e5ddd5]"
+                      >
+                        <img
+                          src={selectedOrder.paymentSlip.url}
+                          alt="Payment slip"
+                          className="w-full object-contain max-h-72 bg-[#f8f5f2]"
+                        />
+                      </a>
+                      <a
+                        href={selectedOrder.paymentSlip.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-[#7d746c] underline underline-offset-2 hover:text-[#3b302a] transition-colors"
+                      >
+                        View full image ↗
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[#a3948b] py-3 px-4 bg-[#f8f5f2] rounded-lg border border-[#e5ddd5]">
+                      No payment slip uploaded yet.
+                    </p>
+                  )}
+                </div>
+
                 <button className="w-full py-4 bg-[#3b302a] text-white text-base font-semibold rounded-xl hover:bg-[#2a221d] transition-all shadow-lg shadow-[#3b302a]/10">
                   Print Invoice
                 </button>
