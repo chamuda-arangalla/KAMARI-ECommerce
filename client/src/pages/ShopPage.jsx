@@ -1,18 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { X } from "lucide-react";
-import ShopCard from "../components/shop/ShopCard";
+import { SlidersHorizontal, X } from "lucide-react";
 import { getProducts } from "../services/productApi";
 import { useCart } from "../context/useCart";
-import {
-  getFirstAvailableVariant,
-  getProductImages,
-  isProductInStock,
-  SHOP_IMAGE_FALLBACK,
-} from "../utils/shopProduct";
 import "../styles/ShopPage.css";
 
+const FALLBACK =
+  "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=700&q=80";
 const PER_PAGE = 8;
+
+const getImages = (product) =>
+  product.colors?.flatMap((c) => c.images || []) || [];
+
+const totalStock = (product) =>
+  product.colors?.reduce(
+    (t, c) => t + (c.sizes?.reduce((s, sz) => s + Number(sz.stock || 0), 0) || 0),
+    0,
+  ) || 0;
+
+const inStock = (product) =>
+  !product.isSoldOut && totalStock(product) > 0;
+
+const firstAvailable = (product) => {
+  const color =
+    product.colors?.find((c) => c.sizes?.some((s) => Number(s.stock || 0) > 0)) ||
+    product.colors?.[0];
+  const size =
+    color?.sizes?.find((s) => Number(s.stock || 0) > 0) || color?.sizes?.[0];
+  return { colorName: color?.colorName || "Default", size: size?.size || "S" };
+};
 
 export default function ShopPage() {
   const navigate = useNavigate();
@@ -25,6 +41,7 @@ export default function ShopPage() {
   const [collection, setCollection] = useState("All");
   const [sort, setSort]             = useState("featured");
   const [page, setPage]             = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -66,11 +83,11 @@ export default function ShopPage() {
   const handleSortChange = (s) => { setSort(s); setPage(1); };
 
   const quickAdd = (product, color) => {
-    if (!isProductInStock(product)) return;
-    const imgs = color?.images?.length ? color.images : getProductImages(product);
+    if (!inStock(product)) return;
+    const imgs = color?.images?.length ? color.images : getImages(product);
     const variant = color
       ? { colorName: color.colorName, size: color.sizes?.find((s) => Number(s.stock || 0) > 0)?.size || color.sizes?.[0]?.size || "S" }
-      : getFirstAvailableVariant(product);
+      : firstAvailable(product);
     handleAddItem({
       id: `${product._id}-${variant.colorName}-${variant.size}`,
       productId: product._id,
@@ -79,7 +96,7 @@ export default function ShopPage() {
       size: variant.size,
       price: Number(product.price || 0),
       qty: 1,
-      img: imgs[0]?.url || SHOP_IMAGE_FALLBACK,
+      img: imgs[0]?.url || FALLBACK,
     });
   };
 
@@ -87,6 +104,13 @@ export default function ShopPage() {
     <main className="shop-page">
 
       {/* ── Page Header ──────────────────────────────── */}
+      <div className="shop-hero">
+        <h1 className="shop-hero-title">Shop All</h1>
+        <p className="shop-hero-sub">
+          Discover our full range of women's fashion — from everyday casuals to smart formals.
+        </p>
+      </div>
+
       {/* ── Tabs + Controls ──────────────────────────── */}
       <div className="shop-controls">
         {/* Tabs */}
@@ -210,21 +234,103 @@ export default function ShopPage() {
 
 function ShopCardSkeleton() {
   return (
-    <article className="shop-card shop-card-skeleton" aria-hidden="true">
+    <article className="shop-card shop-card-skeleton">
       <div className="shop-card-img-wrap">
-        <div className="skeleton-img" />
+        <div className="skeleton skeleton-img" />
       </div>
       <div className="shop-card-info">
-        <div className="skeleton-text medium" />
-        <div className="skeleton-text full" />
+        <div className="skeleton skeleton-text short" />
+        <div className="skeleton skeleton-text medium" />
         <div className="skeleton-swatches">
-          <span className="skeleton-swatch" />
-          <span className="skeleton-swatch" />
-          <span className="skeleton-swatch" />
+          <div className="skeleton skeleton-swatch" />
+          <div className="skeleton skeleton-swatch" />
+          <div className="skeleton skeleton-swatch" />
         </div>
-        <div className="skeleton-text short" />
+        <div className="skeleton skeleton-text short" />
+        <div className="skeleton skeleton-text medium" />
       </div>
     </article>
   );
 }
 
+function ShopCard({ product, onOpen, onQuickAdd }) {
+  const colors   = product.colors || [];
+  const inStockP = inStock(product);
+  const images   = getImages(product);
+
+  const [hoveredColor, setHoveredColor] = useState(null);
+
+  const activeColor  = hoveredColor ?? colors[0];
+  const displayImg   = activeColor?.images?.[0]?.url || images[0]?.url || FALLBACK;
+  const displayImg2  = activeColor?.images?.[1]?.url || images[1]?.url || displayImg;
+
+  const badge = product.isFeatured ? "Best Seller"
+              : product.isNewArrival ? "New"
+              : null;
+
+  const colorSoldOut = (color) =>
+    color.sizes?.every((s) => Number(s.stock || 0) === 0);
+
+  return (
+    <article className="shop-card" onClick={onOpen}>
+      {/* Image */}
+      <div className="shop-card-img-wrap">
+        <img src={displayImg}  alt={product.name} className="shop-card-img front" />
+        <img src={displayImg2} alt={product.name} className="shop-card-img back" />
+
+        {badge && inStockP && (
+          <span className={`shop-card-badge ${badge === "Best Seller" ? "best" : "new"}`}>
+            {badge}
+          </span>
+        )}
+
+        {!inStockP && (
+          <div className="shop-card-sold-out">
+            <span>Sold Out</span>
+          </div>
+        )}
+
+        {inStockP && (
+          <button
+            className="shop-card-quick-add"
+            onClick={(e) => { e.stopPropagation(); onQuickAdd(activeColor); }}
+          >
+            Quick Add
+          </button>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="shop-card-info">
+        <p className="shop-card-collection">
+          {product.setName || product.collection}
+        </p>
+        <p className="shop-card-name">{product.name}</p>
+
+        {/* Color swatches */}
+        <div className="shop-card-swatches">
+          {colors.slice(0, 5).map((c) => (
+            <button
+              key={c._id || c.colorName}
+              type="button"
+              className={`shop-card-swatch ${colorSoldOut(c) ? "sold-out" : ""} ${activeColor === c ? "active" : ""}`}
+              style={{ backgroundColor: c.colorCode || "#ccc" }}
+              title={colorSoldOut(c) ? `${c.colorName} — Sold Out` : c.colorName}
+              onClick={(e) => { e.stopPropagation(); setHoveredColor(c); }}
+              onMouseEnter={() => setHoveredColor(c)}
+              onMouseLeave={() => setHoveredColor(null)}
+            />
+          ))}
+          {colors.length > 5 && (
+            <span className="shop-card-more-colors">+{colors.length - 5}</span>
+          )}
+        </div>
+
+        <p className="shop-card-price">LKR {Number(product.price || 0).toLocaleString()}</p>
+        <p className="shop-card-installment">
+          or 3 × LKR {Math.round(Number(product.price || 0) / 3).toLocaleString()} with Koko
+        </p>
+      </div>
+    </article>
+  );
+}
