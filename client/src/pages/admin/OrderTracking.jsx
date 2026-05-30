@@ -3,6 +3,77 @@ import { Check, ChevronRight, Clock, Loader2, Search, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAdmin } from '../../context/useAdmin';
 
+const stages = [
+  { id: 'Created', icon: Clock, label: 'Created' },
+  { id: 'Shipping', icon: ChevronRight, label: 'Shipping' },
+  { id: 'Received', icon: Check, label: 'Received' },
+];
+
+const TrackingDetails = ({ selectedOrder, currentStageIndex, compact = false }) => (
+  <div className={`rounded-2xl border border-[#e5ddd5] bg-white shadow-sm ${compact ? 'p-5' : 'p-6 sm:p-8'}`}>
+    <div className={`${compact ? 'mb-8' : 'mb-12'} flex flex-col justify-between gap-4 sm:flex-row sm:items-start`}>
+      <div>
+        <h3 className={`${compact ? 'text-xl' : 'text-2xl'} font-bold text-[#3b302a]`}>
+          Live Tracking: {selectedOrder.orderNumber}
+        </h3>
+        <p className="mt-1 text-sm text-[#a3948b] sm:text-base">Customer: {selectedOrder.customerName}</p>
+      </div>
+      <span className="w-fit rounded-full border border-[#e5ddd5] bg-[#fcfaf7] px-4 py-2 text-sm font-semibold text-[#3b302a] sm:text-base">
+        {selectedOrder.orderStatus}
+      </span>
+    </div>
+
+    <div className={`${compact ? 'mb-10' : 'mb-20'} overflow-x-auto pb-2`}>
+      <div className="relative min-w-[360px] sm:min-w-0">
+        <div className="absolute left-0 right-0 top-7 h-1 bg-[#f3ede8]" />
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${(currentStageIndex / (stages.length - 1)) * 100}%` }}
+          className="absolute left-0 top-7 h-1 bg-[#d4a373]"
+        />
+        <div className="relative flex justify-between">
+          {stages.map((stage, idx) => {
+            const Icon = stage.icon;
+            const isCompleted = idx <= currentStageIndex;
+            const isCurrent = idx === currentStageIndex;
+
+            return (
+              <div key={stage.id} className="flex flex-col items-center">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-full transition-all duration-500 sm:h-14 sm:w-14 ${
+                  isCompleted ? 'bg-[#d4a373] text-white' : 'border-2 border-[#f3ede8] bg-white text-[#a3948b]'
+                } ${isCurrent ? 'shadow-lg ring-4 ring-[#d4a373]/20' : ''}`}
+                >
+                  <Icon size={compact ? 18 : 22} />
+                </div>
+                <p className={`mt-3 text-xs font-bold uppercase tracking-wider sm:text-sm ${isCompleted ? 'text-[#3b302a]' : 'text-[#a3948b]'}`}>
+                  {stage.label}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+
+    <div className="space-y-6">
+      <h4 className="text-sm font-semibold uppercase tracking-widest text-[#3b302a]">History</h4>
+      <div className="relative max-h-[280px] space-y-6 overflow-y-auto pr-2">
+        <div className="absolute bottom-2 left-2.5 top-2 w-px bg-[#f3ede8]" />
+        {[...selectedOrder.trackingTimeline].reverse().map((event, idx) => (
+          <div key={`${event.status}-${idx}`} className="relative pl-10">
+            <div className="absolute left-0 top-1 z-10 h-5 w-5 rounded-full border-2 border-[#d4a373] bg-white" />
+            <div>
+              <p className="text-base font-bold text-[#3b302a]">{event.status}</p>
+              <p className="mt-1 text-sm text-[#6b5e55] sm:text-base">{event.description}</p>
+              <p className="mt-1 text-sm text-[#a3948b]">{event.date}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 const OrderTracking = () => {
   const { orders, ordersLoading, ordersError } = useAdmin();
   const [selectedOrderId, setSelectedOrderId] = useState('');
@@ -21,31 +92,38 @@ const OrderTracking = () => {
   });
 
   const selectedOrder = orders.find((order) => order.id === selectedOrderId);
-
-  const stages = [
-    { id: 'Created', icon: Clock, label: 'Created' },
-    { id: 'Shipping', icon: ChevronRight, label: 'Shipping' },
-    { id: 'Received', icon: Check, label: 'Received' },
-  ];
-
   const currentStageIndex = Math.max(
     stages.findIndex((stage) => stage.id === selectedOrder?.orderStatus),
     0,
   );
 
+  const handleSelectOrder = (order) => {
+    setSelectedOrderId(order.id);
+  };
+
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-3xl font-semibold text-[#3b302a]">Order Tracking</h2>
-        <p className="text-[#a3948b] mt-1">Monitor and update order progress</p>
+        <p className="mt-1 text-[#a3948b]">Monitor order progress</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-1">
+          <div className="rounded-2xl border border-[#e5ddd5] bg-white p-6 shadow-sm">
+            <h3 className="mb-5 text-base font-bold uppercase tracking-widest text-[#3b302a]">Select Order</h3>
 
-          {/* Order selector */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
-            <h3 className="text-base font-bold text-[#3b302a] uppercase tracking-widest mb-5">Select Order</h3>
+            <div className="relative mb-4">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]" />
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search orders"
+                className="w-full rounded-xl border border-[#e5ddd5] bg-[#fcfaf7] py-3 pl-10 pr-4 text-sm text-[#3b302a] outline-none transition-all placeholder:text-[#b8ada5] focus:border-[#c2b2a6] focus:bg-white"
+              />
+            </div>
+
             <div className="space-y-3">
               {ordersLoading && (
                 <div className="flex items-center gap-2 py-8 text-sm text-[#6b5e55]">
@@ -54,140 +132,103 @@ const OrderTracking = () => {
                 </div>
               )}
 
-        {!ordersLoading && ordersError && (
-          <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
-            {ordersError}
-          </p>
-        )}
+              {!ordersLoading && ordersError && (
+                <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                  {ordersError}
+                </p>
+              )}
 
-        {!ordersLoading && !ordersError && orders.length === 0 && (
-          <p className="py-12 text-sm text-[#a3948b]">No orders found.</p>
-        )}
+              {!ordersLoading && !ordersError && orders.length === 0 && (
+                <p className="py-10 text-sm text-[#a3948b]">No orders found.</p>
+              )}
 
-        {!ordersLoading && !ordersError && orders.length > 0 && filteredOrders.length === 0 && (
-          <p className="py-12 text-sm text-[#a3948b]">No matching orders.</p>
-        )}
+              {!ordersLoading && !ordersError && orders.length > 0 && filteredOrders.length === 0 && (
+                <p className="py-10 text-sm text-[#a3948b]">No matching orders.</p>
+              )}
 
-        {!ordersLoading && !ordersError && filteredOrders.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-            {filteredOrders.map((order) => (
-              <button
-                key={order.id}
-                type="button"
-                onClick={() => setSelectedOrderId(order.id)}
-                className="group flex min-h-[168px] flex-col justify-between rounded-2xl border border-[#f0ebe5] bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#c2b2a6] hover:shadow-md"
-              >
-                <div className="min-w-0">
-                  <div className="mb-3 flex items-start justify-between gap-3">
-                    <p className="truncate text-base font-bold text-[#3b302a]">{order.orderNumber}</p>
-                    <ChevronRight size={18} className="shrink-0 text-[#a3948b] transition-colors group-hover:text-[#3b302a]" />
-                  </div>
-                  <p className="truncate text-sm font-medium text-[#6b5e55]">{order.customerName}</p>
-                  <p className="mt-1 text-xs text-[#a3948b]">{order.date}</p>
-                </div>
-
-          {/* Update status */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
-            <h3 className="text-base font-bold text-[#3b302a] uppercase tracking-widest mb-5">Update Status</h3>
-            <form onSubmit={handleUpdateStatus} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-[#a3948b] uppercase mb-1.5">New Status</label>
-                <select
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full bg-[#f8f5f2] border-none rounded-xl px-4 py-3 text-base focus:ring-1 focus:ring-[#c2b2a6] outline-none"
-                  required
-                  disabled={!selectedOrder}
+              {!ordersLoading && !ordersError && filteredOrders.map((order) => (
+                <button
+                  key={order.id}
+                  type="button"
+                  onClick={() => handleSelectOrder(order)}
+                  className={`group flex w-full items-center justify-between gap-4 rounded-xl border p-4 text-left transition-all ${
+                    selectedOrderId === order.id
+                      ? 'border-[#c2b2a6] bg-[#fcfaf7]'
+                      : 'border-[#f0ebe5] bg-white hover:border-[#c2b2a6] hover:bg-[#fcfaf7]'
+                  }`}
                 >
-                  <option value="">Select Stage</option>
-                  {stages.map((stage) => (
-                    <option key={stage.id} value={stage.id}>{stage.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#a3948b] uppercase mb-1.5">Note (Optional)</label>
-                <textarea
-                  value={statusNote}
-                  onChange={(e) => setStatusNote(e.target.value)}
-                  placeholder="E.g., Payment completed"
-                  className="w-full bg-[#f8f5f2] border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none h-24 resize-none"
-                  disabled={!selectedOrder}
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={!selectedOrder}
-                className="w-full py-3 bg-[#3b302a] text-white rounded-lg font-medium hover:bg-[#2a221d] transition-all disabled:opacity-60"
-              >
-                Update Timeline
-              </button>
-            ))}
+                  <span className="min-w-0">
+                    <span className="block truncate text-base font-bold text-[#3b302a]">{order.orderNumber}</span>
+                    <span className="mt-1 block truncate text-sm font-medium text-[#6b5e55]">{order.customerName}</span>
+                    <span className="mt-1 block text-xs text-[#a3948b]">{order.date}</span>
+                  </span>
+                  <ChevronRight size={18} className="shrink-0 text-[#a3948b] transition-colors group-hover:text-[#3b302a]" />
+                </button>
+              ))}
+            </div>
           </div>
-        )}
+        </div>
+
+        <div className="hidden space-y-6 lg:col-span-2 lg:block">
+          <AnimatePresence mode="wait">
+            {selectedOrder ? (
+              <motion.div
+                key={selectedOrder.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+              >
+                <TrackingDetails selectedOrder={selectedOrder} currentStageIndex={currentStageIndex} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-2xl border border-dashed border-[#e5ddd5] bg-white p-12 text-center text-[#a3948b]"
+              >
+                Select an order to view its tracking timeline.
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-        <div className="lg:col-span-2 space-y-6">
-          {selectedOrder ? (
-            <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
-              <div className="flex justify-between items-start mb-12">
-                <div>
-                  <h3 className="text-2xl font-bold text-[#3b302a]">Live Tracking: {selectedOrder.orderNumber}</h3>
-                  <p className="text-base text-[#a3948b] mt-1">Customer: {selectedOrder.customerName}</p>
-                </div>
-                <span className="px-4 py-2 bg-[#fcfaf7] border border-[#e5ddd5] rounded-full text-base font-semibold text-[#3b302a]">
-                  {selectedOrder.status}
-                </span>
+      <AnimatePresence>
+        {selectedOrder && (
+          <div className="lg:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[80] bg-[#3b302a]/35 backdrop-blur-sm"
+              onClick={() => setSelectedOrderId('')}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 240 }}
+              className="fixed inset-x-3 bottom-3 top-20 z-[90] overflow-y-auto rounded-2xl bg-[#f8f5f2] p-3 shadow-2xl"
+            >
+              <div className="mb-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrderId('')}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#6b5e55] shadow-sm"
+                  aria-label="Close tracking details"
+                >
+                  <X size={18} />
+                </button>
               </div>
-
-              <div className="relative mb-20">
-                <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#f3ede8] -translate-y-1/2"></div>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(currentStageIndex / (stages.length - 1)) * 100}%` }}
-                  className="absolute left-8 top-7 h-1 bg-[#d4a373] sm:left-0 sm:top-1/2 sm:-translate-y-1/2"
-                />
-                <div className="relative flex min-w-[520px] justify-between sm:min-w-0">
-                  {stages.map((stage, idx) => {
-                    const Icon = stage.icon;
-                    const isCompleted = idx <= currentStageIndex;
-                    const isCurrent = idx === currentStageIndex;
-                    return (
-                      <div key={stage.id} className="flex flex-col items-center">
-                        <div className={`
-                          w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center z-10 transition-all duration-500
-                          ${isCompleted ? 'bg-[#d4a373] text-white' : 'bg-white border-2 border-[#f3ede8] text-[#a3948b]'}
-                          ${isCurrent ? 'ring-4 ring-[#d4a373]/20 shadow-lg' : ''}
-                        `}>
-                          <Icon size={22} />
-                        </div>
-                        <p className={`mt-3 text-sm font-bold uppercase tracking-wider ${isCompleted ? 'text-[#3b302a]' : 'text-[#a3948b]'}`}>
-                          {stage.label}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                <h4 className="text-sm font-semibold text-[#3b302a] uppercase tracking-widest">History</h4>
-                <div className="relative max-h-[280px] space-y-6 overflow-y-auto pr-2">
-                  <div className="absolute left-2.5 top-2 bottom-2 w-px bg-[#f3ede8]" />
-                  {[...selectedOrder.trackingTimeline].reverse().map((event, idx) => (
-                    <div key={`${event.status}-${idx}`} className="relative pl-10">
-                      <div className="absolute left-0 top-1 z-10 h-5 w-5 rounded-full border-2 border-[#d4a373] bg-white" />
-                      <div>
-                        <p className="text-base font-bold text-[#3b302a]">{event.status}</p>
-                        <p className="text-base text-[#6b5e55] mt-1">{event.description}</p>
-                        <p className="text-sm text-[#a3948b] mt-1">{event.date}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <TrackingDetails
+                selectedOrder={selectedOrder}
+                currentStageIndex={currentStageIndex}
+                compact
+              />
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

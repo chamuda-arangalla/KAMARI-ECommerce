@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowRight, Loader2, Package, PackageSearch, Receipt, ShoppingBag } from "lucide-react";
+import { ArrowRight, Package, PackageSearch, Receipt, ShoppingBag } from "lucide-react";
 import { getOrdersByUserId } from "../services/orderApi";
 
 const getStoredCustomer = () => JSON.parse(localStorage.getItem("customerUser") || "{}");

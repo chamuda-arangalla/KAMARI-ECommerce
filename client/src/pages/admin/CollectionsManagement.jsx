@@ -43,7 +43,13 @@ export default function CollectionsManagement() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      load();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const openAdd = () => {
     setEditing(null);

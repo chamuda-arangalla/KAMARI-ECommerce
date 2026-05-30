@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const getSiteContent = async (pageType) => {
   const res = await axios.get(`${API_URL}/api/site-content/${pageType}`);

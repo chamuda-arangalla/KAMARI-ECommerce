@@ -4,23 +4,17 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../context/useCart";
 import "../../styles/CartDrawer.css";
 
-const FREE_DELIVERY_THRESHOLD = 10000;
-
 export default function CartDrawer() {
   const {
     items,
     isDrawerOpen,
     setIsDrawerOpen,
     totalItems,
-    afterDiscount,
     total,
     freeDelivery,
     deliveryFee,
     handleRemove,
   } = useCart();
-
-  const remaining = FREE_DELIVERY_THRESHOLD - afterDiscount;
-  const progressPct = Math.min((afterDiscount / FREE_DELIVERY_THRESHOLD) * 100, 100);
 
   return (
     <AnimatePresence>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SlidersHorizontal, X } from "lucide-react";
+import { X } from "lucide-react";
 import { getProducts } from "../services/productApi";
 import { useCart } from "../context/useCart";
 import "../styles/ShopPage.css";
@@ -41,8 +41,6 @@ export default function ShopPage() {
   const [collection, setCollection] = useState("All");
   const [sort, setSort]             = useState("featured");
   const [page, setPage]             = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
-
   useEffect(() => {
     (async () => {
       try {

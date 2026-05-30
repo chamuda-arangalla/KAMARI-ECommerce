@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL ;
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
 

@@ -75,10 +75,14 @@ function SearchableDropdown({ value, onChange, options, placeholder }) {
 
   useEffect(() => {
     if (open) {
-      setSearch("");
       setTimeout(() => searchRef.current?.focus(), 50);
     }
   }, [open]);
+
+  const toggleOpen = () => {
+    if (!open) setSearch("");
+    setOpen((current) => !current);
+  };
 
   const select = (option) => {
     onChange(option);
@@ -90,7 +94,7 @@ function SearchableDropdown({ value, onChange, options, placeholder }) {
       <button
         type="button"
         className={`district-trigger ${!value ? "placeholder" : ""}`}
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggleOpen}
       >
         <span>{value || placeholder}</span>
         <ChevronDown size={14} className={`district-chevron ${open ? "open" : ""}`} />

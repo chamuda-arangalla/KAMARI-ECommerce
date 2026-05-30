@@ -53,8 +53,14 @@ export default function CollectionsPage() {
   }, [products]);
 
   useEffect(() => {
-    if (products.length) setMaxPrice(maxProductPrice);
-  }, [maxProductPrice]);
+    if (!products.length) return undefined;
+
+    const timeoutId = setTimeout(() => {
+      setMaxPrice(maxProductPrice);
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [maxProductPrice, products.length]);
 
   const categoryOptions = useMemo(
     () => ["All", ...new Set(products.map((product) => product.category).filter(Boolean))],
@@ -88,8 +94,19 @@ export default function CollectionsPage() {
   useEffect(() => {
     const cat = searchParams.get("category");
     const sort = searchParams.get("sort");
-    if (cat) { setCategory(cat); setPage(1); }
-    if (sort) { setSortBy(sort); setPage(1); }
+
+    const timeoutId = setTimeout(() => {
+      if (cat) {
+        setCategory(cat);
+        setPage(1);
+      }
+      if (sort) {
+        setSortBy(sort);
+        setPage(1);
+      }
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [searchParams]);
 
   const toggleSize = (s) =>

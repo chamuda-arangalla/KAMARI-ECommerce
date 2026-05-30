@@ -173,10 +173,10 @@ const OrdersPage = () => {
       <div className="flex gap-2 overflow-x-auto border-b border-[#e5ddd5] sm:gap-8">
         {tabs.map((tab) => (
           <button
-            key={tab}
-            onClick={() => setFilter(tab)}
+            key={tab.label}
+            onClick={() => setFilter(tab.label)}
             className={`relative shrink-0 px-1 pb-4 text-sm sm:text-base font-medium transition-all ${
-              filter === tab ? 'text-[#3b302a]' : 'text-[#a3948b] hover:text-[#6b5e55]'
+              filter === tab.label ? 'text-[#3b302a]' : 'text-[#a3948b] hover:text-[#6b5e55]'
             }`}
           >
             {tab.label}

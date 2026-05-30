@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
@@ -31,12 +31,22 @@ const getProductImg = (product) =>
 export default function Home() {
   const navigate = useNavigate();
   const collectionSliderRef = useRef(null);
+  const heroRevealRef = useRef(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: heroRevealRef,
+    offset: ["start start", "end start"],
+  });
+  const heroImageY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
+  const heroImageScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+  const heroTextOpacity = useTransform(scrollYProgress, [0, 0.72, 1], [1, 1, 0]);
 
   const [collections, setCollections]   = useState([]);
   const [newArrivals, setNewArrivals]   = useState([]);
   const [bestSellers, setBestSellers]   = useState([]);
   const [heroReady, setHeroReady] = useState(false);
   const [showBelowContent, setShowBelowContent] = useState(false);
+  const showFeatureBanner = collections.length < 0;
 
   const scrollCollections = (direction) => {
     const slider = collectionSliderRef.current;
@@ -102,58 +112,70 @@ export default function Home() {
     <main className="bg-[#F8F5F2] text-[#3B302A]" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
 
       {/* ── Hero ─────────────────────────────────────── */}
-      <section className="relative mt-16 h-[calc(100svh-64px)] min-h-[520px] overflow-hidden md:min-h-[600px]">
-        <picture className="block h-full w-full">
-          <source media="(max-width: 767px)" srcSet={HERO_MOBILE_IMG} />
-          <motion.img
-            initial={{ scale: 1.08, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.4, ease: "easeOut" }}
-            src={HERO_IMG}
-            alt="KAMARI"
-            fetchPriority="high"
-            loading="eager"
-            decoding="sync"
-            onLoad={() => setHeroReady(true)}
-            onError={() => setHeroReady(true)}
-            className="h-full w-full object-cover object-center md:object-top"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#3B302A]/70 via-[#3B302A]/25 to-transparent md:bg-gradient-to-r md:from-[#3B302A]/60 md:via-[#3B302A]/20 md:to-transparent" />
-
+      <section
+        ref={heroRevealRef}
+        className="relative mt-16 h-[calc(100svh-64px)] min-h-[560px] overflow-hidden bg-[#3B302A] md:min-h-[640px]"
+      >
         <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.9, delay: 0.3 }}
-          className="absolute inset-x-6 bottom-12 max-w-lg md:left-[8%] md:right-auto md:top-1/2 md:-translate-y-1/2"
+          className="absolute inset-0"
+          style={{
+            y: prefersReducedMotion ? 0 : heroImageY,
+            scale: prefersReducedMotion ? 1 : heroImageScale,
+          }}
         >
-          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#E8DED6]">New Season</p>
-          <h1 className="mb-5 text-5xl font-light tracking-[0.18em] text-white sm:text-6xl md:text-7xl leading-tight">
-            KAMARI
-          </h1>
-          <p className="mb-8 text-base tracking-[0.08em] text-[#E8DED6] leading-relaxed">
-            Contemporary women's fashion for everyday elegance.
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <motion.button
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate("/shop")}
-              className="rounded-full bg-white px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#F8F5F2]"
-            >
-              Shop Now
-            </motion.button>
-            <motion.button
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate("/collections")}
-              className="rounded-full border border-white/60 px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-white transition hover:border-white"
-            >
-              Collections
-            </motion.button>
-          </div>
+          <picture className="block h-[112%] w-full">
+              <source media="(max-width: 767px)" srcSet={HERO_MOBILE_IMG} />
+              <motion.img
+                initial={{ scale: 1.08, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1.4, ease: "easeOut" }}
+                src={HERO_IMG}
+                alt="KAMARI"
+                fetchPriority="high"
+                loading="eager"
+                decoding="sync"
+                onLoad={() => setHeroReady(true)}
+                onError={() => setHeroReady(true)}
+                className="h-full w-full object-cover object-center md:object-top"
+              />
+          </picture>
         </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#3B302A]/72 via-[#3B302A]/28 to-transparent md:bg-gradient-to-r md:from-[#3B302A]/64 md:via-[#3B302A]/20 md:to-transparent" />
+
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ duration: 0.9, delay: 0.3 }}
+              style={{ opacity: prefersReducedMotion ? 1 : heroTextOpacity }}
+              className="absolute inset-x-6 bottom-12 max-w-lg md:left-[8%] md:right-auto md:top-1/2 md:-translate-y-1/2"
+            >
+              <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#E8DED6]">New Season</p>
+              <h1 className="mb-5 text-5xl font-light tracking-[0.18em] text-white sm:text-6xl md:text-7xl leading-tight">
+                KAMARI
+              </h1>
+              <p className="mb-8 text-base tracking-[0.08em] text-[#E8DED6] leading-relaxed">
+                Contemporary women's fashion for everyday elegance.
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => navigate("/shop")}
+                  className="rounded-full bg-white px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#F8F5F2]"
+                >
+                  Shop Now
+                </motion.button>
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => navigate("/collections")}
+                  className="rounded-full border border-white/60 px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-white transition hover:border-white"
+                >
+                  Collections
+                </motion.button>
+              </div>
+            </motion.div>
       </section>
 
       {/* ── Shop by Collection ───────────────────────── */}
@@ -298,6 +320,7 @@ export default function Home() {
       )}
 
       {/* ── Feature Banner ───────────────────────────── */}
+      {showFeatureBanner && (
       <motion.section
         variants={sectionReveal}
         initial="hidden"
@@ -355,6 +378,7 @@ export default function Home() {
           </div>
         </motion.div>
       </motion.section>
+      )}
 
       {/* ── Best Sellers ─────────────────────────────── */}
       {bestSellers.length > 0 && (

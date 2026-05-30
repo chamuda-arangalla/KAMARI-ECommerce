@@ -30,7 +30,8 @@ const CustomerRegisterPage = () => {
     }
     setLoading(true);
     try {
-      const { confirmPassword, ...payload } = form;
+      const payload = { ...form };
+      delete payload.confirmPassword;
       await registerCustomer(payload);
       navigate("/login");
     } catch (err) {

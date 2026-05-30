@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Tag, X, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const DELIVERY_FEE = 350;
-
 export default function Checkout({
   subtotal,
   discount,
@@ -74,7 +72,7 @@ export default function Checkout({
             <div className="flex justify-between text-[#7D746C]">
               <span>Delivery</span>
               <span className="text-[#3B302A]">
-                {freeDelivery ? "Free" : `LKR ${DELIVERY_FEE.toLocaleString()}`}
+                {freeDelivery ? "Free" : `LKR ${deliveryFee.toLocaleString()}`}
               </span>
             </div>
           </div>

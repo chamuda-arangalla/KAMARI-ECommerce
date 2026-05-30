@@ -37,7 +37,7 @@ const OAuthCallbackPage = () => {
     } catch {
       navigate("/login?error=oauth_failed", { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-[#F8F5F2] flex items-center justify-center font-['Poppins']">
