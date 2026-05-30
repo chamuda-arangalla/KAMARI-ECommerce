@@ -6,7 +6,7 @@ import {
   mapBackendCustomerToAdminCustomer,
   updateCustomer as updateCustomerRequest,
 } from '../services/customerApi';
-import { getAllOrders } from '../services/orderApi';
+import { getAllOrders, updateOrder as updateOrderRequest } from '../services/orderApi';
 import { getProducts, mapBackendProductToAdminProduct } from '../services/productApi';
 import { AdminContext } from './adminContextValue';
 
@@ -32,8 +32,24 @@ const formatTimelineDate = (value) =>
 
 const normalizeOrderStatus = (paymentStatus) => {
   if (!paymentStatus) return "Pending";
+  if (String(paymentStatus).toUpperCase() === "COD") return "COD";
   return String(paymentStatus).charAt(0).toUpperCase() + String(paymentStatus).slice(1).toLowerCase();
 };
+
+const normalizeFulfillmentStatus = (orderStatus) => {
+  if (!orderStatus) return "Created";
+  return String(orderStatus).charAt(0).toUpperCase() + String(orderStatus).slice(1).toLowerCase();
+};
+
+const getPaymentType = (paymentStatus) =>
+  String(paymentStatus).toUpperCase() === "COD"
+    ? "Cash on Delivery"
+    : "Bank Transfer";
+
+const needsPaymentVerification = (order) =>
+  order.paymentStatus === "pending" &&
+  String(order.paymentStatus).toUpperCase() !== "COD" &&
+  Boolean(order.paymentSlip?.url);
 
 const mapBackendOrderToAdminOrder = (order) => {
   const receiver = order.receiverDetails || {};
@@ -60,11 +76,14 @@ const mapBackendOrderToAdminOrder = (order) => {
       location.country,
     ].filter(Boolean).join(", "),
     status: normalizeOrderStatus(order.paymentStatus),
+    orderStatus: normalizeFulfillmentStatus(order.orderStatus),
+    paymentType: getPaymentType(order.paymentStatus),
+    needsPaymentVerification: needsPaymentVerification(order),
     date: formatOrderDate(order.createdAt),
     paymentSlip: order.paymentSlip || null,
     trackingTimeline: [
       {
-        status: normalizeOrderStatus(order.paymentStatus),
+        status: normalizeFulfillmentStatus(order.orderStatus),
         date: formatTimelineDate(order.createdAt),
         description: "Order created",
       },
@@ -148,21 +167,33 @@ export const AdminProvider = ({ children }) => {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const updateOrderStatus = (orderId, newStatus, description) => {
+  const updateOrderStatus = async (orderId, newStatus, description) => {
+    const token = localStorage.getItem("adminToken");
+    const response = await updateOrderRequest(orderId, { orderStatus: newStatus.toLowerCase() }, token);
+    const updatedOrder = mapBackendOrderToAdminOrder(response.data);
+    const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
     setOrders(prev => prev.map(order => {
-      if (order.id === orderId) {
-        const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
-        return {
-          ...order,
-          status: newStatus,
-          trackingTimeline: [
-            ...order.trackingTimeline,
-            { status: newStatus, date: now, description }
-          ]
-        };
-      }
-      return order;
+      if (order.id !== orderId) return order;
+      return {
+        ...updatedOrder,
+        trackingTimeline: [
+          ...order.trackingTimeline,
+          { status: updatedOrder.orderStatus, date: now, description }
+        ]
+      };
     }));
+
+    return updatedOrder;
+  };
+
+  const verifyOrderPayment = async (orderId) => {
+    const token = localStorage.getItem("adminToken");
+    const response = await updateOrderRequest(orderId, { paymentStatus: "complete" }, token);
+    const updatedOrder = mapBackendOrderToAdminOrder(response.data);
+
+    setOrders(prev => prev.map(order => order.id === orderId ? updatedOrder : order));
+    return updatedOrder;
   };
 
   const updateStockCount = (productId, size, count) => {
@@ -231,6 +262,7 @@ export const AdminProvider = ({ children }) => {
       refreshOrders,
       refreshCustomers,
       updateOrderStatus,
+      verifyOrderPayment,
       updateStockCount,
       addProduct,
       editProduct,
