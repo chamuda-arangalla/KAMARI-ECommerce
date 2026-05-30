@@ -45,6 +45,16 @@ const DISTRICTS = [
   "Vavuniya",
 ];
 
+const PAYMENT_METHODS = {
+  BANK_TRANSFER: "bank_transfer",
+  COD: "cash_on_delivery",
+};
+
+const CHECKOUT_STEPS = {
+  RECEIVER: "receiver",
+  PAYMENT: "payment",
+};
+
 function SearchableDropdown({ value, onChange, options, placeholder }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -137,7 +147,7 @@ const createReceiverDraft = () => {
   };
 };
 
-const buildOrderPayload = (items, receiverDetails) => ({
+const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
   productDetails: items.map((item) => ({
     productId: item.productId || item.id,
     colour: item.variant,
@@ -157,6 +167,8 @@ const buildOrderPayload = (items, receiverDetails) => ({
     phoneNumber: receiverDetails.phoneNumber.trim(),
     secondaryPhoneNumber: receiverDetails.secondaryPhoneNumber.trim(),
   },
+  paymentStatus:
+    paymentMethod === PAYMENT_METHODS.COD ? "COD" : "pending",
 });
 
 const buildUpdatedCustomer = (receiverDetails, updatedUser) => {
@@ -211,6 +223,8 @@ export default function CheckoutPage() {
   const [slipUploading, setSlipUploading] = useState(false);
   const [slipUploaded, setSlipUploaded] = useState(false);
   const [slipError, setSlipError] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS.BANK_TRANSFER);
+  const [checkoutStep, setCheckoutStep] = useState(CHECKOUT_STEPS.RECEIVER);
   const slipInputRef = useRef(null);
 
   const token = localStorage.getItem("customerToken");
@@ -232,6 +246,23 @@ export default function CheckoutPage() {
     setReceiverDetails((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleReceiverNext = (event) => {
+    event.preventDefault();
+
+    if (items.length === 0) {
+      setError("Your cart is empty.");
+      return;
+    }
+
+    if (!receiverDetails.district || !receiverDetails.province) {
+      setError("Please select your district and province.");
+      return;
+    }
+
+    setError("");
+    setCheckoutStep(CHECKOUT_STEPS.PAYMENT);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -245,7 +276,7 @@ export default function CheckoutPage() {
       setError("");
 
       const response = await createOrder(
-        buildOrderPayload(items, receiverDetails),
+        buildOrderPayload(items, receiverDetails, paymentMethod),
         token,
       );
       const order = response?.data || response;
@@ -299,6 +330,9 @@ export default function CheckoutPage() {
     if (slipInputRef.current) slipInputRef.current.value = "";
   };
 
+  const isCodOrder = createdOrder?.paymentStatus === "COD";
+  const isPaymentStep = checkoutStep === CHECKOUT_STEPS.PAYMENT;
+
   return (
     <div className="checkout-page">
       <div className="checkout-wrapper">
@@ -309,7 +343,23 @@ export default function CheckoutPage() {
             <Link to="/cart">Cart</Link>
             <span className="checkout-breadcrumb-step">
               <ChevronRight size={12} className="step-separator" />
-              <span className="step-active">Receiver Details</span>
+              {isPaymentStep ? (
+                <button
+                  type="button"
+                  className="step-link checkout-step-button"
+                  onClick={() => setCheckoutStep(CHECKOUT_STEPS.RECEIVER)}
+                >
+                  Receiver Details
+                </button>
+              ) : (
+                <span className="step-active">Receiver Details</span>
+              )}
+            </span>
+            <span className="checkout-breadcrumb-step">
+              <ChevronRight size={12} className="step-separator" />
+              <span className={isPaymentStep ? "step-active" : "step-upcoming"}>
+                Payment
+              </span>
             </span>
           </nav>
 
@@ -326,6 +376,18 @@ export default function CheckoutPage() {
                 </p>
               </div>
 
+              {isCodOrder ? (
+                <div className="cod-confirmation-card">
+                  <span className="bank-transfer-badge">Cash on Delivery</span>
+                  <h3 className="bank-transfer-title">Pay When Your Order Arrives</h3>
+                  <p className="bank-transfer-note">
+                    Your order has been placed with Cash on Delivery. Please keep
+                    <strong> LKR {orderTotal.toLocaleString()} </strong>
+                    ready and our team will contact you before delivery.
+                  </p>
+                </div>
+              ) : (
+                <>
               <div className="bank-transfer-card">
                 <div className="bank-transfer-header">
                   <span className="bank-transfer-badge">Bank Transfer</span>
@@ -431,13 +493,17 @@ export default function CheckoutPage() {
                   </>
                 )}
               </div>
+                </>
+              )}
 
               <Link to="/" className="checkout-btn-primary checkout-btn-link" style={{ marginTop: "24px" }}>
                 Continue Shopping
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={isPaymentStep ? handleSubmit : handleReceiverNext}>
+              {!isPaymentStep ? (
+                <>
               <h2 className="checkout-section-title">Receiver Details</h2>
 
               <div className="checkout-row">
@@ -549,6 +615,66 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+                </>
+              ) : (
+                <>
+              <h2 className="checkout-section-title">Payment</h2>
+              <div className="payment-methods">
+                <label
+                  className={`payment-method-option ${paymentMethod === PAYMENT_METHODS.BANK_TRANSFER ? "selected" : ""}`}
+                >
+                  <div className="payment-method-top">
+                    <div className="payment-method-left">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={PAYMENT_METHODS.BANK_TRANSFER}
+                        checked={paymentMethod === PAYMENT_METHODS.BANK_TRANSFER}
+                        onChange={() => setPaymentMethod(PAYMENT_METHODS.BANK_TRANSFER)}
+                      />
+                      <span className="payment-method-name">BANK TRANSFER</span>
+                    </div>
+                    <span className="payment-method-tag">Slip required</span>
+                  </div>
+                  {paymentMethod === PAYMENT_METHODS.BANK_TRANSFER && (
+                    <div className="payment-method-body">
+                      <p className="payment-method-note">
+                        Transfer to our bank account after placing the order and upload
+                        your payment slip for confirmation.
+                      </p>
+                    </div>
+                  )}
+                </label>
+
+                <label
+                  className={`payment-method-option ${paymentMethod === PAYMENT_METHODS.COD ? "selected" : ""}`}
+                >
+                  <div className="payment-method-top">
+                    <div className="payment-method-left">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={PAYMENT_METHODS.COD}
+                        checked={paymentMethod === PAYMENT_METHODS.COD}
+                        onChange={() => setPaymentMethod(PAYMENT_METHODS.COD)}
+                      />
+                      <span className="payment-method-name">CASH ON DELIVERY (COD)</span>
+                    </div>
+                    <span className="payment-method-tag">Pay on delivery</span>
+                  </div>
+                  {paymentMethod === PAYMENT_METHODS.COD && (
+                    <div className="payment-method-body">
+                      <p className="payment-method-note">
+                        Place your order now and pay the delivery team in cash when
+                        your order arrives.
+                      </p>
+                    </div>
+                  )}
+                </label>
+              </div>
+                </>
+              )}
+
               {error && <p className="checkout-error">{error}</p>}
 
               <button
@@ -562,12 +688,24 @@ export default function CheckoutPage() {
                     Creating Order
                   </span>
                 ) : (
-                  `Create Order - LKR ${total.toLocaleString()}`
+                  isPaymentStep
+                    ? `Create Order - LKR ${total.toLocaleString()}`
+                    : "Next to Payment"
                 )}
               </button>
-              <Link to="/cart" className="checkout-btn-secondary">
-                Return to cart
-              </Link>
+              {isPaymentStep ? (
+                <button
+                  type="button"
+                  className="checkout-btn-secondary"
+                  onClick={() => setCheckoutStep(CHECKOUT_STEPS.RECEIVER)}
+                >
+                  Back to receiver details
+                </button>
+              ) : (
+                <Link to="/cart" className="checkout-btn-secondary">
+                  Return to cart
+                </Link>
+              )}
             </form>
           )}
         </div>
