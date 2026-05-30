@@ -355,25 +355,25 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
 
   return (
     <>
-      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[120] flex items-stretch justify-center p-0 sm:items-center sm:p-4">
         <div className="absolute inset-0 bg-[#3b302a]/25 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative bg-white w-full max-w-6xl max-h-[92vh] overflow-y-auto border border-[#e5ddd5] shadow-xl rounded-3xl">
-        <div className="sticky top-0 z-10 bg-[#fcfaf7] border-b border-[#e5ddd5] px-8 py-5 flex items-center justify-between rounded-t-3xl">
-          <div>
-            <h3 className="text-2xl font-bold text-[#3b302a]">
+        <div className="relative flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden border border-[#e5ddd5] bg-white shadow-xl sm:h-auto sm:max-h-[92vh] sm:rounded-3xl">
+        <div className="shrink-0 bg-[#fcfaf7] border-b border-[#e5ddd5] px-4 py-4 sm:px-8 sm:py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:rounded-t-3xl">
+          <div className="min-w-0">
+            <h3 className="truncate text-xl font-bold text-[#3b302a] sm:text-2xl">
               {product?.name || "Product View"}
             </h3>
-            <p className="text-base text-[#a3948b] mt-0.5">{productId}</p>
+            <p className="mt-0.5 truncate text-sm text-[#a3948b] sm:text-base">{productId}</p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-[1fr_1fr_44px] gap-2 sm:flex sm:items-center">
             {product && (
               <>
                 <button
                   type="button"
                   onClick={() => setEditMode((value) => !value)}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#d8ccc2] bg-white text-base font-medium text-[#5f5149] hover:bg-[#f8f5f2] hover:text-[#3b302a]"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d8ccc2] bg-white px-3 py-2.5 text-sm font-medium text-[#5f5149] hover:bg-[#f8f5f2] hover:text-[#3b302a] sm:px-5 sm:text-base"
                 >
                   <Edit2 size={18} />
                   {editMode ? "Cancel Edit" : "Edit"}
@@ -382,7 +382,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                   type="button"
                   onClick={() => setDeleteOpen(true)}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-rose-100 bg-rose-50 text-rose-700 text-base font-medium hover:bg-rose-100 disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2.5 text-sm font-medium text-rose-700 hover:bg-rose-100 disabled:opacity-60 sm:px-5 sm:text-base"
                 >
                   <Trash2 size={18} />
                   Delete
@@ -392,13 +392,14 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             <button
               type="button"
               onClick={onClose}
-              className="p-2.5 rounded-xl hover:bg-white text-[#6b5e55]"
+              className="flex h-11 w-11 items-center justify-center rounded-xl text-[#6b5e55] hover:bg-white"
             >
               <X size={24} />
             </button>
           </div>
         </div>
 
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {loading && (
           <div className="p-12 flex items-center justify-center gap-3 text-base text-[#6b5e55]">
             <Loader2 size={22} className="animate-spin" />
@@ -413,15 +414,15 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
         )}
 
         {product && draft && (
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
+          <div className="space-y-6 p-4 sm:p-6">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[320px_1fr] lg:gap-6">
               <div className="space-y-3">
                 <img
                   src={mainImage}
                   alt={product.name}
-                  className="w-full aspect-square object-cover bg-[#f8f5f2] border border-[#e5ddd5]"
+                  className="w-full max-h-[420px] aspect-square object-cover bg-[#f8f5f2] border border-[#e5ddd5]"
                 />
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-4">
                   {images.map((image) => (
                     <img
                       key={image.publicId || image.url}
@@ -447,7 +448,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h4 className="text-sm font-bold text-[#a3948b] uppercase tracking-widest">
                   Colors And Size Quantity
                 </h4>
@@ -455,7 +456,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                   <button
                     type="button"
                     onClick={addColor}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8d7667] text-white text-base font-medium hover:bg-[#735f53] shadow-sm"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#8d7667] px-4 py-2.5 text-base font-medium text-white shadow-sm hover:bg-[#735f53]"
                   >
                     <Plus size={18} />
                     Add Color
@@ -464,14 +465,14 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
               </div>
 
               {(editMode ? draft.colors : product.colors || []).map((color, colorIndex) => (
-                <div key={`${color.colorName}-${colorIndex}`} className="border border-[#e5ddd5]">
-                  <div className="px-4 py-3 bg-[#fcfaf7] flex items-center gap-3 border-b border-[#e5ddd5]">
+                <div key={`${color.colorName}-${colorIndex}`} className="overflow-hidden border border-[#e5ddd5]">
+                  <div className="flex flex-col gap-3 border-b border-[#e5ddd5] bg-[#fcfaf7] px-4 py-3 sm:flex-row sm:items-center">
                     <span
-                      className="w-6 h-6 border border-[#d7ccc3]"
+                      className="h-6 w-6 shrink-0 border border-[#d7ccc3]"
                       style={{ backgroundColor: color.colorCode || "#ffffff" }}
                     />
                     {editMode ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-[1fr_120px_auto] gap-2 flex-1">
+                      <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[1fr_120px_auto]">
                         <input
                           value={color.colorName}
                           onChange={(event) =>
@@ -579,7 +580,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                       )}
                     </div>
                   )}
-                  <div className="p-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                     {(color.sizes || []).map((item, sizeIndex) => (
                       <div key={`${item.size}-${sizeIndex}`} className="border border-[#e5ddd5] px-3 py-2">
                         {editMode ? (
@@ -632,12 +633,12 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             </div>
 
             {editMode && (
-              <div className="sticky bottom-0 bg-white border-t border-[#e5ddd5] px-2 py-5 flex justify-end">
+              <div className="sticky bottom-0 flex justify-end border-t border-[#e5ddd5] bg-white px-0 py-4 sm:px-2 sm:py-5">
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#8d7667] text-white text-base font-semibold hover:bg-[#735f53] disabled:opacity-60 shadow-sm"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#8d7667] px-7 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#735f53] disabled:opacity-60 sm:w-auto"
                 >
                   {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                   Save Changes
@@ -646,6 +647,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             )}
           </div>
         )}
+        </div>
         </div>
       </div>
 
@@ -712,7 +714,7 @@ const EditForm = ({ draft, collections, sizeChartUpload, onSizeChartUpload, upda
       )}
     </div>
     <div className="flex flex-wrap gap-6">
-      <CheckField label="Featured" checked={draft.isFeatured} onChange={(value) => updateDraft("isFeatured", value)} />
+      <CheckField label="Best Seller" checked={draft.isFeatured} onChange={(value) => updateDraft("isFeatured", value)} />
       <CheckField label="New Arrival" checked={draft.isNewArrival} onChange={(value) => updateDraft("isNewArrival", value)} />
       <CheckField label="Sold Out" checked={draft.isSoldOut} onChange={(value) => updateDraft("isSoldOut", value)} />
     </div>
@@ -755,7 +757,7 @@ const ProductSummary = ({ product, totalStock }) => (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       <DetailTile label="Total Stock" value={totalStock} />
       <DetailTile label="Colors" value={product.colors?.length || 0} />
-      <DetailTile label="Featured" value={product.isFeatured ? "Yes" : "No"} />
+      <DetailTile label="Best Seller" value={product.isFeatured ? "Yes" : "No"} />
       <DetailTile label="New Arrival" value={product.isNewArrival ? "Yes" : "No"} />
     </div>
 

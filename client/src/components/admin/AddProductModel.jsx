@@ -366,7 +366,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div className="flex flex-wrap gap-6">
-                  <Checkbox label="Featured" name="isFeatured" checked={form.isFeatured} onChange={handleChange} />
+                  <Checkbox label="Best Seller" name="isFeatured" checked={form.isFeatured} onChange={handleChange} />
                   <Checkbox label="New Arrival" name="isNewArrival" checked={form.isNewArrival} onChange={handleChange} />
                 </div>
               </section>
