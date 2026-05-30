@@ -19,6 +19,7 @@ const formatDate = (v) =>
 const STATUS_MAP = {
   pending:  { label: "Pending",  dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-200",   bar: "bg-amber-400"   },
   complete: { label: "Complete", dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", bar: "bg-emerald-400" },
+  cod:      { label: "COD",      dot: "bg-sky-400",     text: "text-sky-700",     bg: "bg-sky-50",     border: "border-sky-200",     bar: "bg-sky-400"     },
   paid:     { label: "Paid",     dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", bar: "bg-emerald-400" },
   failed:   { label: "Failed",   dot: "bg-rose-400",    text: "text-rose-700",    bg: "bg-rose-50",    border: "border-rose-200",    bar: "bg-rose-400"    },
 };
@@ -137,6 +138,8 @@ export default function CustomerOrderDetailsPage() {
   if (!token) return <Navigate to="/login" replace />;
 
   const st       = getStatus(order?.paymentStatus);
+  const isCodOrder = order?.paymentStatus?.toUpperCase() === "COD";
+  const isPaymentComplete = order?.paymentStatus?.toLowerCase() === "complete";
   const receiver = order?.receiverDetails;
   const location = receiver?.location;
 
@@ -280,9 +283,14 @@ export default function CustomerOrderDetailsPage() {
                 </div>
               </div>
 
-              <Divider label="Payment Slip" />
+              <Divider label={isCodOrder ? "Payment" : "Payment Slip"} />
 
               {/* ── Payment slip ── */}
+              {isCodOrder ? (
+                <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-700">
+                  This order is Cash on Delivery. Please pay when your order arrives.
+                </div>
+              ) : (
               <div>
                 {/* Success */}
                 {slipUploaded && (
@@ -292,20 +300,29 @@ export default function CustomerOrderDetailsPage() {
                   </div>
                 )}
 
+                {isPaymentComplete && (
+                  <div className="mb-4 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm font-medium text-emerald-700">
+                    <CheckCircle2 size={15} className="flex-shrink-0" />
+                    Payment verified.
+                  </div>
+                )}
+
                 {/* Existing slip */}
                 {order.paymentSlip?.url && (
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
-                        <CheckCircle2 size={13} /> Slip uploaded
+                        {isPaymentComplete ? "" : "Slip uploaded"}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => slipInputRef.current?.click()}
-                        className="text-xs text-[#a3948b] underline underline-offset-2 hover:text-[#3b302a] transition-colors bg-transparent border-none cursor-pointer p-0 font-inherit"
-                      >
-                        Replace
-                      </button>
+                      {!isPaymentComplete && (
+                        <button
+                          type="button"
+                          onClick={() => slipInputRef.current?.click()}
+                          className="text-xs text-[#a3948b] underline underline-offset-2 hover:text-[#3b302a] transition-colors bg-transparent border-none cursor-pointer p-0 font-inherit"
+                        >
+                          Replace
+                        </button>
+                      )}
                     </div>
                     <a href={order.paymentSlip.url} target="_blank" rel="noopener noreferrer"
                       className="block overflow-hidden rounded-xl border border-[#e5ddd5]">
@@ -328,7 +345,7 @@ export default function CustomerOrderDetailsPage() {
                 )}
 
                 {/* Drop zone */}
-                {!slipPreview && (
+                {!slipPreview && !isPaymentComplete && (
                   <button
                     type="button"
                     onClick={() => slipInputRef.current?.click()}
@@ -344,9 +361,11 @@ export default function CustomerOrderDetailsPage() {
                   </button>
                 )}
 
-                <input ref={slipInputRef} type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden" onChange={handleSlipSelect} />
+                {!isPaymentComplete && (
+                  <input ref={slipInputRef} type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden" onChange={handleSlipSelect} />
+                )}
 
                 {slipError && (
                   <p className="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-4 py-2.5 text-xs text-rose-600">
@@ -354,7 +373,7 @@ export default function CustomerOrderDetailsPage() {
                   </p>
                 )}
 
-                {slipFile && !slipUploaded && (
+                {slipFile && !slipUploaded && !isPaymentComplete && (
                   <button
                     type="button"
                     onClick={handleSlipUpload}
@@ -369,6 +388,7 @@ export default function CustomerOrderDetailsPage() {
                   </button>
                 )}
               </div>
+              )}
 
             </div>
           </div>

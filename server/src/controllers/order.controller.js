@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
@@ -131,15 +132,27 @@ const calculatePricing = (productDetails) => {
   };
 };
 
+const shouldMoveOrderToShipping = (paymentStatus) =>
+  paymentStatus === PAYMENT_STATUS.COMPLETE ||
+  paymentStatus === PAYMENT_STATUS.COD;
+
 const buildOrderPayload = async (body, orderId) => {
   const productDetails = await validateOrderProducts(body.productDetails);
+  const paymentStatus =
+    body.paymentStatus === PAYMENT_STATUS.COD
+      ? PAYMENT_STATUS.COD
+      : PAYMENT_STATUS.PENDING;
+  const orderStatus = shouldMoveOrderToShipping(paymentStatus)
+    ? ORDER_STATUS.SHIPPING
+    : ORDER_STATUS.CREATED;
 
   return {
   orderId,
   productDetails,
   pricing: calculatePricing(productDetails),
   receiverDetails: body.receiverDetails,
-  paymentStatus: PAYMENT_STATUS.PENDING,
+  paymentStatus,
+  orderStatus,
   };
 };
 
@@ -377,7 +390,7 @@ export const updateOrder = async (req, res) => {
       });
     }
 
-    const { productDetails, receiverDetails, paymentStatus } = req.body;
+    const { productDetails, receiverDetails, paymentStatus, orderStatus } = req.body;
 
     if (productDetails !== undefined) {
       const updatedProductDetails = await validateOrderProducts(productDetails);
@@ -385,7 +398,13 @@ export const updateOrder = async (req, res) => {
       order.pricing = calculatePricing(updatedProductDetails);
     }
     if (receiverDetails !== undefined) order.receiverDetails = receiverDetails;
-    if (paymentStatus !== undefined) order.paymentStatus = paymentStatus;
+    if (paymentStatus !== undefined) {
+      order.paymentStatus = paymentStatus;
+      if (shouldMoveOrderToShipping(paymentStatus) && orderStatus === undefined) {
+        order.orderStatus = ORDER_STATUS.SHIPPING;
+      }
+    }
+    if (orderStatus !== undefined) order.orderStatus = orderStatus;
 
     await order.save();
 

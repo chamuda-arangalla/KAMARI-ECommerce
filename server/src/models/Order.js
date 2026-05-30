@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 
 const productDetailsSchema = new mongoose.Schema(
@@ -63,6 +64,11 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: Object.values(PAYMENT_STATUS),
       default: PAYMENT_STATUS.PENDING,
+    },
+    orderStatus: {
+      type: String,
+      enum: Object.values(ORDER_STATUS),
+      default: ORDER_STATUS.CREATED,
     },
     paymentSlip: {
       url:      { type: String, default: "" },
