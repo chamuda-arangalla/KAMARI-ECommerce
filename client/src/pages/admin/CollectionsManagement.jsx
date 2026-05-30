@@ -123,19 +123,19 @@ export default function CollectionsManagement() {
   };
 
   return (
-    <div>
+    <div className="space-y-6 sm:space-y-8">
 
       {/* ── Page Header ─────────────────────────────── */}
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <h1 className="text-4xl font-bold text-[#3b302a]">Collections</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Collections</h1>
           <p className="text-base text-[#a3948b] mt-2">
             Manage the collections shown in the header dropdown and shop filters
           </p>
         </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-3 bg-[#3b302a] text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-[#2e2622] transition"
+          className="flex w-full items-center justify-center gap-3 bg-[#3b302a] text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-[#2e2622] transition sm:w-auto"
         >
           <Plus size={20} />
           Add Collection
@@ -153,19 +153,19 @@ export default function CollectionsManagement() {
           <p className="text-base">Click "Add Collection" to create your first one.</p>
         </div>
       ) : (
-        <div className="grid gap-5">
+        <div className="grid gap-4 sm:gap-5">
           {collections.map((col) => (
             <div
               key={col._id}
-              className={`flex items-center gap-5 bg-white rounded-2xl border p-5 transition ${
+              className={`grid grid-cols-[72px_1fr] gap-4 bg-white rounded-2xl border p-4 transition sm:flex sm:items-center sm:gap-5 sm:p-5 ${
                 col.isActive ? "border-[#e5ddd5]" : "border-dashed border-[#ddd] opacity-60"
               }`}
             >
               {/* Drag handle */}
-              <GripVertical size={24} className="text-[#ccc] flex-shrink-0" />
+              <GripVertical size={24} className="hidden text-[#ccc] flex-shrink-0 sm:block" />
 
               {/* Thumbnail */}
-              <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-[#f3ede8]">
+              <div className="h-20 w-20 overflow-hidden rounded-xl bg-[#f3ede8] sm:h-24 sm:w-24 sm:flex-shrink-0">
                 {col.image?.url ? (
                   <img src={col.image.url} alt={col.name} className="w-full h-full object-cover" />
                 ) : (
@@ -176,9 +176,9 @@ export default function CollectionsManagement() {
               </div>
 
               {/* Info */}
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 sm:flex-1">
                 <div className="flex items-center gap-3 flex-wrap mb-1">
-                  <p className="text-xl font-bold text-[#3b302a] truncate">{col.name}</p>
+                  <p className="max-w-full truncate text-lg font-bold text-[#3b302a] sm:text-xl">{col.name}</p>
                   <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
                     col.isActive
                       ? "bg-green-100 text-green-700"
@@ -197,11 +197,11 @@ export default function CollectionsManagement() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="col-span-2 flex items-center justify-end gap-2 border-t border-[#f3ede8] pt-3 sm:col-span-1 sm:flex-shrink-0 sm:border-t-0 sm:pt-0">
                 <button
                   onClick={() => handleToggleActive(col)}
                   title={col.isActive ? "Hide collection" : "Show collection"}
-                  className="p-3 rounded-xl hover:bg-[#f3ede8] transition"
+                  className="p-2.5 sm:p-3 rounded-xl hover:bg-[#f3ede8] transition"
                 >
                   {col.isActive
                     ? <ToggleRight size={28} className="text-green-600" />
@@ -209,13 +209,13 @@ export default function CollectionsManagement() {
                 </button>
                 <button
                   onClick={() => openEdit(col)}
-                  className="p-3 rounded-xl hover:bg-[#f3ede8] text-[#7d746c] transition"
+                  className="p-2.5 sm:p-3 rounded-xl hover:bg-[#f3ede8] text-[#7d746c] transition"
                 >
                   <Pencil size={22} />
                 </button>
                 <button
                   onClick={() => setDeleteTarget(col)}
-                  className="p-3 rounded-xl hover:bg-red-50 text-red-400 transition"
+                  className="p-2.5 sm:p-3 rounded-xl hover:bg-red-50 text-red-400 transition"
                 >
                   <Trash2 size={22} />
                 </button>
@@ -227,12 +227,12 @@ export default function CollectionsManagement() {
 
       {/* ── Add / Edit Modal ─────────────────────────── */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-6">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/30 backdrop-blur-sm p-0 sm:items-center sm:p-6">
+          <div className="flex h-[100dvh] w-full max-w-xl flex-col bg-white shadow-2xl sm:h-auto sm:max-h-[90vh] sm:rounded-3xl">
 
             {/* Modal Header */}
-            <div className="px-8 py-6 border-b border-[#f0ebe5] flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-[#3b302a]">
+            <div className="shrink-0 px-5 py-5 sm:px-8 sm:py-6 border-b border-[#f0ebe5] flex items-center justify-between gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#3b302a]">
                 {editing ? "Edit Collection" : "Add Collection"}
               </h2>
               <button
@@ -243,7 +243,8 @@ export default function CollectionsManagement() {
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="px-8 py-6 space-y-6">
+            <form onSubmit={handleSave} className="flex min-h-0 flex-1 flex-col">
+              <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-5 sm:px-8 sm:py-6">
 
               {/* Image Upload */}
               <div>
@@ -251,7 +252,7 @@ export default function CollectionsManagement() {
                   Collection Image
                 </label>
                 {imagePreview ? (
-                  <div className="relative w-full h-56 rounded-2xl overflow-hidden border border-[#e5ddd5]">
+                  <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden border border-[#e5ddd5]">
                     <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -272,7 +273,7 @@ export default function CollectionsManagement() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-48 border-2 border-dashed border-[#e5ddd5] rounded-2xl flex flex-col items-center justify-center gap-3 text-[#a3948b] hover:border-[#3b302a] hover:text-[#3b302a] transition"
+                    className="w-full h-44 sm:h-48 border-2 border-dashed border-[#e5ddd5] rounded-2xl flex flex-col items-center justify-center gap-3 text-[#a3948b] hover:border-[#3b302a] hover:text-[#3b302a] transition"
                   >
                     <Upload size={32} />
                     <span className="text-base font-semibold">Click to upload image</span>
@@ -338,7 +339,7 @@ export default function CollectionsManagement() {
                   onChange={(e) => setForm((f) => ({ ...f, displayOrder: e.target.value }))}
                   placeholder="1"
                   min={0}
-                  className="w-36 border border-[#e5ddd5] rounded-xl px-4 py-3 text-base outline-none focus:border-[#3b302a] transition"
+                  className="w-full sm:w-36 border border-[#e5ddd5] rounded-xl px-4 py-3 text-base outline-none focus:border-[#3b302a] transition"
                 />
                 <p className="text-sm text-[#a3948b] mt-1.5">Lower numbers appear first in the header</p>
               </div>
@@ -347,19 +348,21 @@ export default function CollectionsManagement() {
                 <p className="text-red-500 text-base font-medium">{formError}</p>
               )}
 
+              </div>
+
               {/* Footer Buttons */}
-              <div className="flex justify-end gap-4 pt-2">
+              <div className="grid shrink-0 grid-cols-2 gap-3 border-t border-[#f0ebe5] bg-white px-5 py-4 sm:flex sm:justify-end sm:gap-4 sm:px-8 sm:py-5">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-6 py-3 rounded-xl border border-[#e5ddd5] text-base font-medium text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                  className="px-4 sm:px-6 py-3 rounded-xl border border-[#e5ddd5] text-base font-medium text-[#3b302a] hover:bg-[#f8f5f2] transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-3 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-50 transition"
+                  className="px-4 sm:px-6 py-3 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-50 transition"
                 >
                   {saving ? "Saving..." : editing ? "Save Changes" : "Create Collection"}
                 </button>

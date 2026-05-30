@@ -280,12 +280,12 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/35 backdrop-blur-sm flex items-center justify-center px-4 py-6">
-      <div className="bg-white w-full max-w-6xl border border-[#e5ddd5] shadow-2xl max-h-[92vh] overflow-hidden">
-        <div className="flex items-center justify-between px-8 py-6 border-b border-[#e5ddd5] bg-[#fcfaf7]">
-          <div>
-            <h3 className="text-2xl font-bold text-[#3b302a]">Add Product</h3>
-            <p className="text-base text-[#8c7d73] mt-1">
+    <div className="fixed inset-0 z-[100] bg-black/35 backdrop-blur-sm flex items-stretch justify-center p-0 sm:items-center sm:px-4 sm:py-6">
+      <div className="flex h-[100dvh] w-full max-w-6xl flex-col bg-white border border-[#e5ddd5] shadow-2xl sm:h-auto sm:max-h-[92vh]">
+        <div className="shrink-0 flex items-start justify-between gap-4 px-5 py-5 sm:items-center sm:px-8 sm:py-6 border-b border-[#e5ddd5] bg-[#fcfaf7]">
+          <div className="min-w-0">
+            <h3 className="text-xl sm:text-2xl font-bold text-[#3b302a]">Add Product</h3>
+            <p className="mt-1 max-w-sm text-sm sm:text-base text-[#8c7d73]">
               Build colors, assign images, and enter size stock.
             </p>
           </div>
@@ -299,9 +299,10 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(92vh-82px)]">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-0">
-            <div className="p-6 space-y-6">
+            <div className="p-5 sm:p-6 space-y-6">
               <section className="space-y-4">
                 <SectionTitle title="Product Details" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -371,12 +372,12 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
               </section>
 
               <section className="space-y-4">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <SectionTitle title="Colors, Images & Stock" />
                   <button
                     type="button"
                     onClick={addColor}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#3b302a] text-white text-base font-medium rounded-lg hover:bg-[#2e2622]"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#3b302a] text-white text-base font-medium rounded-lg hover:bg-[#2e2622]"
                   >
                     <Plus size={18} />
                     Add Color
@@ -403,10 +404,10 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
               </section>
             </div>
 
-            <aside className="p-6 bg-[#f8f5f2] border-l border-[#e5ddd5] space-y-5">
+            <aside className="p-5 sm:p-6 bg-[#f8f5f2] border-t xl:border-t-0 xl:border-l border-[#e5ddd5] space-y-5">
               <SectionTitle title="Uploaded Images" />
 
-              <label className="flex flex-col items-center justify-center border border-dashed border-[#b8a99f] bg-white p-8 cursor-pointer hover:border-[#3b302a] transition">
+              <label className="flex flex-col items-center justify-center border border-dashed border-[#b8a99f] bg-white p-6 sm:p-8 cursor-pointer hover:border-[#3b302a] transition">
                 <Upload size={28} className="text-[#6b5e55] mb-3" />
                 <span className="text-base font-semibold text-[#3b302a]">Upload product images</span>
                 <span className="text-sm text-[#8c7d73] mt-1">JPG, PNG, or WEBP up to 5MB</span>
@@ -450,20 +451,21 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
               )}
             </aside>
           </div>
+          </div>
 
-          <div className="sticky bottom-0 bg-white border-t border-[#e5ddd5] px-8 py-5 flex justify-end gap-4">
+          <div className="shrink-0 bg-white border-t border-[#e5ddd5] px-5 py-4 sm:px-8 sm:py-5 grid grid-cols-2 gap-3 sm:flex sm:justify-end sm:gap-4">
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
-              className="px-6 py-3 rounded-xl border border-[#d7ccc3] text-base font-medium text-[#6b5e55] hover:bg-[#f8f5f2] disabled:opacity-60"
+              className="px-4 sm:px-6 py-3 rounded-xl border border-[#d7ccc3] text-base font-medium text-[#6b5e55] hover:bg-[#f8f5f2] disabled:opacity-60"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 px-4 sm:px-7 py-3 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-60"
             >
               {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
               {loading ? "Saving..." : "Add Product"}
@@ -575,7 +577,7 @@ const ColorEditor = ({
 
         <div className="space-y-2">
           {color.sizes.map((size) => (
-            <div key={size.id} className="grid grid-cols-[1fr_120px_36px] gap-2">
+            <div key={size.id} className="grid grid-cols-[minmax(0,1fr)_minmax(72px,96px)_36px] gap-2 sm:grid-cols-[1fr_120px_36px]">
               <input
                 required
                 value={size.size}

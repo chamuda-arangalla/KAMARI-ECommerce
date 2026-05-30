@@ -5,15 +5,25 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { getCollections } from "../services/collectionApi";
 import { getProducts } from "../services/productApi";
 import homeHeroImg from "../assets/images/Home.jpg";
+import homeHeroMobileImg from "../assets/images/Home-mobile.jpg";
 import content01Img from "../assets/images/Content01.png";
 
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
 const HERO_IMG = homeHeroImg;
+const HERO_MOBILE_IMG = homeHeroMobileImg;
 const BRAND_IMG = content01Img;
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 const fadeIn  = { hidden: { opacity: 0 },        visible: { opacity: 1 } };
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+const sectionReveal = {
+  hidden: { opacity: 0, y: 56 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: "easeOut" },
+  },
+};
 
 const getProductImg = (product) =>
   product?.colors?.flatMap((c) => c.images || [])?.[0]?.url || FALLBACK_IMG;
@@ -25,6 +35,8 @@ export default function Home() {
   const [collections, setCollections]   = useState([]);
   const [newArrivals, setNewArrivals]   = useState([]);
   const [bestSellers, setBestSellers]   = useState([]);
+  const [heroReady, setHeroReady] = useState(false);
+  const [showBelowContent, setShowBelowContent] = useState(false);
 
   const scrollCollections = (direction) => {
     const slider = collectionSliderRef.current;
@@ -37,52 +49,93 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Load collections from DB
-    getCollections()
-      .then((res) => setCollections(res.data || []))
-      .catch(() => setCollections([]));
-
-    // Load products from DB
-    getProducts()
-      .then((res) => {
-        const products = res.data || [];
-        setNewArrivals(products.filter((p) => p.isNewArrival && !p.isSoldOut).slice(0, 4));
-        const featured = products.filter((p) => p.isFeatured && !p.isSoldOut);
-        setBestSellers((featured.length ? featured : products.filter((p) => !p.isSoldOut)).slice(0, 4));
-      })
-      .catch(() => {});
+    const fallbackTimer = window.setTimeout(() => setHeroReady(true), 1800);
+    return () => window.clearTimeout(fallbackTimer);
   }, []);
+
+  useEffect(() => {
+    if (!heroReady) return undefined;
+
+    let cancelled = false;
+    let idleId = null;
+    let timerId = null;
+
+    const loadBelowContent = () => {
+      if (cancelled) return;
+
+      setShowBelowContent(true);
+
+      getCollections()
+        .then((res) => {
+          if (!cancelled) setCollections(res.data || []);
+        })
+        .catch(() => {
+          if (!cancelled) setCollections([]);
+        });
+
+      getProducts()
+        .then((res) => {
+          if (cancelled) return;
+
+          const products = res.data || [];
+          setNewArrivals(products.filter((p) => p.isNewArrival && !p.isSoldOut).slice(0, 4));
+          const featured = products.filter((p) => p.isFeatured && !p.isSoldOut);
+          setBestSellers((featured.length ? featured : products.filter((p) => !p.isSoldOut)).slice(0, 4));
+        })
+        .catch(() => {});
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(loadBelowContent, { timeout: 700 });
+    } else {
+      timerId = window.setTimeout(loadBelowContent, 250);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId) window.cancelIdleCallback(idleId);
+      if (timerId) window.clearTimeout(timerId);
+    };
+  }, [heroReady]);
 
   return (
     <main className="bg-[#F8F5F2] text-[#3B302A]" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
 
       {/* ── Hero ─────────────────────────────────────── */}
-      <section className="relative h-screen min-h-[600px] overflow-hidden">
-        <motion.img
-          initial={{ scale: 1.08, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.4, ease: "easeOut" }}
-          src={HERO_IMG}
-          alt="KAMARI"
-          className="h-full w-full object-cover object-top"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#3B302A]/60 via-[#3B302A]/20 to-transparent" />
+      <section className="relative mt-16 h-[calc(100svh-64px)] min-h-[520px] overflow-hidden md:min-h-[600px]">
+        <picture className="block h-full w-full">
+          <source media="(max-width: 767px)" srcSet={HERO_MOBILE_IMG} />
+          <motion.img
+            initial={{ scale: 1.08, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.4, ease: "easeOut" }}
+            src={HERO_IMG}
+            alt="KAMARI"
+            fetchPriority="high"
+            loading="eager"
+            decoding="sync"
+            onLoad={() => setHeroReady(true)}
+            onError={() => setHeroReady(true)}
+            className="h-full w-full object-cover object-center md:object-top"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#3B302A]/70 via-[#3B302A]/25 to-transparent md:bg-gradient-to-r md:from-[#3B302A]/60 md:via-[#3B302A]/20 md:to-transparent" />
 
         <motion.div
           variants={fadeUp}
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.9, delay: 0.3 }}
-          className="absolute left-[8%] top-1/2 -translate-y-1/2 max-w-lg"
+          className="absolute inset-x-6 bottom-12 max-w-lg md:left-[8%] md:right-auto md:top-1/2 md:-translate-y-1/2"
         >
           <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#E8DED6]">New Season</p>
-          <h1 className="mb-5 text-6xl font-light tracking-[0.18em] text-white md:text-7xl leading-tight">
+          <h1 className="mb-5 text-5xl font-light tracking-[0.18em] text-white sm:text-6xl md:text-7xl leading-tight">
             KAMARI
           </h1>
           <p className="mb-8 text-base tracking-[0.08em] text-[#E8DED6] leading-relaxed">
             Contemporary women's fashion for everyday elegance.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <motion.button
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.97 }}
@@ -104,8 +157,16 @@ export default function Home() {
       </section>
 
       {/* ── Shop by Collection ───────────────────────── */}
+      {showBelowContent && (
+        <>
       {collections.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 py-16">
+        <motion.section
+          variants={sectionReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.16 }}
+          className="mx-auto max-w-7xl px-6 py-16"
+        >
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -162,6 +223,8 @@ export default function Home() {
                       <img
                         src={col.image.url}
                         alt={col.name}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
                       />
                     ) : (
@@ -181,12 +244,18 @@ export default function Home() {
               ))}
             </motion.div>
           </div>
-        </section>
+        </motion.section>
       )}
 
       {/* ── New Arrivals ─────────────────────────────── */}
       {newArrivals.length > 0 && (
-        <section className="bg-white py-16">
+        <motion.section
+          variants={sectionReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.16 }}
+          className="bg-white py-16"
+        >
           <div className="mx-auto max-w-7xl px-6">
             <motion.div
               variants={fadeUp}
@@ -225,11 +294,17 @@ export default function Home() {
               ))}
             </motion.div>
           </div>
-        </section>
+        </motion.section>
       )}
 
       {/* ── Feature Banner ───────────────────────────── */}
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-0 px-6 py-16 md:grid-cols-2 md:gap-8">
+      <motion.section
+        variants={sectionReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.18 }}
+        className="mx-auto grid max-w-7xl grid-cols-1 gap-0 px-6 py-16 md:grid-cols-2 md:gap-8"
+      >
         <motion.div
           variants={fadeIn}
           initial="hidden"
@@ -242,6 +317,8 @@ export default function Home() {
           <img
             src={BRAND_IMG}
             alt="KAMARI style"
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover object-top"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#3B302A]/60 via-transparent" />
@@ -277,11 +354,17 @@ export default function Home() {
             </motion.button>
           </div>
         </motion.div>
-      </section>
+      </motion.section>
 
       {/* ── Best Sellers ─────────────────────────────── */}
       {bestSellers.length > 0 && (
-        <section className="bg-[#F8F5F2] py-16">
+        <motion.section
+          variants={sectionReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.16 }}
+          className="bg-[#F8F5F2] py-16"
+        >
           <div className="mx-auto max-w-7xl px-6">
             <motion.div
               variants={fadeUp}
@@ -320,14 +403,20 @@ export default function Home() {
               ))}
             </motion.div>
           </div>
-        </section>
+        </motion.section>
       )}
 
       {/* ── Product Mood Grid ─────────────────────────── */}
       <MoodGrid products={[...newArrivals, ...bestSellers]} navigate={navigate} />
 
       {/* ── Newsletter ───────────────────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <motion.section
+        variants={sectionReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="mx-auto max-w-7xl px-6 py-12"
+      >
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -352,7 +441,7 @@ export default function Home() {
             </button>
           </div>
         </motion.div>
-      </section>
+      </motion.section>
 
       {/* ── Footer ───────────────────────────────────── */}
       <footer className="border-t border-[#3B302A]/10 bg-[#F8F5F2]">
@@ -364,6 +453,7 @@ export default function Home() {
                 Contemporary women's fashion for everyday Sri Lankan life.
               </p>
               <p className="mt-4 text-xs text-[#a3948b]">© 2026 KAMARI. All rights reserved.</p>
+              <p className="mt-2 text-xs text-[#a3948b]">Solution By CyberNest</p>
             </div>
             <FooterCol title="Shop"     links={[{ label: "All Products", to: "/shop" }, { label: "Collections", to: "/collections" }]} />
             <FooterCol title="Discover" links={[{ label: "New Arrivals", to: "/collections?sort=newest" }, { label: "Best Sellers", to: "/shop" }]} />
@@ -372,6 +462,8 @@ export default function Home() {
           </div>
         </div>
       </footer>
+        </>
+      )}
     </main>
   );
 }
@@ -391,8 +483,20 @@ function ProductCard({ product, badge, onClick }) {
       onClick={onClick}
     >
       <div className="relative mb-3 overflow-hidden rounded-xl bg-[#f8f8f8]" style={{ aspectRatio: "3/4" }}>
-        <img src={img1} alt={product.name} className="absolute inset-0 h-full w-full object-cover object-top transition duration-700 group-hover:opacity-0" />
-        <img src={img2} alt={product.name} className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition duration-700 group-hover:opacity-100" />
+        <img
+          src={img1}
+          alt={product.name}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-top transition duration-700 group-hover:opacity-0"
+        />
+        <img
+          src={img2}
+          alt={product.name}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition duration-700 group-hover:opacity-100"
+        />
 
         {badge && (
           <span className={`absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
@@ -470,6 +574,8 @@ function MoodGrid({ products, navigate }) {
             <img
               src={img.url}
               alt="KAMARI style"
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover object-top transition duration-500 hover:scale-110"
             />
           </motion.div>

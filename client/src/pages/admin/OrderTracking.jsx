@@ -31,17 +31,17 @@ const OrderTracking = () => {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h2 className="text-3xl font-semibold text-[#3b302a]">Order Tracking</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold text-[#3b302a]">Order Tracking</h2>
         <p className="text-[#a3948b] mt-1">Monitor and update order progress</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-8">
         <div className="lg:col-span-1 space-y-6">
 
           {/* Order selector */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
             <h3 className="text-base font-bold text-[#3b302a] uppercase tracking-widest mb-5">Select Order</h3>
             <div className="space-y-3">
               {ordersLoading && (
@@ -82,7 +82,7 @@ const OrderTracking = () => {
           </div>
 
           {/* Update status */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
             <h3 className="text-base font-bold text-[#3b302a] uppercase tracking-widest mb-5">Update Status</h3>
             <form onSubmit={handleUpdateStatus} className="space-y-4">
               <div>
@@ -123,18 +123,18 @@ const OrderTracking = () => {
 
         <div className="lg:col-span-2 space-y-6">
           {selectedOrder ? (
-            <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
-              <div className="flex justify-between items-start mb-12">
+            <div className="bg-white p-5 sm:p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start mb-10 sm:mb-12">
                 <div>
-                  <h3 className="text-2xl font-bold text-[#3b302a]">Live Tracking: {selectedOrder.orderNumber}</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#3b302a]">Live Tracking: {selectedOrder.orderNumber}</h3>
                   <p className="text-base text-[#a3948b] mt-1">Customer: {selectedOrder.customerName}</p>
                 </div>
-                <span className="px-4 py-2 bg-[#fcfaf7] border border-[#e5ddd5] rounded-full text-base font-semibold text-[#3b302a]">
+                <span className="w-fit px-4 py-2 bg-[#fcfaf7] border border-[#e5ddd5] rounded-full text-base font-semibold text-[#3b302a]">
                   {selectedOrder.status}
                 </span>
               </div>
 
-              <div className="relative mb-20">
+              <div className="relative mb-16 sm:mb-20">
                 <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#f3ede8] -translate-y-1/2"></div>
                 <motion.div
                   initial={{ width: 0 }}
@@ -149,7 +149,7 @@ const OrderTracking = () => {
                     return (
                       <div key={stage.id} className="flex flex-col items-center">
                         <div className={`
-                          w-14 h-14 rounded-full flex items-center justify-center z-10 transition-all duration-500
+                          w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center z-10 transition-all duration-500
                           ${isCompleted ? 'bg-[#d4a373] text-white' : 'bg-white border-2 border-[#f3ede8] text-[#a3948b]'}
                           ${isCurrent ? 'ring-4 ring-[#d4a373]/20 shadow-lg' : ''}
                         `}>
@@ -164,7 +164,7 @@ const OrderTracking = () => {
                 </div>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 <h4 className="text-sm font-semibold text-[#3b302a] uppercase tracking-widest">History</h4>
                 <div className="space-y-6 relative">
                   <div className="absolute left-2.5 top-2 bottom-2 w-px bg-[#f3ede8]" />

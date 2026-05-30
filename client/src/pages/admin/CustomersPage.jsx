@@ -120,10 +120,10 @@ const CustomersPage = () => {
   const drawerOpen = selectedCustomer || creatingCustomer;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-bold text-[#3b302a]">Customers</h2>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Customers</h2>
           <p className="text-base text-[#a3948b] mt-2">Create, edit, or remove customer accounts</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -148,8 +148,8 @@ const CustomersPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-[#e5ddd5] overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#e5ddd5] overflow-hidden shadow-sm">
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
@@ -233,6 +233,75 @@ const CustomersPage = () => {
             </tbody>
           </table>
         </div>
+
+        <div className="divide-y divide-[#f3ede8] md:hidden">
+          {customersLoading && (
+            <div className="px-5 py-10 text-center text-base text-[#6b5e55]">
+              <span className="inline-flex items-center gap-2">
+                <Loader2 size={20} className="animate-spin" /> Loading customers...
+              </span>
+            </div>
+          )}
+
+          {customersError && !customersLoading && (
+            <div className="px-5 py-10 text-center">
+              <p className="text-base text-rose-600">{customersError}</p>
+              <button type="button" onClick={refreshCustomers} className="mt-3 px-5 py-2.5 rounded-xl border border-[#d8ccc2] text-base text-[#5f5149] hover:bg-[#f8f5f2]">
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {!customersLoading && !customersError && filteredCustomers.length === 0 && (
+            <div className="px-5 py-10 text-center text-base text-[#8c7d73]">No customers found.</div>
+          )}
+
+          {!customersLoading && !customersError && filteredCustomers.map((customer) => (
+            <div key={customer.id} className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f3ede8] text-lg font-bold text-[#3b302a]">
+                  {customer.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold text-[#3b302a]">{customer.name}</p>
+                  <p className="mt-0.5 text-sm text-[#a3948b]">ID: {customer.id}</p>
+                </div>
+                <div className="flex gap-1">
+                  <button type="button" onClick={() => openEditCustomer(customer)}
+                    className="p-2.5 text-[#8c7d73] hover:text-[#3b302a] hover:bg-[#f3ede8] rounded-xl transition-all">
+                    <Edit2 size={19} />
+                  </button>
+                  <button type="button" onClick={() => setDeleteTarget(customer)}
+                    className="p-2.5 text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                    <Trash2 size={19} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2 text-sm text-[#6b5e55]">
+                <span className="flex min-w-0 items-center gap-2">
+                  <Mail size={16} className="shrink-0 text-[#a3948b]" />
+                  <span className="truncate">{customer.email}</span>
+                </span>
+                <span className="flex items-center gap-2">
+                  <Phone size={16} className="text-[#a3948b]" /> {customer.phone}
+                </span>
+                <span className="flex items-start gap-2">
+                  <MapPin size={16} className="mt-0.5 shrink-0 text-[#a3948b]" />
+                  <span>
+                    {customer.defaultAddress
+                      ? `${customer.defaultAddress.addressLine1}, ${customer.defaultAddress.city}`
+                      : "No saved address"}
+                  </span>
+                </span>
+              </div>
+
+              <p className="mt-4 text-xs uppercase tracking-wider text-[#a3948b]">
+                Joined {customer.joinedDate}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Drawer */}
@@ -243,7 +312,7 @@ const CustomersPage = () => {
               className="fixed inset-0 bg-[#3b302a]/25 backdrop-blur-sm z-[60]" onClick={closeDrawer} />
             <motion.aside initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
               className="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-white z-[70] shadow-2xl overflow-y-auto">
-              <form onSubmit={handleSave} className="p-8 space-y-8">
+              <form onSubmit={handleSave} className="p-5 sm:p-8 space-y-6 sm:space-y-8">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-2xl font-bold text-[#3b302a]">
@@ -258,8 +327,8 @@ const CustomersPage = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center gap-5 p-6 bg-[#fcfaf7] rounded-3xl border border-[#e5ddd5]">
-                  <div className="w-16 h-16 rounded-full bg-[#3b302a] flex items-center justify-center text-white text-2xl font-bold">
+                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 bg-[#fcfaf7] rounded-2xl sm:rounded-3xl border border-[#e5ddd5]">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#3b302a] flex items-center justify-center text-white text-xl sm:text-2xl font-bold">
                     {(selectedCustomer?.name || draft.email || "C").charAt(0).toUpperCase()}
                   </div>
                   <div>
@@ -329,13 +398,13 @@ const CustomersPage = () => {
                   <p className="text-base text-rose-600 bg-rose-50 border border-rose-100 rounded-2xl px-4 py-3">{formError}</p>
                 )}
 
-                <div className="flex gap-3 pt-2">
+                <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
                   <button type="button" onClick={closeDrawer}
-                    className="flex-1 py-3.5 rounded-xl bg-white border border-[#d8ccc2] text-base font-semibold text-[#5f5149] hover:bg-[#f8f5f2]">
+                    className="py-3.5 rounded-xl bg-white border border-[#d8ccc2] text-base font-semibold text-[#5f5149] hover:bg-[#f8f5f2]">
                     Cancel
                   </button>
                   <button type="submit" disabled={saving}
-                    className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-60">
+                    className="inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-60">
                     {saving && <Loader2 size={18} className="animate-spin" />}
                     {creatingCustomer ? "Create Customer" : "Save Changes"}
                   </button>

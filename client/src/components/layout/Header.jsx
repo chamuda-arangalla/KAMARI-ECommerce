@@ -113,12 +113,21 @@ const Header = () => {
     navigate(`/collections?category=${encodeURIComponent(categoryName)}`);
   };
 
+  const handleHomeClick = () => {
+    setDropdownOpen(false);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 z-50 w-full bg-[#F8F5F2]/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
-          <Link to="/" className="text-xl font-light tracking-[0.25em] text-[#3B302A]">
+          <Link
+            to="/"
+            onClick={handleHomeClick}
+            className="text-xl font-light tracking-[0.25em] text-[#3B302A]"
+          >
             KAMARI
           </Link>
 

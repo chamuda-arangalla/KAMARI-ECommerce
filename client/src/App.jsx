@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { CartProvider } from "./context/CartContext";
 import Header from "./components/layout/Header";
 import CartDrawer from "./components/cart/CartDrawer";
@@ -24,7 +25,6 @@ import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
-import HomeImagesPage from "./pages/admin/HomeImagesPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
 
 const AdminGuard = ({ children }) => {
@@ -32,10 +32,21 @@ const AdminGuard = ({ children }) => {
   return token ? children : <Navigate to="/admin/login" replace />;
 };
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+};
+
 function App() {
   return (
     <BrowserRouter>
       <CartProvider>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<><Header /><CartDrawer /><Home /></>} />
           <Route path="/shop" element={<><Header /><CartDrawer /><ShopPage /></>} />
@@ -62,7 +73,6 @@ function App() {
             <Route path="products" element={<Navigate to="/admin/inventory" replace />} />
             <Route path="products/:id" element={<ProductDetailsPage />} />
             <Route path="collections" element={<CollectionsManagement />} />
-            <Route path="home-images" element={<HomeImagesPage />} />
           </Route>
         </Routes>
       </CartProvider>

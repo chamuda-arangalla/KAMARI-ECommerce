@@ -9,39 +9,39 @@ import { TrendingUp, Users, ShoppingCart, DollarSign } from 'lucide-react';
 const COLORS = ['#d4a373', '#c2b2a6', '#e5ddd5', '#f3ede8'];
 
 const StatCard = ({ icon: Icon, label, value, trend }) => (
-  <div className="bg-white p-7 rounded-2xl border border-[#e5ddd5] shadow-sm">
-    <div className="flex items-center justify-between mb-5">
+  <div className="bg-white p-5 sm:p-7 rounded-2xl border border-[#e5ddd5] shadow-sm">
+    <div className="flex items-center justify-between mb-4 sm:mb-5">
       <div className="p-3 bg-[#fcfaf7] rounded-xl text-[#3b302a]">
-        <Icon size={28} />
+        <Icon size={24} className="sm:h-7 sm:w-7" />
       </div>
       <span className={`text-sm font-bold px-3 py-1.5 rounded-full ${trend.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
         {trend}
       </span>
     </div>
     <p className="text-base text-[#a3948b] font-medium">{label}</p>
-    <p className="text-3xl font-bold text-[#3b302a] mt-1">{value}</p>
+    <p className="text-2xl sm:text-3xl font-bold text-[#3b302a] mt-1">{value}</p>
   </div>
 );
 
 const AnalyticsPage = () => (
-  <div className="space-y-8">
+  <div className="space-y-6 sm:space-y-8">
     <div>
-      <h2 className="text-4xl font-bold text-[#3b302a]">Analytics</h2>
+      <h2 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Analytics</h2>
       <p className="text-base text-[#a3948b] mt-2">Performance insights and business growth</p>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
       <StatCard icon={DollarSign}  label="Total Revenue"    value="LKR 42,850" trend="+12.5%" />
       <StatCard icon={ShoppingCart}label="Total Orders"     value="384"         trend="+8.2%"  />
       <StatCard icon={Users}       label="New Customers"    value="52"          trend="+15.1%" />
       <StatCard icon={TrendingUp}  label="Avg. Order Value" value="LKR 112"    trend="-2.4%"  />
     </div>
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
       {/* Revenue */}
-      <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
-        <h3 className="text-xl font-bold text-[#3b302a] mb-8">Revenue Overview</h3>
-        <div className="h-80 w-full">
+      <div className="bg-white p-5 sm:p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
+        <h3 className="text-lg sm:text-xl font-bold text-[#3b302a] mb-6 sm:mb-8">Revenue Overview</h3>
+        <div className="h-64 sm:h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={mockAnalytics.revenueData}>
               <defs>
@@ -61,9 +61,9 @@ const AnalyticsPage = () => (
       </div>
 
       {/* Best Sellers */}
-      <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
-        <h3 className="text-xl font-bold text-[#3b302a] mb-8">Best Selling Products</h3>
-        <div className="h-80 w-full">
+      <div className="bg-white p-5 sm:p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
+        <h3 className="text-lg sm:text-xl font-bold text-[#3b302a] mb-6 sm:mb-8">Best Selling Products</h3>
+        <div className="h-64 sm:h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={mockAnalytics.bestSellers} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f3ede8" />
@@ -77,9 +77,9 @@ const AnalyticsPage = () => (
       </div>
 
       {/* Order Distribution */}
-      <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
-        <h3 className="text-xl font-bold text-[#3b302a] mb-8">Order Distribution</h3>
-        <div className="h-80 w-full flex items-center justify-center">
+      <div className="bg-white p-5 sm:p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
+        <h3 className="text-lg sm:text-xl font-bold text-[#3b302a] mb-6 sm:mb-8">Order Distribution</h3>
+        <div className="h-64 sm:h-80 w-full flex items-center justify-center">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie data={mockAnalytics.statusBreakdown} cx="50%" cy="50%" innerRadius={80} outerRadius={110} paddingAngle={8} dataKey="value">
@@ -95,9 +95,9 @@ const AnalyticsPage = () => (
       </div>
 
       {/* Regional Sales */}
-      <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
-        <h3 className="text-xl font-bold text-[#3b302a] mb-8">Regional Sales</h3>
-        <div className="space-y-6">
+      <div className="bg-white p-5 sm:p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
+        <h3 className="text-lg sm:text-xl font-bold text-[#3b302a] mb-6 sm:mb-8">Regional Sales</h3>
+        <div className="space-y-5 sm:space-y-6">
           {[
             { region: 'United Kingdom', value: '42%', color: 'bg-[#d4a373]' },
             { region: 'United States',  value: '28%', color: 'bg-[#c2b2a6]' },

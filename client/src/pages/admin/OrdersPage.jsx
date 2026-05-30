@@ -26,33 +26,33 @@ const OrdersPage = () => {
   const filteredOrders = filter === 'All' ? orders : orders.filter((order) => order.status === filter);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-semibold text-[#3b302a]">Orders</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-[#3b302a]">Orders</h2>
           <p className="text-[#a3948b] mt-1">Manage and track customer orders</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
           <button
             onClick={refreshOrders}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-[#e5ddd5] rounded-lg text-[#6b5e55] hover:bg-[#fcfaf7] transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#e5ddd5] rounded-lg text-[#6b5e55] hover:bg-[#fcfaf7] transition-all"
           >
             <Download size={18} />
             <span>Refresh</span>
           </button>
+          <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-base font-medium text-[#6b5e55] hover:bg-[#fcfaf7] transition-all">
+            <Download size={20} />
+            Export CSV
+          </button>
         </div>
-        <button className="flex items-center gap-2 px-5 py-3 bg-white border border-[#e5ddd5] rounded-xl text-base font-medium text-[#6b5e55] hover:bg-[#fcfaf7] transition-all">
-          <Download size={20} />
-          Export CSV
-        </button>
       </div>
 
-      <div className="flex border-b border-[#e5ddd5] gap-8">
+      <div className="flex gap-2 overflow-x-auto border-b border-[#e5ddd5] sm:gap-8">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`pb-4 text-base font-medium transition-all relative ${
+            className={`relative shrink-0 px-1 pb-4 text-sm sm:text-base font-medium transition-all ${
               filter === tab ? 'text-[#3b302a]' : 'text-[#a3948b] hover:text-[#6b5e55]'
             }`}
           >
@@ -68,7 +68,7 @@ const OrdersPage = () => {
       </div>
 
       <div className="bg-white rounded-2xl border border-[#e5ddd5] overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
@@ -138,6 +138,65 @@ const OrdersPage = () => {
             </tbody>
           </table>
         </div>
+
+        <div className="divide-y divide-[#f3ede8] md:hidden">
+          {ordersLoading && (
+            <div className="px-5 py-10 text-center text-[#6b5e55]">
+              <span className="inline-flex items-center gap-2">
+                <Loader2 size={18} className="animate-spin" />
+                Loading orders...
+              </span>
+            </div>
+          )}
+
+          {!ordersLoading && ordersError && (
+            <div className="p-4">
+              <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                {ordersError}
+              </p>
+            </div>
+          )}
+
+          {!ordersLoading && !ordersError && filteredOrders.length === 0 && (
+            <div className="px-5 py-10 text-center text-[#a3948b]">No orders found.</div>
+          )}
+
+          {!ordersLoading && !ordersError && filteredOrders.map((order) => (
+            <button
+              key={order.id}
+              type="button"
+              onClick={() => setSelectedOrder(order)}
+              className="block w-full p-4 text-left transition hover:bg-[#fcfaf7]"
+            >
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-base font-semibold text-[#3b302a]">{order.orderNumber}</p>
+                  <p className="mt-0.5 text-sm text-[#a3948b]">{order.date}</p>
+                </div>
+                <StatusBadge status={order.status} />
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-[#a3948b]">Customer</p>
+                  <p className="mt-1 font-medium text-[#6b5e55]">{order.customerName}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-[#a3948b]">Total</p>
+                  <p className="mt-1 font-semibold text-[#3b302a]">{formatCurrency(order.totalAmount)}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-[#a3948b]">Items</p>
+                  <p className="mt-1 text-[#6b5e55]">
+                    {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
+                  </p>
+                </div>
+                <div className="flex items-end justify-end text-[#a3948b]">
+                  <ChevronRight size={22} />
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       <AnimatePresence>
@@ -157,7 +216,7 @@ const OrdersPage = () => {
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white z-[70] shadow-2xl overflow-y-auto"
             >
-              <div className="p-8 space-y-8">
+              <div className="p-5 sm:p-8 space-y-6 sm:space-y-8">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-semibold text-[#3b302a]">Order Details</h3>
                   <button

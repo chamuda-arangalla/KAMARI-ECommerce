@@ -46,10 +46,10 @@ const InventoryPage = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-bold text-[#3b302a]">Inventory</h2>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Inventory</h2>
           <p className="text-base text-[#a3948b] mt-2">Manage stock levels across all collections</p>
         </div>
 
@@ -91,7 +91,7 @@ const InventoryPage = () => {
             Loading products...
           </div>
         )}
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
@@ -183,6 +183,87 @@ const InventoryPage = () => {
               })}
             </tbody>
           </table>
+        </div>
+
+        <div className="divide-y divide-[#f3ede8] md:hidden">
+          {!productsLoading && filteredProducts.length === 0 && (
+            <div className="px-5 py-10 text-center text-[#8c7d73]">No products found.</div>
+          )}
+
+          {filteredProducts.map((product) => {
+            const totalStock = Object.values(product.stock).reduce((a, b) => a + b, 0);
+            const isLowStock = Object.values(product.stock).some((count) => count < 5);
+
+            return (
+              <div
+                key={product.id}
+                className="p-4"
+                onClick={() => openProductView(product)}
+              >
+                <div className="flex gap-4">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-20 w-20 shrink-0 rounded-xl border border-[#e5ddd5] object-cover"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-base font-semibold text-[#3b302a]">{product.name}</p>
+                    <p className="mt-1 text-sm text-[#a3948b]">LKR {product.price?.toLocaleString()}</p>
+                    <span className="mt-2 inline-flex rounded-full bg-[#f8f5f2] px-3 py-1 text-sm text-[#6b5e55]">
+                      {product.collection}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {Object.entries(product.stock).map(([size, count]) => (
+                    <div key={size} className="min-w-12 rounded-lg border border-[#e5ddd5] bg-[#fcfaf7] px-3 py-2 text-center">
+                      <p className="text-[11px] font-bold uppercase text-[#a3948b]">{size}</p>
+                      <p className={`text-sm font-semibold ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}>
+                        {count}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  {totalStock === 0 ? (
+                    <span className="flex items-center gap-1.5 text-sm font-semibold uppercase text-rose-600">
+                      <AlertCircle size={16} /> Sold Out
+                    </span>
+                  ) : isLowStock ? (
+                    <span className="flex items-center gap-1.5 text-sm font-semibold uppercase text-amber-600">
+                      <AlertCircle size={16} /> Low Stock
+                    </span>
+                  ) : (
+                    <span className="text-sm font-semibold uppercase text-emerald-600">In Stock</span>
+                  )}
+
+                  <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => openProductView(product, true)}
+                      aria-label={`Edit ${product.name}`}
+                      className="p-2.5 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-xl transition-all"
+                    >
+                      <Edit2 size={20} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeleteError("");
+                        setDeleteTarget(product);
+                      }}
+                      aria-label={`Delete ${product.name}`}
+                      className="p-2.5 text-[#a3948b] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
