@@ -1,0 +1,80 @@
+import { motion } from "framer-motion";
+import { fadeUp, getHomeProductImage } from "./homeConstants";
+
+export default function HomeProductCard({ product, badge, onClick }) {
+  const img1 = getHomeProductImage(product);
+  const img2 =
+    product?.colors?.flatMap((color) => color.images || [])?.[1]?.url || img1;
+  const colors = product.colors || [];
+
+  return (
+    <motion.div
+      variants={fadeUp}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.3 }}
+      className="group cursor-pointer"
+      onClick={onClick}
+    >
+      <div
+        className="relative mb-3 overflow-hidden rounded-xl bg-[#f8f8f8]"
+        style={{ aspectRatio: "3/4" }}
+      >
+        <img
+          src={img1}
+          alt={product.name}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-top transition duration-700 group-hover:opacity-0"
+        />
+        <img
+          src={img2}
+          alt={product.name}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition duration-700 group-hover:opacity-100"
+        />
+
+        {badge && (
+          <span
+            className={`absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+              badge === "New"
+                ? "border border-[#3B302A] bg-[#F8F5F2] text-[#3B302A]"
+                : "bg-[#3B302A] text-[#F8F5F2]"
+            }`}
+          >
+            {badge}
+          </span>
+        )}
+
+        <button className="absolute inset-x-3 bottom-3 z-10 rounded-lg bg-[#3B302A] py-3 text-xs font-medium uppercase tracking-[0.12em] text-white opacity-0 transition duration-300 group-hover:opacity-100">
+          View Product
+        </button>
+      </div>
+
+      <p className="mb-0.5 text-xs uppercase tracking-[0.1em] text-[#a3948b]">
+        {product.setName || product.collection}
+      </p>
+      <h4 className="mb-2 text-sm font-medium leading-snug text-[#3B302A]">
+        {product.name}
+      </h4>
+
+      <div className="mb-2 flex gap-1.5">
+        {colors.slice(0, 4).map((color) => (
+          <span
+            key={color._id || color.colorName}
+            className="inline-block h-3.5 w-3.5 rounded-full border border-black/10"
+            style={{ backgroundColor: color.colorCode || "#ccc" }}
+            title={color.colorName}
+          />
+        ))}
+        {colors.length > 4 && (
+          <span className="text-[11px] text-[#7D746C]">+{colors.length - 4}</span>
+        )}
+      </div>
+
+      <p className="text-sm text-[#3B302A]">
+        LKR {Number(product.price || 0).toLocaleString()}
+      </p>
+    </motion.div>
+  );
+}

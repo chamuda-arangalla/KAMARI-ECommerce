@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthLoadingScreen from "../components/auth/AuthLoadingScreen";
+import { REDIRECT_MAP } from "../components/auth/authConstants";
 
 const OAuthCallbackPage = () => {
   const navigate = useNavigate();
@@ -14,7 +16,6 @@ const OAuthCallbackPage = () => {
     const userRaw = params.get("user");
     const error = params.get("error");
     const redirect = params.get("redirect");
-    const REDIRECT_MAP = { checkout: "/checkout", cart: "/cart" };
     const redirectTo = REDIRECT_MAP[redirect] || "/";
 
     if (error || !token || !userRaw) {
@@ -39,14 +40,7 @@ const OAuthCallbackPage = () => {
     }
   }, [navigate]);
 
-  return (
-    <div className="min-h-screen bg-[#F8F5F2] flex items-center justify-center font-['Poppins']">
-      <div className="text-center space-y-3">
-        <div className="w-8 h-8 border-2 border-[#3b302a] border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-[#a3948b] text-sm tracking-wide">Signing you in...</p>
-      </div>
-    </div>
-  );
+  return <AuthLoadingScreen />;
 };
 
 export default OAuthCallbackPage;
