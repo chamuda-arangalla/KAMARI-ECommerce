@@ -90,10 +90,7 @@ export default function CustomerOrderDetailsPage() {
   const isPaymentComplete = order?.paymentStatus?.toLowerCase() === "complete";
 
   return (
-    <main
-      className="min-h-screen bg-[#F8F5F2] pb-20 pt-24"
-      style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-    >
+    <main className="min-h-screen bg-[#F8F5F2] pb-20 pt-24">
       <div className="mx-auto max-w-2xl px-5">
         <Link
           to="/orders"
@@ -105,7 +102,7 @@ export default function CustomerOrderDetailsPage() {
         {loading && <OrderDetailsSkeleton />}
 
         {!loading && error && (
-          <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-4 text-sm text-rose-600">
+          <div className="rounded-2xl border border-[#c9a797] bg-[#eaded4] px-5 py-4 text-sm text-[#5a3026]">
             {error}
           </div>
         )}

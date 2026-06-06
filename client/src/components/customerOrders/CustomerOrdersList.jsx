@@ -25,7 +25,7 @@ export default function CustomerOrdersList({ orders, loading, error }) {
       )}
 
       {!loading && error && (
-        <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-4 text-sm text-rose-600">
+        <div className="rounded-2xl border border-[#c9a797] bg-[#eaded4] px-5 py-4 text-sm text-[#5a3026]">
           {error}
         </div>
       )}

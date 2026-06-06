@@ -113,10 +113,7 @@ export default function Home() {
   }, [heroReady]);
 
   return (
-    <main
-      className="bg-[#F8F5F2] text-[#3B302A]"
-      style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-    >
+    <main className="bg-[#F8F5F2] text-[#3B302A]">
       <HomeHero
         heroImageScale={heroImageScale}
         heroImageY={heroImageY}

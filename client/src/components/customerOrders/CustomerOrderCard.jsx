@@ -35,12 +35,12 @@ export default function CustomerOrderCard({ order, index }) {
               </span>
               <OrderStatusBadge status={status} />
               {hasSlip && !isCodOrder && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
+                <span className="inline-flex items-center gap-1 rounded-full border border-[#d2bba4] bg-[#efe6dc] px-2.5 py-0.5 text-[11px] font-medium text-[#4f3b2d]">
                   Slip uploaded
                 </span>
               )}
               {!hasSlip && !isCodOrder && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium text-amber-600">
+                <span className="inline-flex items-center gap-1 rounded-full border border-[#dcc8b4] bg-[#f3eadf] px-2.5 py-0.5 text-[11px] font-medium text-[#7a5838]">
                   Slip pending
                 </span>
               )}

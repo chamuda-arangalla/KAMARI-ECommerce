@@ -16,7 +16,7 @@ export default function OrderPaymentSlipSection({
 }) {
   if (isCodOrder) {
     return (
-      <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-700">
+      <div className="rounded-2xl border border-[#e5ddd5] bg-[#f8f5f2] px-4 py-3 text-sm text-[#5c4b3f]">
         This order is Cash on Delivery. Please pay when your order arrives.
       </div>
     );
@@ -25,14 +25,14 @@ export default function OrderPaymentSlipSection({
   return (
     <div>
       {slipUploaded && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#d2bba4] bg-[#efe6dc] px-4 py-3 text-sm font-medium text-[#4f3b2d]">
           <CheckCircle2 size={15} className="flex-shrink-0" />
           Payment slip uploaded successfully!
         </div>
       )}
 
       {isPaymentComplete && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#d2bba4] bg-[#efe6dc] px-4 py-3 text-sm font-medium text-[#4f3b2d]">
           <CheckCircle2 size={15} className="flex-shrink-0" />
           Payment verified.
         </div>
@@ -41,7 +41,7 @@ export default function OrderPaymentSlipSection({
       {order.paymentSlip?.url && (
         <div className="mb-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4f3b2d]">
               {isPaymentComplete ? "" : "Slip uploaded"}
             </span>
             {!isPaymentComplete && (
@@ -79,7 +79,7 @@ export default function OrderPaymentSlipSection({
           <button
             type="button"
             onClick={onSlipRemove}
-            className="mt-2 inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-inherit text-xs text-[#a3948b] transition-colors hover:text-rose-600"
+            className="mt-2 inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-inherit text-xs text-[#a3948b] transition-colors hover:text-[#5a3026]"
           >
             <X size={11} /> Remove
           </button>
@@ -113,7 +113,7 @@ export default function OrderPaymentSlipSection({
       )}
 
       {slipError && (
-        <p className="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-4 py-2.5 text-xs text-rose-600">
+        <p className="mt-3 rounded-xl border border-[#c9a797] bg-[#eaded4] px-4 py-2.5 text-xs text-[#5a3026]">
           {slipError}
         </p>
       )}
