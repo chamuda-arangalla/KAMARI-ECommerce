@@ -10,7 +10,7 @@ const AdminLayout = () => {
   return (
     <AdminProvider>
       <div
-        className="min-h-screen bg-[#f8f5f2]"
+        className="min-h-screen bg-[#eae0d6]"
         style={{ fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif' }}
       >
         <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
@@ -24,7 +24,7 @@ const AdminLayout = () => {
             </div>
           </main>
           
-          <footer className="px-4 py-6 text-center text-[#a3948b] text-xs sm:text-sm">
+          <footer className="px-4 py-6 text-center text-[#8f8376] text-xs sm:text-sm">
             &copy; 2024 KAMARI Admin Portal. All rights reserved.
           </footer>
         </div>

@@ -32,17 +32,17 @@ export default function ImageUploadField({ label, value, onChange }) {
   return (
     <div>
       {label && (
-        <p className="text-sm font-semibold text-[#a3948b] uppercase tracking-wider mb-2">{label}</p>
+        <p className="text-sm font-semibold text-[#8f8376] uppercase tracking-wider mb-2">{label}</p>
       )}
 
       {value ? (
-        <div className="relative w-full rounded-xl overflow-hidden border border-[#e5ddd5]" style={{ maxHeight: 220 }}>
+        <div className="relative w-full rounded-xl overflow-hidden border border-[#d7c9b8]" style={{ maxHeight: 220 }}>
           <img src={value} alt="preview" className="w-full object-cover" style={{ maxHeight: 220 }} />
           <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-100 transition flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="bg-white text-[#3b302a] text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow hover:bg-[#f8f5f2] transition"
+              className="bg-white text-[#2c2b28] text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow hover:bg-[#eae0d6] transition"
             >
               {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
               {uploading ? "Uploading..." : "Change"}
@@ -61,7 +61,7 @@ export default function ImageUploadField({ label, value, onChange }) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="w-full h-40 border-2 border-dashed border-[#e5ddd5] rounded-xl flex flex-col items-center justify-center gap-2 text-[#a3948b] hover:border-[#3b302a] hover:text-[#3b302a] transition disabled:opacity-50"
+          className="w-full h-40 border-2 border-dashed border-[#d7c9b8] rounded-xl flex flex-col items-center justify-center gap-2 text-[#8f8376] hover:border-[#2c2b28] hover:text-[#2c2b28] transition disabled:opacity-50"
         >
           {uploading
             ? <><Loader2 size={28} className="animate-spin" /><span className="text-sm">Uploading...</span></>

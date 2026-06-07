@@ -123,24 +123,24 @@ const CustomersPage = () => {
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Customers</h2>
-          <p className="text-base text-[#a3948b] mt-2">Create, edit, or remove customer accounts</p>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[#2c2b28]">Customers</h2>
+          <p className="text-base text-[#8f8376] mt-2">Create, edit, or remove customer accounts</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8376]" size={20} />
             <input
               type="text"
               placeholder="Search by name, email or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-11 pr-4 py-3 bg-white border border-[#e5ddd5] rounded-xl text-base w-full md:w-80 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
+              className="pl-11 pr-4 py-3 bg-white border border-[#d7c9b8] rounded-xl text-base w-full md:w-80 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
             />
           </div>
           <button
             type="button"
             onClick={openCreateCustomer}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] shadow-sm"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#2c2b28] text-white text-base font-semibold hover:bg-[#544c43] shadow-sm"
           >
             <Plus size={20} />
             Add Customer
@@ -148,22 +148,22 @@ const CustomersPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#e5ddd5] overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#d7c9b8] overflow-hidden shadow-sm">
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Default Address</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Joined</th>
+              <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Default Address</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Joined</th>
                 <th className="px-6 py-5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
               {customersLoading && (
                 <tr>
-                  <td colSpan="5" className="px-6 py-10 text-center text-base text-[#6b5e55]">
+                  <td colSpan="5" className="px-6 py-10 text-center text-base text-[#5f564d]">
                     <span className="inline-flex items-center gap-2">
                       <Loader2 size={20} className="animate-spin" /> Loading customers...
                     </span>
@@ -174,7 +174,7 @@ const CustomersPage = () => {
                 <tr>
                   <td colSpan="5" className="px-6 py-10 text-center">
                     <p className="text-base text-rose-600">{customersError}</p>
-                    <button type="button" onClick={refreshCustomers} className="mt-3 px-5 py-2.5 rounded-xl border border-[#d8ccc2] text-base text-[#5f5149] hover:bg-[#f8f5f2]">
+                    <button type="button" onClick={refreshCustomers} className="mt-3 px-5 py-2.5 rounded-xl border border-[#d8ccc2] text-base text-[#5f5149] hover:bg-[#eae0d6]">
                       Try Again
                     </button>
                   </td>
@@ -189,37 +189,37 @@ const CustomersPage = () => {
                 <tr key={customer.id} className="hover:bg-[#fcfaf7] transition-colors">
                   <td className="px-6 py-5 whitespace-nowrap">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[#f3ede8] flex items-center justify-center text-[#3b302a] text-lg font-bold">
+                      <div className="w-12 h-12 rounded-full bg-[#f3ede8] flex items-center justify-center text-[#2c2b28] text-lg font-bold">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-base font-semibold text-[#3b302a]">{customer.name}</p>
-                        <p className="text-sm text-[#a3948b] mt-0.5">ID: {customer.id}</p>
+                        <p className="text-base font-semibold text-[#2c2b28]">{customer.name}</p>
+                        <p className="text-sm text-[#8f8376] mt-0.5">ID: {customer.id}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex flex-col gap-1.5">
-                      <span className="flex items-center gap-2 text-base text-[#6b5e55]">
-                        <Mail size={16} className="text-[#a3948b]" /> {customer.email}
+                      <span className="flex items-center gap-2 text-base text-[#5f564d]">
+                        <Mail size={16} className="text-[#8f8376]" /> {customer.email}
                       </span>
-                      <span className="flex items-center gap-2 text-base text-[#6b5e55]">
-                        <Phone size={16} className="text-[#a3948b]" /> {customer.phone}
+                      <span className="flex items-center gap-2 text-base text-[#5f564d]">
+                        <Phone size={16} className="text-[#8f8376]" /> {customer.phone}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-5 max-w-xs">
-                    <p className="text-base text-[#6b5e55] truncate">
+                    <p className="text-base text-[#5f564d] truncate">
                       {customer.defaultAddress
                         ? `${customer.defaultAddress.addressLine1}, ${customer.defaultAddress.city}`
                         : "No saved address"}
                     </p>
                   </td>
-                  <td className="px-6 py-5 text-base text-[#6b5e55]">{customer.joinedDate}</td>
+                  <td className="px-6 py-5 text-base text-[#5f564d]">{customer.joinedDate}</td>
                   <td className="px-6 py-5">
                     <div className="flex justify-end gap-2">
                       <button type="button" onClick={() => openEditCustomer(customer)}
-                        className="p-2.5 text-[#8c7d73] hover:text-[#3b302a] hover:bg-[#f3ede8] rounded-xl transition-all">
+                        className="p-2.5 text-[#8c7d73] hover:text-[#2c2b28] hover:bg-[#f3ede8] rounded-xl transition-all">
                         <Edit2 size={19} />
                       </button>
                       <button type="button" onClick={() => setDeleteTarget(customer)}
@@ -236,7 +236,7 @@ const CustomersPage = () => {
 
         <div className="divide-y divide-[#f3ede8] md:hidden">
           {customersLoading && (
-            <div className="px-5 py-10 text-center text-base text-[#6b5e55]">
+            <div className="px-5 py-10 text-center text-base text-[#5f564d]">
               <span className="inline-flex items-center gap-2">
                 <Loader2 size={20} className="animate-spin" /> Loading customers...
               </span>
@@ -246,7 +246,7 @@ const CustomersPage = () => {
           {customersError && !customersLoading && (
             <div className="px-5 py-10 text-center">
               <p className="text-base text-rose-600">{customersError}</p>
-              <button type="button" onClick={refreshCustomers} className="mt-3 px-5 py-2.5 rounded-xl border border-[#d8ccc2] text-base text-[#5f5149] hover:bg-[#f8f5f2]">
+              <button type="button" onClick={refreshCustomers} className="mt-3 px-5 py-2.5 rounded-xl border border-[#d8ccc2] text-base text-[#5f5149] hover:bg-[#eae0d6]">
                 Try Again
               </button>
             </div>
@@ -259,16 +259,16 @@ const CustomersPage = () => {
           {!customersLoading && !customersError && filteredCustomers.map((customer) => (
             <div key={customer.id} className="p-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f3ede8] text-lg font-bold text-[#3b302a]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f3ede8] text-lg font-bold text-[#2c2b28]">
                   {customer.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-semibold text-[#3b302a]">{customer.name}</p>
-                  <p className="mt-0.5 text-sm text-[#a3948b]">ID: {customer.id}</p>
+                  <p className="truncate text-base font-semibold text-[#2c2b28]">{customer.name}</p>
+                  <p className="mt-0.5 text-sm text-[#8f8376]">ID: {customer.id}</p>
                 </div>
                 <div className="flex gap-1">
                   <button type="button" onClick={() => openEditCustomer(customer)}
-                    className="p-2.5 text-[#8c7d73] hover:text-[#3b302a] hover:bg-[#f3ede8] rounded-xl transition-all">
+                    className="p-2.5 text-[#8c7d73] hover:text-[#2c2b28] hover:bg-[#f3ede8] rounded-xl transition-all">
                     <Edit2 size={19} />
                   </button>
                   <button type="button" onClick={() => setDeleteTarget(customer)}
@@ -278,16 +278,16 @@ const CustomersPage = () => {
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2 text-sm text-[#6b5e55]">
+              <div className="mt-4 space-y-2 text-sm text-[#5f564d]">
                 <span className="flex min-w-0 items-center gap-2">
-                  <Mail size={16} className="shrink-0 text-[#a3948b]" />
+                  <Mail size={16} className="shrink-0 text-[#8f8376]" />
                   <span className="truncate">{customer.email}</span>
                 </span>
                 <span className="flex items-center gap-2">
-                  <Phone size={16} className="text-[#a3948b]" /> {customer.phone}
+                  <Phone size={16} className="text-[#8f8376]" /> {customer.phone}
                 </span>
                 <span className="flex items-start gap-2">
-                  <MapPin size={16} className="mt-0.5 shrink-0 text-[#a3948b]" />
+                  <MapPin size={16} className="mt-0.5 shrink-0 text-[#8f8376]" />
                   <span>
                     {customer.defaultAddress
                       ? `${customer.defaultAddress.addressLine1}, ${customer.defaultAddress.city}`
@@ -296,7 +296,7 @@ const CustomersPage = () => {
                 </span>
               </div>
 
-              <p className="mt-4 text-xs uppercase tracking-wider text-[#a3948b]">
+              <p className="mt-4 text-xs uppercase tracking-wider text-[#8f8376]">
                 Joined {customer.joinedDate}
               </p>
             </div>
@@ -309,31 +309,31 @@ const CustomersPage = () => {
         {drawerOpen && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-[#3b302a]/25 backdrop-blur-sm z-[60]" onClick={closeDrawer} />
+              className="fixed inset-0 bg-[#2c2b28]/25 backdrop-blur-sm z-[60]" onClick={closeDrawer} />
             <motion.aside initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
               className="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-white z-[70] shadow-2xl overflow-y-auto">
               <form onSubmit={handleSave} className="p-5 sm:p-8 space-y-6 sm:space-y-8">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-2xl font-bold text-[#3b302a]">
+                    <h3 className="text-2xl font-bold text-[#2c2b28]">
                       {creatingCustomer ? "Create Customer" : "Edit Customer"}
                     </h3>
-                    <p className="text-base text-[#a3948b] mt-1">
+                    <p className="text-base text-[#8f8376] mt-1">
                       {creatingCustomer ? "Add a customer profile" : selectedCustomer.id}
                     </p>
                   </div>
-                  <button type="button" onClick={closeDrawer} className="p-2 hover:bg-[#f8f5f2] rounded-full text-[#6b5e55]">
+                  <button type="button" onClick={closeDrawer} className="p-2 hover:bg-[#eae0d6] rounded-full text-[#5f564d]">
                     <X size={26} />
                   </button>
                 </div>
 
-                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 bg-[#fcfaf7] rounded-2xl sm:rounded-3xl border border-[#e5ddd5]">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#3b302a] flex items-center justify-center text-white text-xl sm:text-2xl font-bold">
+                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 bg-[#fcfaf7] rounded-2xl sm:rounded-3xl border border-[#d7c9b8]">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#2c2b28] flex items-center justify-center text-white text-xl sm:text-2xl font-bold">
                     {(selectedCustomer?.name || draft.email || "C").charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-[#3b302a]">{selectedCustomer?.name || "New Customer"}</h4>
-                    <p className="text-base text-[#a3948b]">{selectedCustomer?.email || "Created by admin"}</p>
+                    <h4 className="text-xl font-bold text-[#2c2b28]">{selectedCustomer?.name || "New Customer"}</h4>
+                    <p className="text-base text-[#8f8376]">{selectedCustomer?.email || "Created by admin"}</p>
                     <p className="text-sm text-[#8c7d73] mt-1">
                       {creatingCustomer ? "Password is required for new customers" : `Joined ${selectedCustomer.joinedDate}`}
                     </p>
@@ -353,13 +353,13 @@ const CustomersPage = () => {
                   />
                 </div>
 
-                <label className="inline-flex items-center gap-3 text-base text-[#3b302a]">
-                  <input type="checkbox" name="isActive" checked={draft.isActive} onChange={handleDraftChange} className="h-5 w-5 accent-[#3b302a]" />
+                <label className="inline-flex items-center gap-3 text-base text-[#2c2b28]">
+                  <input type="checkbox" name="isActive" checked={draft.isActive} onChange={handleDraftChange} className="h-5 w-5 accent-[#2c2b28]" />
                   Active customer account
                 </label>
 
                 <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-[#a3948b] uppercase tracking-widest border-b border-[#e5ddd5] pb-2">
+                  <h4 className="text-sm font-bold text-[#8f8376] uppercase tracking-widest border-b border-[#d7c9b8] pb-2">
                     Default Address
                   </h4>
                   <Field label="Address Line 1" name="addressLine1" value={draft.addressLine1} onChange={handleDraftChange} />
@@ -374,18 +374,18 @@ const CustomersPage = () => {
 
                 {!creatingCustomer && (
                   <div className="space-y-3">
-                    <h4 className="text-sm font-bold text-[#a3948b] uppercase tracking-widest">Saved Addresses</h4>
+                    <h4 className="text-sm font-bold text-[#8f8376] uppercase tracking-widest">Saved Addresses</h4>
                     {selectedCustomer.addresses.length === 0 ? (
-                      <p className="text-base text-[#8c7d73] bg-[#fcfaf7] border border-[#e5ddd5] rounded-2xl px-4 py-3">
+                      <p className="text-base text-[#8c7d73] bg-[#fcfaf7] border border-[#d7c9b8] rounded-2xl px-4 py-3">
                         No saved addresses.
                       </p>
                     ) : (
                       selectedCustomer.addresses.map((address, index) => (
-                        <div key={`${address.addressLine1}-${index}`} className="rounded-2xl border border-[#e5ddd5] bg-white px-4 py-3">
-                          <p className="flex items-center gap-2 text-base font-semibold text-[#3b302a]">
+                        <div key={`${address.addressLine1}-${index}`} className="rounded-2xl border border-[#d7c9b8] bg-white px-4 py-3">
+                          <p className="flex items-center gap-2 text-base font-semibold text-[#2c2b28]">
                             <MapPin size={16} /> {address.fullName || selectedCustomer.name}
                           </p>
-                          <p className="mt-1 text-base text-[#6b5e55]">
+                          <p className="mt-1 text-base text-[#5f564d]">
                             {[address.addressLine1, address.addressLine2, address.city, address.district, address.postalCode, address.country].filter(Boolean).join(", ")}
                           </p>
                         </div>
@@ -400,11 +400,11 @@ const CustomersPage = () => {
 
                 <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
                   <button type="button" onClick={closeDrawer}
-                    className="py-3.5 rounded-xl bg-white border border-[#d8ccc2] text-base font-semibold text-[#5f5149] hover:bg-[#f8f5f2]">
+                    className="py-3.5 rounded-xl bg-white border border-[#d8ccc2] text-base font-semibold text-[#5f5149] hover:bg-[#eae0d6]">
                     Cancel
                   </button>
                   <button type="submit" disabled={saving}
-                    className="inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-60">
+                    className="inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#2c2b28] text-white text-base font-semibold hover:bg-[#544c43] disabled:opacity-60">
                     {saving && <Loader2 size={18} className="animate-spin" />}
                     {creatingCustomer ? "Create Customer" : "Save Changes"}
                   </button>
@@ -431,11 +431,11 @@ const CustomersPage = () => {
 
 const Field = ({ label, name, type = "text", value, onChange, required = false, placeholder = "" }) => (
   <label className="block">
-    <span className="block text-sm font-semibold text-[#a3948b] uppercase tracking-wider mb-2">{label}</span>
+    <span className="block text-sm font-semibold text-[#8f8376] uppercase tracking-wider mb-2">{label}</span>
     <input
       name={name} type={type} value={value} onChange={onChange}
       required={required} placeholder={placeholder}
-      className="w-full px-4 py-3 bg-white border border-[#e5ddd5] rounded-xl text-base text-[#3b302a] focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+      className="w-full px-4 py-3 bg-white border border-[#d7c9b8] rounded-xl text-base text-[#2c2b28] focus:ring-1 focus:ring-[#c2b2a6] outline-none"
     />
   </label>
 );

@@ -26,7 +26,7 @@ const ConfirmDialog = ({
       <button
         type="button"
         aria-label="Close confirmation"
-        className="absolute inset-0 bg-[#3b302a]/30 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#2c2b28]/30 backdrop-blur-sm"
         onClick={loading ? undefined : onCancel}
       />
 
@@ -36,7 +36,7 @@ const ConfirmDialog = ({
             <Icon size={22} />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-xl font-bold text-[#3b302a]">{title}</h2>
+            <h2 className="text-xl font-bold text-[#2c2b28]">{title}</h2>
             <p className="mt-1.5 text-base leading-6 text-[#7b6d64]">{message}</p>
           </div>
           <button
@@ -44,7 +44,7 @@ const ConfirmDialog = ({
             onClick={onCancel}
             disabled={loading}
             aria-label="Cancel"
-            className="p-2 rounded-full text-[#8c7d73] hover:bg-white hover:text-[#3b302a] disabled:opacity-50"
+            className="p-2 rounded-full text-[#8c7d73] hover:bg-white hover:text-[#2c2b28] disabled:opacity-50"
           >
             <X size={20} />
           </button>
@@ -55,7 +55,7 @@ const ConfirmDialog = ({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="px-6 py-3 rounded-xl border border-[#d8ccc2] bg-white text-base font-semibold text-[#5f5149] hover:bg-[#f8f5f2] disabled:opacity-50"
+            className="px-6 py-3 rounded-xl border border-[#d8ccc2] bg-white text-base font-semibold text-[#5f5149] hover:bg-[#eae0d6] disabled:opacity-50"
           >
             {cancelLabel}
           </button>

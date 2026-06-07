@@ -131,21 +131,21 @@ const CustomerProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F5F2] pt-28 pb-16 px-4 font-['Poppins']">
+    <div className="min-h-screen bg-[#EAE0D6] pt-28 pb-16 px-4 font-['Poppins']">
       <div className="mx-auto max-w-4xl">
         <div className="mb-10 flex items-center gap-5">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#3b302a] text-white">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2c2b28] text-white">
             <User size={26} strokeWidth={1.6} />
           </div>
           <div>
-            <h1 className="text-4xl font-bold text-[#3b302a]">My Profile</h1>
-            <p className="text-base text-[#a3948b] mt-1">Manage your KAMARI account details</p>
+            <h1 className="text-4xl font-bold text-[#2c2b28]">My Profile</h1>
+            <p className="text-base text-[#8f8376] mt-1">Manage your KAMARI account details</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-3xl border border-[#e5ddd5] bg-white p-8 md:p-10 shadow-[0_20px_60px_rgba(59,48,42,0.10)]">
+        <form onSubmit={handleSubmit} className="rounded-3xl border border-[#d7c9b8] bg-white p-8 md:p-10 shadow-[0_20px_60px_rgba(59,48,42,0.10)]">
           {loading ? (
-            <div className="flex items-center justify-center gap-3 py-16 text-base text-[#6b5e55]">
+            <div className="flex items-center justify-center gap-3 py-16 text-base text-[#5f564d]">
               <Loader2 size={22} className="animate-spin" />
               Loading profile...
             </div>
@@ -189,7 +189,7 @@ const CustomerProfilePage = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3b302a] px-8 py-3.5 text-base font-semibold text-white hover:bg-[#2e2622] disabled:opacity-60 transition"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2c2b28] px-8 py-3.5 text-base font-semibold text-white hover:bg-[#544c43] disabled:opacity-60 transition"
                 >
                   {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                   Save Profile
@@ -204,20 +204,20 @@ const CustomerProfilePage = () => {
 };
 
 const SectionTitle = ({ children }) => (
-  <h2 className="border-b border-[#e5ddd5] pb-2 text-sm font-bold uppercase tracking-wider text-[#a3948b]">
+  <h2 className="border-b border-[#d7c9b8] pb-2 text-sm font-bold uppercase tracking-wider text-[#8f8376]">
     {children}
   </h2>
 );
 
 const Field = ({ label, name, type = "text", value, onChange, required = false, placeholder = "" }) => (
   <label className="block">
-    <span className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[#a3948b]">
+    <span className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[#8f8376]">
       {label}
     </span>
     <input
       name={name} type={type} value={value} onChange={onChange}
       required={required} placeholder={placeholder}
-      className="w-full rounded-xl border border-[#e5ddd5] bg-white px-4 py-3 text-base text-[#3b302a] outline-none focus:ring-1 focus:ring-[#c2b2a6]"
+      className="w-full rounded-xl border border-[#d7c9b8] bg-white px-4 py-3 text-base text-[#2c2b28] outline-none focus:ring-1 focus:ring-[#c2b2a6]"
     />
   </label>
 );

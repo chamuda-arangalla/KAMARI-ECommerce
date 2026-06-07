@@ -45,7 +45,7 @@ export default function CustomerOrdersPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#F8F5F2] pb-20 pt-24">
+    <main className="min-h-screen bg-[#EAE0D6] pb-20 pt-24">
       <CustomerOrdersHero
         firstName={firstName}
         loading={loading}

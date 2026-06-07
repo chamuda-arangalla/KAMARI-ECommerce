@@ -6,11 +6,11 @@ export default function CustomerOrdersList({ orders, loading, error }) {
   return (
     <div className="mx-auto max-w-4xl px-6 pt-10">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#7d746c]">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#8f8376]">
           Order History
         </h2>
         {orders.length > 0 && (
-          <span className="rounded-full bg-[#3b302a] px-3 py-1 text-xs text-white">
+          <span className="rounded-full bg-[#2c2b28] px-3 py-1 text-xs text-[#f3ebe2]">
             {orders.length} {orders.length === 1 ? "order" : "orders"}
           </span>
         )}
@@ -25,7 +25,7 @@ export default function CustomerOrdersList({ orders, loading, error }) {
       )}
 
       {!loading && error && (
-        <div className="rounded-2xl border border-[#c9a797] bg-[#eaded4] px-5 py-4 text-sm text-[#5a3026]">
+        <div className="rounded-2xl border border-[#b7aa9a] bg-[#ead9c4] px-5 py-4 text-sm text-[#544c43]">
           {error}
         </div>
       )}

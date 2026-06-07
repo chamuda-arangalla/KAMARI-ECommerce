@@ -90,11 +90,11 @@ export default function CustomerOrderDetailsPage() {
   const isPaymentComplete = order?.paymentStatus?.toLowerCase() === "complete";
 
   return (
-    <main className="min-h-screen bg-[#F8F5F2] pb-20 pt-24">
+    <main className="min-h-screen bg-[#EAE0D6] pb-20 pt-24">
       <div className="mx-auto max-w-2xl px-5">
         <Link
           to="/orders"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-[#7d746c] transition-colors hover:text-[#3b302a]"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-[#8f8376] transition-colors hover:text-[#2c2b28]"
         >
           <ArrowLeft size={15} /> Back to orders
         </Link>
@@ -102,7 +102,7 @@ export default function CustomerOrderDetailsPage() {
         {loading && <OrderDetailsSkeleton />}
 
         {!loading && error && (
-          <div className="rounded-2xl border border-[#c9a797] bg-[#eaded4] px-5 py-4 text-sm text-[#5a3026]">
+          <div className="rounded-2xl border border-[#b7aa9a] bg-[#ead9c4] px-5 py-4 text-sm text-[#544c43]">
             {error}
           </div>
         )}

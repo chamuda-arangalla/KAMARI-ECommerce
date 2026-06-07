@@ -7,6 +7,7 @@ import HomeHero from "../components/home/HomeHero";
 import HomeMoodGrid from "../components/home/HomeMoodGrid";
 import HomeNewsletter from "../components/home/HomeNewsletter";
 import HomeProductSection from "../components/home/HomeProductSection";
+import HomeQuoteFeature from "../components/home/HomeQuoteFeature";
 import { getCollections } from "../services/collectionApi";
 import { getProducts } from "../services/productApi";
 
@@ -113,7 +114,7 @@ export default function Home() {
   }, [heroReady]);
 
   return (
-    <main className="bg-[#F8F5F2] text-[#3B302A]">
+    <main className="bg-[#EAE0D6] text-[#2C2B28]">
       <HomeHero
         heroImageScale={heroImageScale}
         heroImageY={heroImageY}
@@ -142,6 +143,8 @@ export default function Home() {
             variant="white"
             onOpenProduct={navigateToProduct}
           />
+
+          <HomeQuoteFeature onNavigate={navigate} />
 
           <HomeProductSection
             badge="Best Seller"

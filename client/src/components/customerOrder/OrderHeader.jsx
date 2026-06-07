@@ -4,13 +4,13 @@ export default function OrderHeader({ order, status }) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
-        <p className="mb-1 text-[10px] uppercase tracking-[0.28em] text-[#a3948b]">
+        <p className="mb-1 text-[10px] uppercase tracking-[0.28em] text-[#8f8376]">
           Order
         </p>
-        <h1 className="text-xl font-semibold tracking-wide text-[#3b302a]">
+        <h1 className="text-xl font-semibold tracking-wide text-[#2c2b28]">
           {order.orderId}
         </h1>
-        <p className="mt-1 text-xs text-[#a3948b]">
+        <p className="mt-1 text-xs text-[#8f8376]">
           {formatDate(order.createdAt)}
         </p>
       </div>

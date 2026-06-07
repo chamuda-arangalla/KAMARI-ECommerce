@@ -3,7 +3,7 @@ import { contactFadeUp } from "./contactConstants";
 
 export default function ContactHero({ title, subtitle }) {
   return (
-    <section className="bg-[#3B302A] py-20 text-center text-white">
+    <section className="bg-[#2C2B28] py-20 text-center text-white">
       <motion.div
         variants={contactFadeUp}
         initial="hidden"

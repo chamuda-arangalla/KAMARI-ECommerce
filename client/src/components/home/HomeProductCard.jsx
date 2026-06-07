@@ -38,23 +38,23 @@ export default function HomeProductCard({ product, badge, onClick }) {
           <span
             className={`absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
               badge === "New"
-                ? "border border-[#3B302A] bg-[#F8F5F2] text-[#3B302A]"
-                : "bg-[#3B302A] text-[#F8F5F2]"
+                ? "border border-[#2C2B28] bg-[#EAE0D6] text-[#2C2B28]"
+                : "bg-[#2C2B28] text-[#EAE0D6]"
             }`}
           >
             {badge}
           </span>
         )}
 
-        <button className="absolute inset-x-3 bottom-3 z-10 rounded-lg bg-[#3B302A] py-3 text-xs font-medium uppercase tracking-[0.12em] text-white opacity-0 transition duration-300 group-hover:opacity-100">
+        <button className="absolute inset-x-3 bottom-3 z-10 rounded-lg bg-[#2C2B28] py-3 text-xs font-medium uppercase tracking-[0.12em] text-white opacity-0 transition duration-300 group-hover:opacity-100">
           View Product
         </button>
       </div>
 
-      <p className="mb-0.5 text-xs uppercase tracking-[0.1em] text-[#a3948b]">
+      <p className="mb-0.5 text-xs uppercase tracking-[0.1em] text-[#8f8376]">
         {product.setName || product.collection}
       </p>
-      <h4 className="mb-2 text-sm font-medium leading-snug text-[#3B302A]">
+      <h4 className="mb-2 text-sm font-medium leading-snug text-[#2C2B28]">
         {product.name}
       </h4>
 
@@ -68,11 +68,11 @@ export default function HomeProductCard({ product, badge, onClick }) {
           />
         ))}
         {colors.length > 4 && (
-          <span className="text-[11px] text-[#7D746C]">+{colors.length - 4}</span>
+          <span className="text-[11px] text-[#5F564D]">+{colors.length - 4}</span>
         )}
       </div>
 
-      <p className="text-sm text-[#3B302A]">
+      <p className="text-sm text-[#2C2B28]">
         LKR {Number(product.price || 0).toLocaleString()}
       </p>
     </motion.div>

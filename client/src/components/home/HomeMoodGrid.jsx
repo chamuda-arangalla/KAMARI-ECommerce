@@ -26,7 +26,7 @@ export default function HomeMoodGrid({ products, onOpenProduct }) {
         transition={{ duration: 0.6 }}
         className="mb-6 text-center"
       >
-        <p className="text-xs uppercase tracking-[0.28em] text-[#7D746C]">
+        <p className="text-xs uppercase tracking-[0.28em] text-[#5F564D]">
           Style Gallery
         </p>
       </motion.div>
