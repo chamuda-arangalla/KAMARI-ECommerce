@@ -6,8 +6,26 @@ import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
+import { sendEmail } from "../services/emailService.js";
+import {
+  orderConfirmationTemplate,
+  adminNewOrderTemplate,
+  orderShippingTemplate,
+  orderDeliveredTemplate,
+  orderCancelledTemplate,
+  paymentConfirmedTemplate,
+  paymentFailedTemplate,
+  adminPaymentSlipTemplate,
+} from "../templates/orderEmailTemplates.js";
 
 const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 350);
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+
+const getCustomerEmail = async (userId) => {
+  if (!userId) return null;
+  const user = await User.findById(userId).select("email").lean();
+  return user?.email || null;
+};
 
 const isValidOrderObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -243,6 +261,22 @@ export const createOrder = async (req, res) => {
       ? await saveReceiverAddressToCustomer(req.user.id, orderBody.receiverDetails)
       : null;
 
+    const customerEmail = await getCustomerEmail(req.user.id);
+    if (customerEmail) {
+      sendEmail({
+        to: customerEmail,
+        subject: `Order Confirmed — ${order.orderId}`,
+        html: orderConfirmationTemplate(order),
+      });
+    }
+    if (ADMIN_EMAIL) {
+      sendEmail({
+        to: ADMIN_EMAIL,
+        subject: `New Order Received — ${order.orderId}`,
+        html: adminNewOrderTemplate(order, customerEmail || "N/A", `${process.env.CLIENT_URL}/admin/orders`),
+      });
+    }
+
     return res.status(201).json({
       success: true,
       message: "Order created successfully",
@@ -392,6 +426,9 @@ export const updateOrder = async (req, res) => {
 
     const { productDetails, receiverDetails, paymentStatus, orderStatus } = req.body;
 
+    const prevOrderStatus = order.orderStatus;
+    const prevPaymentStatus = order.paymentStatus;
+
     if (productDetails !== undefined) {
       const updatedProductDetails = await validateOrderProducts(productDetails);
       order.productDetails = updatedProductDetails;
@@ -407,6 +444,51 @@ export const updateOrder = async (req, res) => {
     if (orderStatus !== undefined) order.orderStatus = orderStatus;
 
     await order.save();
+
+    const customerEmail = await getCustomerEmail(order.receiverDetails?.userId);
+
+    if (customerEmail) {
+      const newOrderStatus = order.orderStatus;
+      const newPaymentStatus = order.paymentStatus;
+
+      if (orderStatus !== undefined && newOrderStatus !== prevOrderStatus) {
+        if (newOrderStatus === ORDER_STATUS.SHIPPING) {
+          sendEmail({
+            to: customerEmail,
+            subject: `Your order is on the way — ${order.orderId}`,
+            html: orderShippingTemplate(order),
+          });
+        } else if (newOrderStatus === ORDER_STATUS.RECEIVED) {
+          sendEmail({
+            to: customerEmail,
+            subject: `Order Delivered — ${order.orderId}`,
+            html: orderDeliveredTemplate(order),
+          });
+        } else if (newOrderStatus === ORDER_STATUS.CANCELLED) {
+          sendEmail({
+            to: customerEmail,
+            subject: `Order Cancelled — ${order.orderId}`,
+            html: orderCancelledTemplate(order),
+          });
+        }
+      }
+
+      if (paymentStatus !== undefined && newPaymentStatus !== prevPaymentStatus) {
+        if (newPaymentStatus === PAYMENT_STATUS.COMPLETE) {
+          sendEmail({
+            to: customerEmail,
+            subject: `Payment Confirmed — ${order.orderId}`,
+            html: paymentConfirmedTemplate(order),
+          });
+        } else if (newPaymentStatus === PAYMENT_STATUS.FAILED) {
+          sendEmail({
+            to: customerEmail,
+            subject: `Payment Failed — ${order.orderId}`,
+            html: paymentFailedTemplate(order),
+          });
+        }
+      }
+    }
 
     return res.status(200).json({
       success: true,
@@ -441,6 +523,15 @@ export const uploadPaymentSlip = async (req, res) => {
     const result = await uploadToCloudinary(req.file, "kamari/payment-slips");
     order.paymentSlip = { url: result.url, publicId: result.publicId };
     await order.save();
+
+    const customerEmail = await getCustomerEmail(order.receiverDetails?.userId);
+    if (ADMIN_EMAIL) {
+      sendEmail({
+        to: ADMIN_EMAIL,
+        subject: `Payment Slip Uploaded — ${order.orderId}`,
+        html: adminPaymentSlipTemplate(order, customerEmail || "N/A", `${process.env.CLIENT_URL}/admin/orders`),
+      });
+    }
 
     return res.status(200).json({
       success: true,

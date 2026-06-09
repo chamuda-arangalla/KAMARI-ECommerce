@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginAdmin } from "../../services/authApi";
 
 const AdminLoginPage = () => {
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const AdminLoginPage = () => {
     setError("");
     setLoading(true);
     try {
-      const data = await loginAdmin(form.username, form.password);
+      const data = await loginAdmin(form.email, form.password);
       localStorage.setItem("adminToken", data.token);
       localStorage.setItem("adminUser", JSON.stringify(data.user));
       navigate("/admin");
@@ -47,16 +47,17 @@ const AdminLoginPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-[#8f8376] uppercase tracking-wider mb-2">
-              Username
+            <label className="block text-sm font-semibold text-[#a3948b] uppercase tracking-wider mb-2">
+              Email
             </label>
             <input
-              name="username"
-              value={form.username}
+              name="email"
+              type="email"
+              value={form.email}
               onChange={handleChange}
               required
-              autoComplete="username"
-              className="w-full px-4 py-3 bg-white border border-[#d7c9b8] rounded-xl text-base focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+              autoComplete="email"
+              className="w-full px-4 py-3 bg-white border border-[#e5ddd5] rounded-xl text-base focus:ring-1 focus:ring-[#c2b2a6] outline-none"
             />
           </div>
 
