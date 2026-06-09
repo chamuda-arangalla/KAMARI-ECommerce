@@ -8,6 +8,7 @@ const addressSchema = new mongoose.Schema(
     addressLine2: { type: String, trim: true },
     city: { type: String, trim: true },
     district: { type: String, trim: true },
+    province: { type: String, trim: true },
     postalCode: { type: String, trim: true },
     country: { type: String, default: "Sri Lanka" },
     isDefault: { type: Boolean, default: true },
@@ -17,6 +18,14 @@ const addressSchema = new mongoose.Schema(
 
 const userSchema = new mongoose.Schema(
   {
+    username: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+      lowercase: true,
+    },
+
     email: {
       type: String,
       trim: true,
@@ -57,6 +66,16 @@ const userSchema = new mongoose.Schema(
     addresses: {
       type: [addressSchema],
       default: [],
+    },
+
+    googleId: {
+      type: String,
+      default: null,
+    },
+
+    facebookId: {
+      type: String,
+      default: null,
     },
 
     isActive: {

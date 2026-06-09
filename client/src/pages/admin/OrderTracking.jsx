@@ -1,175 +1,236 @@
-import React, { useState } from 'react';
-import { useAdmin } from '../../context/AdminContext';
-import { Check, Clock, Truck, Package, Search, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Check, ChevronRight, Clock, Loader2, Search, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useAdmin } from '../../context/useAdmin';
+
+const stages = [
+  { id: 'Created', icon: Clock, label: 'Created' },
+  { id: 'Shipping', icon: ChevronRight, label: 'Shipping' },
+  { id: 'Received', icon: Check, label: 'Received' },
+];
+
+const TrackingDetails = ({ selectedOrder, currentStageIndex, compact = false }) => (
+  <div className={`rounded-2xl border border-[#e5ddd5] bg-white shadow-sm ${compact ? 'p-5' : 'p-6 sm:p-8'}`}>
+    <div className={`${compact ? 'mb-8' : 'mb-12'} flex flex-col justify-between gap-4 sm:flex-row sm:items-start`}>
+      <div>
+        <h3 className={`${compact ? 'text-xl' : 'text-2xl'} font-bold text-[#3b302a]`}>
+          Live Tracking: {selectedOrder.orderNumber}
+        </h3>
+        <p className="mt-1 text-sm text-[#a3948b] sm:text-base">Customer: {selectedOrder.customerName}</p>
+      </div>
+      <span className="w-fit rounded-full border border-[#e5ddd5] bg-[#fcfaf7] px-4 py-2 text-sm font-semibold text-[#3b302a] sm:text-base">
+        {selectedOrder.orderStatus}
+      </span>
+    </div>
+
+    <div className={`${compact ? 'mb-10' : 'mb-20'} overflow-x-auto pb-2`}>
+      <div className="relative min-w-[360px] sm:min-w-0">
+        <div className="absolute left-0 right-0 top-7 h-1 bg-[#f3ede8]" />
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${(currentStageIndex / (stages.length - 1)) * 100}%` }}
+          className="absolute left-0 top-7 h-1 bg-[#d4a373]"
+        />
+        <div className="relative flex justify-between">
+          {stages.map((stage, idx) => {
+            const Icon = stage.icon;
+            const isCompleted = idx <= currentStageIndex;
+            const isCurrent = idx === currentStageIndex;
+
+            return (
+              <div key={stage.id} className="flex flex-col items-center">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-full transition-all duration-500 sm:h-14 sm:w-14 ${
+                  isCompleted ? 'bg-[#d4a373] text-white' : 'border-2 border-[#f3ede8] bg-white text-[#a3948b]'
+                } ${isCurrent ? 'shadow-lg ring-4 ring-[#d4a373]/20' : ''}`}
+                >
+                  <Icon size={compact ? 18 : 22} />
+                </div>
+                <p className={`mt-3 text-xs font-bold uppercase tracking-wider sm:text-sm ${isCompleted ? 'text-[#3b302a]' : 'text-[#a3948b]'}`}>
+                  {stage.label}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+
+    <div className="space-y-6">
+      <h4 className="text-sm font-semibold uppercase tracking-widest text-[#3b302a]">History</h4>
+      <div className="relative max-h-[280px] space-y-6 overflow-y-auto pr-2">
+        <div className="absolute bottom-2 left-2.5 top-2 w-px bg-[#f3ede8]" />
+        {[...selectedOrder.trackingTimeline].reverse().map((event, idx) => (
+          <div key={`${event.status}-${idx}`} className="relative pl-10">
+            <div className="absolute left-0 top-1 z-10 h-5 w-5 rounded-full border-2 border-[#d4a373] bg-white" />
+            <div>
+              <p className="text-base font-bold text-[#3b302a]">{event.status}</p>
+              <p className="mt-1 text-sm text-[#6b5e55] sm:text-base">{event.description}</p>
+              <p className="mt-1 text-sm text-[#a3948b]">{event.date}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const OrderTracking = () => {
-  const { orders, updateOrderStatus } = useAdmin();
-  const [selectedOrderId, setSelectedOrderId] = useState(orders[0]?.id || '');
-  const [newStatus, setNewStatus] = useState('');
-  const [statusNote, setStatusNote] = useState('');
+  const { orders, ordersLoading, ordersError } = useAdmin();
+  const [selectedOrderId, setSelectedOrderId] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const selectedOrder = orders.find(o => o.id === selectedOrderId);
+  const filteredOrders = orders.filter((order) => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return true;
 
-  const stages = [
-    { id: 'Pending', icon: Clock, label: 'Pending' },
-    { id: 'Processing', icon: Package, label: 'Processing' },
-    { id: 'Shipped', icon: Truck, label: 'Shipped' },
-    { id: 'Delivered', icon: Check, label: 'Delivered' }
-  ];
+    return [
+      order.orderNumber,
+      order.customerName,
+      order.orderStatus,
+      order.status,
+    ].some((value) => String(value || '').toLowerCase().includes(query));
+  });
 
-  const handleUpdateStatus = (e) => {
-    e.preventDefault();
-    if (!newStatus) return;
-    updateOrderStatus(selectedOrderId, newStatus, statusNote || `Status updated to ${newStatus}`);
-    setNewStatus('');
-    setStatusNote('');
+  const selectedOrder = orders.find((order) => order.id === selectedOrderId);
+  const currentStageIndex = Math.max(
+    stages.findIndex((stage) => stage.id === selectedOrder?.orderStatus),
+    0,
+  );
+
+  const handleSelectOrder = (order) => {
+    setSelectedOrderId(order.id);
   };
-
-  const currentStageIndex = stages.findIndex(s => s.id === selectedOrder?.status);
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-3xl font-semibold text-[#3b302a]">Order Tracking</h2>
-        <p className="text-[#a3948b] mt-1">Monitor and update delivery progress</p>
+        <p className="mt-1 text-[#a3948b]">Monitor order progress</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Order Selector */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
-            <h3 className="text-sm font-semibold text-[#3b302a] uppercase tracking-widest mb-4">Select Order</h3>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-1">
+          <div className="rounded-2xl border border-[#e5ddd5] bg-white p-6 shadow-sm">
+            <h3 className="mb-5 text-base font-bold uppercase tracking-widest text-[#3b302a]">Select Order</h3>
+
+            <div className="relative mb-4">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]" />
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search orders"
+                className="w-full rounded-xl border border-[#e5ddd5] bg-[#fcfaf7] py-3 pl-10 pr-4 text-sm text-[#3b302a] outline-none transition-all placeholder:text-[#b8ada5] focus:border-[#c2b2a6] focus:bg-white"
+              />
+            </div>
+
             <div className="space-y-3">
-              {orders.map(order => (
+              {ordersLoading && (
+                <div className="flex items-center gap-2 py-8 text-sm text-[#6b5e55]">
+                  <Loader2 size={16} className="animate-spin" />
+                  Loading orders...
+                </div>
+              )}
+
+              {!ordersLoading && ordersError && (
+                <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                  {ordersError}
+                </p>
+              )}
+
+              {!ordersLoading && !ordersError && orders.length === 0 && (
+                <p className="py-10 text-sm text-[#a3948b]">No orders found.</p>
+              )}
+
+              {!ordersLoading && !ordersError && orders.length > 0 && filteredOrders.length === 0 && (
+                <p className="py-10 text-sm text-[#a3948b]">No matching orders.</p>
+              )}
+
+              {!ordersLoading && !ordersError && filteredOrders.map((order) => (
                 <button
                   key={order.id}
-                  onClick={() => setSelectedOrderId(order.id)}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                  type="button"
+                  onClick={() => handleSelectOrder(order)}
+                  className={`group flex w-full items-center justify-between gap-4 rounded-xl border p-4 text-left transition-all ${
                     selectedOrderId === order.id
-                      ? 'bg-[#fcfaf7] border-[#c2b2a6] shadow-sm'
-                      : 'bg-white border-[#f3ede8] hover:border-[#e5ddd5]'
+                      ? 'border-[#c2b2a6] bg-[#fcfaf7]'
+                      : 'border-[#f0ebe5] bg-white hover:border-[#c2b2a6] hover:bg-[#fcfaf7]'
                   }`}
                 >
-                  <div className="text-left">
-                    <p className="font-medium text-[#3b302a]">{order.orderNumber}</p>
-                    <p className="text-xs text-[#a3948b]">{order.customerName}</p>
-                  </div>
-                  <ChevronRight size={18} className={selectedOrderId === order.id ? 'text-[#3b302a]' : 'text-[#a3948b]'} />
+                  <span className="min-w-0">
+                    <span className="block truncate text-base font-bold text-[#3b302a]">{order.orderNumber}</span>
+                    <span className="mt-1 block truncate text-sm font-medium text-[#6b5e55]">{order.customerName}</span>
+                    <span className="mt-1 block text-xs text-[#a3948b]">{order.date}</span>
+                  </span>
+                  <ChevronRight size={18} className="shrink-0 text-[#a3948b] transition-colors group-hover:text-[#3b302a]" />
                 </button>
               ))}
             </div>
           </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] shadow-sm">
-            <h3 className="text-sm font-semibold text-[#3b302a] uppercase tracking-widest mb-4">Update Status</h3>
-            <form onSubmit={handleUpdateStatus} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-[#a3948b] uppercase mb-1.5">New Status</label>
-                <select 
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full bg-[#f8f5f2] border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
-                  required
-                >
-                  <option value="">Select Stage</option>
-                  {stages.map(s => (
-                    <option key={s.id} value={s.id}>{s.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#a3948b] uppercase mb-1.5">Note (Optional)</label>
-                <textarea 
-                  value={statusNote}
-                  onChange={(e) => setStatusNote(e.target.value)}
-                  placeholder="E.g., Out for delivery"
-                  className="w-full bg-[#f8f5f2] border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none h-24 resize-none"
-                />
-              </div>
-              <button 
-                type="submit"
-                className="w-full py-3 bg-[#3b302a] text-white rounded-lg font-medium hover:bg-[#2a221d] transition-all"
-              >
-                Update Timeline
-              </button>
-            </form>
-          </div>
         </div>
 
-        {/* Timeline View */}
-        <div className="lg:col-span-2 space-y-6">
-          {selectedOrder ? (
-            <div className="bg-white p-8 rounded-2xl border border-[#e5ddd5] shadow-sm">
-              <div className="flex justify-between items-start mb-12">
-                <div>
-                  <h3 className="text-xl font-semibold text-[#3b302a]">Live Tracking: {selectedOrder.orderNumber}</h3>
-                  <p className="text-[#a3948b] text-sm">Customer: {selectedOrder.customerName}</p>
-                </div>
-                <span className="px-4 py-1.5 bg-[#fcfaf7] border border-[#e5ddd5] rounded-full text-sm font-medium text-[#3b302a]">
-                  Current: {selectedOrder.status}
-                </span>
-              </div>
-
-              {/* Visual Progress Bar */}
-              <div className="relative mb-20">
-                <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#f3ede8] -translate-y-1/2"></div>
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(currentStageIndex / (stages.length - 1)) * 100}%` }}
-                  className="absolute top-1/2 left-0 h-1 bg-[#d4a373] -translate-y-1/2"
-                />
-                
-                <div className="relative flex justify-between">
-                  {stages.map((stage, idx) => {
-                    const Icon = stage.icon;
-                    const isCompleted = idx <= currentStageIndex;
-                    const isCurrent = idx === currentStageIndex;
-                    
-                    return (
-                      <div key={stage.id} className="flex flex-col items-center">
-                        <div className={`
-                          w-12 h-12 rounded-full flex items-center justify-center z-10 transition-all duration-500
-                          ${isCompleted ? 'bg-[#d4a373] text-white' : 'bg-white border-2 border-[#f3ede8] text-[#a3948b]'}
-                          ${isCurrent ? 'ring-4 ring-[#d4a373]/20 shadow-lg' : ''}
-                        `}>
-                          <Icon size={20} />
-                        </div>
-                        <p className={`mt-3 text-xs font-semibold uppercase tracking-wider ${isCompleted ? 'text-[#3b302a]' : 'text-[#a3948b]'}`}>
-                          {stage.label}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Timeline List */}
-              <div className="space-y-8">
-                <h4 className="text-sm font-semibold text-[#3b302a] uppercase tracking-widest">History</h4>
-                <div className="space-y-6 relative">
-                  <div className="absolute left-2.5 top-2 bottom-2 w-px bg-[#f3ede8]"></div>
-                  {[...selectedOrder.trackingTimeline].reverse().map((event, idx) => (
-                    <div key={idx} className="relative pl-10">
-                      <div className="absolute left-0 top-1 w-5 h-5 rounded-full bg-white border-2 border-[#d4a373] z-10"></div>
-                      <div>
-                        <p className="text-[#3b302a] font-semibold">{event.status}</p>
-                        <p className="text-sm text-[#6b5e55] mt-1">{event.description}</p>
-                        <p className="text-xs text-[#a3948b] mt-1.5">{event.date}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="h-96 bg-white rounded-2xl border border-dashed border-[#e5ddd5] flex flex-col items-center justify-center text-[#a3948b]">
-              <Search size={48} className="mb-4 opacity-20" />
-              <p>Select an order to view tracking data</p>
-            </div>
-          )}
+        <div className="hidden space-y-6 lg:col-span-2 lg:block">
+          <AnimatePresence mode="wait">
+            {selectedOrder ? (
+              <motion.div
+                key={selectedOrder.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+              >
+                <TrackingDetails selectedOrder={selectedOrder} currentStageIndex={currentStageIndex} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-2xl border border-dashed border-[#e5ddd5] bg-white p-12 text-center text-[#a3948b]"
+              >
+                Select an order to view its tracking timeline.
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
+
+      <AnimatePresence>
+        {selectedOrder && (
+          <div className="lg:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[80] bg-[#3b302a]/35 backdrop-blur-sm"
+              onClick={() => setSelectedOrderId('')}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 240 }}
+              className="fixed inset-x-3 bottom-3 top-20 z-[90] overflow-y-auto rounded-2xl bg-[#f8f5f2] p-3 shadow-2xl"
+            >
+              <div className="mb-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrderId('')}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#6b5e55] shadow-sm"
+                  aria-label="Close tracking details"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <TrackingDetails
+                selectedOrder={selectedOrder}
+                currentStageIndex={currentStageIndex}
+                compact
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

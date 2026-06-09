@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import CustomerLoginCard from "../components/auth/CustomerLoginCard";
+import { API_URL, REDIRECT_MAP } from "../components/auth/authConstants";
 import { login } from "../services/authApi";
 
 const CustomerLoginPage = () => {
@@ -7,27 +9,31 @@ const CustomerLoginPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
+  const redirectTo = REDIRECT_MAP[redirectParam] || "/";
 
-  const handleChange = (e) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (event) => {
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
     setLoading(true);
 
     try {
       const data = await login(form.email, form.password);
-
       if (data.user.role === "admin") {
         localStorage.setItem("adminToken", data.token);
         localStorage.setItem("adminUser", JSON.stringify(data.user));
         navigate("/");
-      } else {
-        localStorage.setItem("customerToken", data.token);
-        localStorage.setItem("customerUser", JSON.stringify(data.user));
-        navigate("/");
+        return;
       }
+
+      localStorage.setItem("customerToken", data.token);
+      localStorage.setItem("customerUser", JSON.stringify(data.user));
+      navigate(redirectTo);
     } catch (err) {
       setError(err.response?.data?.message || "Sign in failed");
     } finally {
@@ -36,68 +42,16 @@ const CustomerLoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F5F2] flex items-center justify-center px-4 font-['Poppins']">
-      <div className="bg-white w-full max-w-sm rounded-2xl border border-[#e5ddd5] shadow-xl p-8">
-        <div className="mb-8 text-center">
-          <Link to="/" className="text-2xl font-light tracking-[0.25em] text-[#3B302A]">
-            KAMARI
-          </Link>
-          <p className="text-sm text-[#a3948b] mt-1">Sign in to your account</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-[#a3948b] uppercase tracking-wider mb-2">
-              Email
-            </label>
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              autoComplete="email"
-              className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-sm text-[#3b302a] focus:ring-1 focus:ring-[#c2b2a6] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#a3948b] uppercase tracking-wider mb-2">
-              Password
-            </label>
-            <input
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              autoComplete="current-password"
-              className="w-full px-4 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-sm text-[#3b302a] focus:ring-1 focus:ring-[#c2b2a6] outline-none"
-            />
-          </div>
-
-          {error && (
-            <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-[#3b302a] text-white text-sm tracking-wide hover:bg-[#2e2622] disabled:opacity-60 transition"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-
-          <p className="text-center text-sm text-[#a3948b]">
-            New to KAMARI?{" "}
-            <Link to="/register" className="text-[#3b302a] underline underline-offset-2">
-              Create an account
-            </Link>
-          </p>
-        </form>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-[#F8F5F2] px-4 font-['Poppins']">
+      <CustomerLoginCard
+        apiUrl={API_URL}
+        error={error}
+        form={form}
+        loading={loading}
+        redirectParam={redirectParam}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };

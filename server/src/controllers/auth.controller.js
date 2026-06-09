@@ -1,51 +1,54 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import generateToken from "../utils/generateToken.js";
-import buildCustomerAddress from "../utils/buildCustomerAddress.js";
 import sendAuthResponse from "../utils/sendAuthResponse.js";
+import validateEmail from "../utils/validateEmail.js";
+import generateToken from "../utils/generateToken.js";
+
+export const logout = (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Logout successful",
+  });
+};
 
 // ADMIN REGISTER
 export const registerAdmin = async (req, res) => {
   try {
-    const { username, password, firstName, lastName, email, phone } = req.body;
+    const { email, password, firstName, lastName } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Username and password are required",
+        message: "Email and password are required",
       });
     }
 
-    const normalizedUsername = username.trim().toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const existingUser = await User.findOne({ username: normalizedUsername });
-
-    if (existingUser) {
+    const existing = await User.findOne({ email: normalizedEmail });
+    if (existing) {
       return res.status(409).json({
         success: false,
-        message: "Username already exists",
+        message: "An account with this email already exists",
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const admin = await User.create({
-      username: normalizedUsername,
+      email: normalizedEmail,
       password: hashedPassword,
       role: "admin",
-      firstName: firstName || "",
+      firstName: firstName || "Admin",
       lastName: lastName || "",
-      email: email || null,
-      phone: phone || null,
     });
 
     return res.status(201).json({
       success: true,
       message: "Admin registered successfully",
-      user: {
+      admin: {
         id: admin._id,
-        username: admin.username,
+        email: admin.email,
         role: admin.role,
       },
     });
@@ -108,21 +111,16 @@ export const login = async (req, res) => {
 // ADMIN LOGIN
 export const loginAdmin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Username and password are required",
+        message: "Email and password are required",
       });
     }
 
-    const normalizedUsername = username.trim().toLowerCase();
-
-    const admin = await User.findOne({
-      username: normalizedUsername,
-      role: "admin",
-    });
+    const admin = await User.findOne({ email: email.trim().toLowerCase(), role: "admin" });
 
     if (!admin || !admin.password) {
       return res.status(401).json({
@@ -177,6 +175,14 @@ export const registerCustomer = async (req, res) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+
+    const emailCheck = await validateEmail(normalizedEmail);
+    if (!emailCheck.valid) {
+      return res.status(400).json({
+        success: false,
+        message: emailCheck.reason,
+      });
+    }
 
     const existingUser = await User.findOne({ email: normalizedEmail });
 
@@ -271,4 +277,28 @@ export const loginCustomer = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+// OAUTH CALLBACK — Google & Facebook
+export const handleOAuthCallback = (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
+  }
+
+  const token = generateToken(user);
+  const userJson = encodeURIComponent(
+    JSON.stringify({
+      id: user._id,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      addresses: user.addresses,
+      isActive: user.isActive,
+    })
+  );
+
+  res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&user=${userJson}`);
 };

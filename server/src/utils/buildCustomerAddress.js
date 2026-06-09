@@ -6,6 +6,7 @@ const buildCustomerAddress = ({
   addressLine2,
   city,
   district,
+  province,
   postalCode,
 }) => {
   if (!addressLine1 && !city && !district && !phone) return [];
@@ -18,6 +19,7 @@ const buildCustomerAddress = ({
       addressLine2: addressLine2 || "",
       city: city || "",
       district: district || "",
+      province: province || "",
       postalCode: postalCode || "",
       country: "Sri Lanka",
       isDefault: true,

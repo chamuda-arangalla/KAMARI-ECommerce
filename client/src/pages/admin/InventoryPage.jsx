@@ -1,200 +1,182 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AddProductModal from "../../components/admin/AddProductModel";
-import { useAdmin } from "../../context/AdminContext";
-import { AlertCircle, Search, Edit2, Check, X, Plus } from "lucide-react";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { useAdmin } from "../../context/useAdmin";
+import { deleteProduct } from "../../services/productApi";
+import { AlertCircle, Search, Edit2, Plus, Trash2 } from "lucide-react";
 
 const InventoryPage = () => {
-  const { products, updateStockCount } = useAdmin();
-  const [editingId, setEditingId] = useState(null);
-  const [editStock, setEditStock] = useState({});
+  const navigate = useNavigate();
+  const { products, productsLoading, productsError, refreshProducts } = useAdmin();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
-  const handleStartEdit = (product) => {
-    setEditingId(product.id);
-    setEditStock(product.stock);
-  };
-
-  const handleSave = (id) => {
-    Object.entries(editStock).forEach(([size, count]) => {
-      updateStockCount(id, size, count);
+  const openProductView = (product, editMode = false) => {
+    navigate(`/admin/products/${product.id}`, {
+      state: { from: "/admin/inventory", edit: editMode },
     });
-    setEditingId(null);
   };
 
   const filteredProducts = products.filter(
     (p) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.collection.toLowerCase().includes(searchTerm.toLowerCase()),
+      p.collection?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  const confirmDeleteProduct = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      setDeleting(true);
+      setDeleteError("");
+
+      const token = localStorage.getItem("adminToken");
+      await deleteProduct(deleteTarget.id, token);
+      setDeleteTarget(null);
+      refreshProducts();
+    } catch (error) {
+      setDeleteError(error.response?.data?.message || "Failed to delete product");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-semibold text-[#3b302a]">Inventory</h2>
-          <p className="text-[#a3948b] mt-1">
-            Manage stock levels across all collections
-          </p>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Inventory</h2>
+          <p className="text-base text-[#a3948b] mt-2">Manage stock levels across all collections</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-3">
           <button
             onClick={() => setIsAddOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#3b302a] text-white rounded-xl text-sm hover:bg-[#2e2622] transition-all shadow-sm"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#3b302a] text-white text-base font-semibold rounded-xl hover:bg-[#2e2622] transition-all shadow-sm"
           >
-            <Plus size={18} />
+            <Plus size={20} />
             Add Product
           </button>
 
           <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]"
-              size={18}
-            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]" size={20} />
             <input
               type="text"
               placeholder="Search inventory..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-sm w-full md:w-72 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
+              className="pl-11 pr-4 py-3 bg-white border border-[#e5ddd5] rounded-xl text-base w-full md:w-72 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
             />
           </div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-[#e5ddd5] overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+        {productsError && (
+          <div className="px-6 py-4 bg-rose-50 text-rose-700 text-base border-b border-rose-100">
+            {productsError}
+          </div>
+        )}
+        {deleteError && (
+          <div className="px-6 py-4 bg-rose-50 text-rose-700 text-base border-b border-rose-100">
+            {deleteError}
+          </div>
+        )}
+        {productsLoading && (
+          <div className="px-6 py-4 bg-[#fcfaf7] text-[#6b5e55] text-base border-b border-[#e5ddd5]">
+            Loading products...
+          </div>
+        )}
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
-                  Product
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
-                  Collection
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
-                  Sizes & Stock
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-[#a3948b] uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4"></th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Product</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Collection</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Sizes & Stock</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Status</th>
+                <th className="px-6 py-5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
               {filteredProducts.map((product) => {
-                const totalStock = Object.values(product.stock).reduce(
-                  (a, b) => a + b,
-                  0,
-                );
-                const isLowStock = Object.values(product.stock).some(
-                  (count) => count < 5,
-                );
-                const isEditing = editingId === product.id;
-
+                const totalStock = Object.values(product.stock).reduce((a, b) => a + b, 0);
+                const isLowStock = Object.values(product.stock).some((count) => count < 5);
                 return (
                   <tr
                     key={product.id}
-                    className="hover:bg-[#fcfaf7] transition-colors"
+                    onClick={() => openProductView(product)}
+                    className="hover:bg-[#fcfaf7] transition-colors cursor-pointer"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="flex items-center gap-4">
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-12 h-12 rounded-lg object-cover border border-[#e5ddd5]"
+                          className="w-14 h-14 rounded-xl object-cover border border-[#e5ddd5]"
                         />
                         <div>
-                          <p className="font-medium text-[#3b302a]">
-                            {product.name}
-                          </p>
-                          <p className="text-xs text-[#a3948b]">
-                            ${product.price}
-                          </p>
+                          <p className="text-base font-semibold text-[#3b302a]">{product.name}</p>
+                          <p className="text-sm text-[#a3948b] mt-0.5">LKR {product.price?.toLocaleString()}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-[#6b5e55] px-3 py-1 bg-[#f8f5f2] rounded-full">
+                    <td className="px-6 py-5">
+                      <span className="text-base text-[#6b5e55] px-3 py-1.5 bg-[#f8f5f2] rounded-full">
                         {product.collection}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-4">
-                        {Object.entries(
-                          isEditing ? editStock : product.stock,
-                        ).map(([size, count]) => (
-                          <div
-                            key={size}
-                            className="flex flex-col items-center"
-                          >
-                            <span className="text-[10px] text-[#a3948b] font-bold mb-1">
-                              {size}
+                    <td className="px-6 py-5">
+                      <div className="flex gap-4 flex-wrap">
+                        {Object.entries(product.stock).map(([size, count]) => (
+                          <div key={size} className="flex flex-col items-center">
+                            <span className="text-xs text-[#a3948b] font-bold mb-1 uppercase">{size}</span>
+                            <span className={`text-base font-semibold ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}>
+                              {count}
                             </span>
-                            {isEditing ? (
-                              <input
-                                type="number"
-                                value={count}
-                                onChange={(e) =>
-                                  setEditStock({
-                                    ...editStock,
-                                    [size]: e.target.value,
-                                  })
-                                }
-                                className="w-12 text-center bg-[#f8f5f2] border-none rounded p-1 text-sm focus:ring-1 focus:ring-[#c2b2a6]"
-                              />
-                            ) : (
-                              <span
-                                className={`text-sm font-medium ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}
-                              >
-                                {count}
-                              </span>
-                            )}
                           </div>
                         ))}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-5">
                       {totalStock === 0 ? (
-                        <span className="flex items-center gap-1.5 text-rose-600 text-xs font-semibold uppercase">
-                          <AlertCircle size={14} /> Sold Out
+                        <span className="flex items-center gap-1.5 text-rose-600 text-sm font-semibold uppercase">
+                          <AlertCircle size={16} /> Sold Out
                         </span>
                       ) : isLowStock ? (
-                        <span className="flex items-center gap-1.5 text-amber-600 text-xs font-semibold uppercase">
-                          <AlertCircle size={14} /> Low Stock
+                        <span className="flex items-center gap-1.5 text-amber-600 text-sm font-semibold uppercase">
+                          <AlertCircle size={16} /> Low Stock
                         </span>
                       ) : (
-                        <span className="text-emerald-600 text-xs font-semibold uppercase">
-                          In Stock
-                        </span>
+                        <span className="text-emerald-600 text-sm font-semibold uppercase">In Stock</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      {isEditing ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleSave(product.id)}
-                            className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-all"
-                          >
-                            <Check size={18} />
-                          </button>
-                          <button
-                            onClick={() => setEditingId(null)}
-                            className="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-all"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      ) : (
+                    <td className="px-6 py-5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-2">
                         <button
-                          onClick={() => handleStartEdit(product)}
-                          className="p-2 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-lg transition-all"
+                          type="button"
+                          onClick={() => openProductView(product, true)}
+                          aria-label={`Edit ${product.name}`}
+                          className="p-2.5 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-xl transition-all"
                         >
-                          <Edit2 size={18} />
+                          <Edit2 size={20} />
                         </button>
-                      )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeleteError("");
+                            setDeleteTarget(product);
+                          }}
+                          aria-label={`Delete ${product.name}`}
+                          className="p-2.5 text-[#a3948b] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -202,11 +184,107 @@ const InventoryPage = () => {
             </tbody>
           </table>
         </div>
+
+        <div className="divide-y divide-[#f3ede8] md:hidden">
+          {!productsLoading && filteredProducts.length === 0 && (
+            <div className="px-5 py-10 text-center text-[#8c7d73]">No products found.</div>
+          )}
+
+          {filteredProducts.map((product) => {
+            const totalStock = Object.values(product.stock).reduce((a, b) => a + b, 0);
+            const isLowStock = Object.values(product.stock).some((count) => count < 5);
+
+            return (
+              <div
+                key={product.id}
+                className="p-4"
+                onClick={() => openProductView(product)}
+              >
+                <div className="flex gap-4">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-20 w-20 shrink-0 rounded-xl border border-[#e5ddd5] object-cover"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-base font-semibold text-[#3b302a]">{product.name}</p>
+                    <p className="mt-1 text-sm text-[#a3948b]">LKR {product.price?.toLocaleString()}</p>
+                    <span className="mt-2 inline-flex rounded-full bg-[#f8f5f2] px-3 py-1 text-sm text-[#6b5e55]">
+                      {product.collection}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {Object.entries(product.stock).map(([size, count]) => (
+                    <div key={size} className="min-w-12 rounded-lg border border-[#e5ddd5] bg-[#fcfaf7] px-3 py-2 text-center">
+                      <p className="text-[11px] font-bold uppercase text-[#a3948b]">{size}</p>
+                      <p className={`text-sm font-semibold ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}>
+                        {count}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  {totalStock === 0 ? (
+                    <span className="flex items-center gap-1.5 text-sm font-semibold uppercase text-rose-600">
+                      <AlertCircle size={16} /> Sold Out
+                    </span>
+                  ) : isLowStock ? (
+                    <span className="flex items-center gap-1.5 text-sm font-semibold uppercase text-amber-600">
+                      <AlertCircle size={16} /> Low Stock
+                    </span>
+                  ) : (
+                    <span className="text-sm font-semibold uppercase text-emerald-600">In Stock</span>
+                  )}
+
+                  <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => openProductView(product, true)}
+                      aria-label={`Edit ${product.name}`}
+                      className="p-2.5 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-xl transition-all"
+                    >
+                      <Edit2 size={20} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeleteError("");
+                        setDeleteTarget(product);
+                      }}
+                      aria-label={`Delete ${product.name}`}
+                      className="p-2.5 text-[#a3948b] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+
       <AddProductModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onSuccess={() => window.location.reload()}
+        onSuccess={refreshProducts}
+      />
+
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        title="Delete product?"
+        message={`"${deleteTarget?.name || "This product"}" will be permanently removed from inventory.`}
+        confirmLabel="Delete Product"
+        type="delete"
+        loading={deleting}
+        onCancel={() => {
+          if (deleting) return;
+          setDeleteTarget(null);
+        }}
+        onConfirm={confirmDeleteProduct}
       />
     </div>
   );

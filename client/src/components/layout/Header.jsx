@@ -1,37 +1,64 @@
 import { useRef, useState, useEffect } from "react";
-import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard, PackageSearch } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/useCart";
+import ConfirmDialog from "../common/ConfirmDialog";
+import { logout } from "../../services/authApi";
+import { getCollections } from "../../services/collectionApi";
+import { getProducts } from "../../services/productApi";
+import { getProductImages } from "../../utils/shopProduct";
 import "../../styles/Header.css";
-
-const COLLECTION_ITEMS = [
-  { name: "Flow Set",   sub: "Light & effortless",  img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300&q=80" },
-  { name: "Ease Set",   sub: "Relaxed & refined",   img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300&q=80" },
-  { name: "Bold Set",   sub: "Confident & sleek",   img: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=300&q=80" },
-  { name: "Breeze Set", sub: "Soft & airy",         img: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&q=80" },
-  { name: "Luxe Set",   sub: "Premium & polished",  img: "https://images.unsplash.com/photo-1551803091-e20673f15770?w=300&q=80" },
-  { name: "Dusk Set",   sub: "Evening elegance",    img: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=300&q=80" },
-  { name: "Dawn Set",   sub: "Morning comfort",     img: "https://images.unsplash.com/photo-1616627988047-1f1a28aa25a9?w=300&q=80" },
-  { name: "Muse Set",   sub: "Artistic & free",     img: "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?w=300&q=80" },
-  { name: "Grace Set",  sub: "Timeless & tailored", img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300&q=80" },
-  { name: "Lush Set",   sub: "Rich & vibrant",      img: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=300&q=80" },
-];
 
 const Header = () => {
   const { totalItems, setIsDrawerOpen } = useCart();
+  const [collections, setCollections] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [customer, setCustomer] = useState(null);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [customer, setCustomer] = useState(() => {
+    const stored = localStorage.getItem("customerUser");
+    const adminStored = localStorage.getItem("adminUser");
+    return stored ? JSON.parse(stored) : adminStored ? JSON.parse(adminStored) : null;
+  });
   const closeTimer = useRef(null);
   const accountRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stored = localStorage.getItem("customerUser");
-    const adminStored = localStorage.getItem("adminUser");
-    if (stored) setCustomer(JSON.parse(stored));
-    else if (adminStored) setCustomer(JSON.parse(adminStored));
+    const loadCollections = async () => {
+      try {
+        const res = await getCollections();
+        const collectionData = res.data || [];
+
+        if (collectionData.length > 0) {
+          setCollections(collectionData);
+          return;
+        }
+
+        const productRes = await getProducts();
+        const productCollections = new Map();
+
+        (productRes.data || []).forEach((product) => {
+          const name = product.setName || product.collection;
+          if (!name || productCollections.has(name)) return;
+
+          productCollections.set(name, {
+            _id: `product-${name}`,
+            name,
+            subtitle: product.collection || "",
+            image: { url: getProductImages(product)[0]?.url || "" },
+          });
+        });
+
+        setCollections([...productCollections.values()]);
+      } catch {
+        setCollections([]);
+      }
+    };
+
+    loadCollections();
   }, []);
 
   useEffect(() => {
@@ -40,18 +67,36 @@ const Header = () => {
         setAccountOpen(false);
       }
     };
+    const handleUserUpdate = () => {
+      const stored = localStorage.getItem("customerUser");
+      const adminStored = localStorage.getItem("adminUser");
+      setCustomer(stored ? JSON.parse(stored) : adminStored ? JSON.parse(adminStored) : null);
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    window.addEventListener("kamari:user-updated", handleUserUpdate);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("kamari:user-updated", handleUserUpdate);
+    };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("customerToken");
-    localStorage.removeItem("customerUser");
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    setCustomer(null);
-    setAccountOpen(false);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await logout();
+    } finally {
+      localStorage.removeItem("customerToken");
+      localStorage.removeItem("customerUser");
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminUser");
+      setCustomer(null);
+      setAccountOpen(false);
+      setLogoutOpen(false);
+      setLoggingOut(false);
+      navigate("/");
+    }
   };
 
   const openDropdown = () => {
@@ -68,12 +113,21 @@ const Header = () => {
     navigate(`/collections?category=${encodeURIComponent(categoryName)}`);
   };
 
+  const handleHomeClick = () => {
+    setDropdownOpen(false);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 z-50 w-full bg-[#F8F5F2]/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
-          <Link to="/" className="text-xl font-light tracking-[0.25em] text-[#3B302A]">
+          <Link
+            to="/"
+            onClick={handleHomeClick}
+            className="text-xl font-light tracking-[0.25em] text-[#3B302A]"
+          >
             KAMARI
           </Link>
 
@@ -94,8 +148,8 @@ const Header = () => {
               </button>
             </div>
 
-            <Link to="/about">About</Link>
-            <Link to="/contact">Contact</Link>
+            <Link to="/about"   className="transition hover:text-[#7D746C]">About</Link>
+            <Link to="/contact" className="transition hover:text-[#7D746C]">Contact</Link>
           </nav>
 
           <div className="flex items-center gap-5 text-[#3B302A]">
@@ -132,8 +186,32 @@ const Header = () => {
                       </Link>
                     )}
 
+                    {customer.role === "customer" && (
+                      <>
+                        <Link
+                          to="/profile"
+                          onClick={() => setAccountOpen(false)}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                        >
+                          <User size={15} />
+                          My Profile
+                        </Link>
+                        <Link
+                          to="/orders"
+                          onClick={() => setAccountOpen(false)}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                        >
+                          <PackageSearch size={15} />
+                          My Orders
+                        </Link>
+                      </>
+                    )}
+
                     <button
-                      onClick={handleLogout}
+                      onClick={() => {
+                        setAccountOpen(false);
+                        setLogoutOpen(true);
+                      }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
                     >
                       <LogOut size={15} />
@@ -194,9 +272,9 @@ const Header = () => {
 
                 {/* All 10 categories in 2 columns */}
                 <div className="collections-dropdown-links">
-                  {COLLECTION_ITEMS.map((col) => (
+                  {collections.map((col) => (
                     <button
-                      key={col.name}
+                      key={col._id}
                       className="collections-dropdown-link"
                       onClick={() => handleCollectionClick(col.name)}
                     >
@@ -227,23 +305,27 @@ const Header = () => {
                 </div>
               </div>
 
-              {/* Right — 4 featured image cards */}
+              {/* Right — featured image cards */}
               <div className="collections-dropdown-right">
-                {COLLECTION_ITEMS.slice(0, 4).map((col) => (
+                {collections.map((col) => (
                   <div
-                    key={col.name}
+                    key={col._id}
                     className="collections-dropdown-card"
                     onClick={() => handleCollectionClick(col.name)}
                   >
                     <div className="collections-dropdown-card-img-wrap">
-                      <img
-                        src={col.img}
-                        alt={col.name}
-                        className="collections-dropdown-card-img"
-                      />
+                      {col.image?.url ? (
+                        <img
+                          src={col.image.url}
+                          alt={col.name}
+                          className="collections-dropdown-card-img"
+                        />
+                      ) : (
+                        <div className="collections-dropdown-card-placeholder" />
+                      )}
                     </div>
                     <p className="collections-dropdown-card-name">{col.name}</p>
-                    <p className="collections-dropdown-card-sub">{col.sub}</p>
+                    <p className="collections-dropdown-card-sub">{col.subtitle}</p>
                   </div>
                 ))}
               </div>
@@ -252,6 +334,17 @@ const Header = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ConfirmDialog
+        isOpen={logoutOpen}
+        title="Sign out?"
+        message="You will be signed out of your current KAMARI session."
+        confirmLabel="Sign Out"
+        type="logout"
+        loading={loggingOut}
+        onCancel={() => setLogoutOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 };

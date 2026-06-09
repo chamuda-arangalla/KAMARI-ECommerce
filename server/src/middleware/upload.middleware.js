@@ -15,7 +15,47 @@ const fileFilter = (req, file, cb) => {
 export const uploadProductImages = multer({
   storage,
   fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).fields([
+  { name: "images", maxCount: 30 },
+  { name: "sizeChartImage", maxCount: 1 },
+]);
+
+export const uploadCollectionImage = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("image");
+
+export const uploadSingleImage = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("image");
+
+export const uploadPaymentSlip = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("paymentSlip");
+
+export const uploadHomeImages = multer({
+  storage,
+  fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024,
   },
-}).array("images", 20);
+}).fields([
+  { name: "heroImage", maxCount: 1 },
+  { name: "collectionImage", maxCount: 1 },
+  { name: "brandStoryImage", maxCount: 1 },
+  { name: "categoryImage0", maxCount: 1 },
+  { name: "categoryImage1", maxCount: 1 },
+  { name: "categoryImage2", maxCount: 1 },
+  { name: "categoryImage3", maxCount: 1 },
+  { name: "moodImage0", maxCount: 1 },
+  { name: "moodImage1", maxCount: 1 },
+  { name: "moodImage2", maxCount: 1 },
+  { name: "moodImage3", maxCount: 1 },
+  { name: "moodImage4", maxCount: 1 },
+]);

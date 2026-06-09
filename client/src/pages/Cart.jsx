@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import CartHeader from "../components/cart/CartHeader";
 import CartItems from "../components/cart/CartItems";
 import Checkout from "../components/cart/Checkout";
@@ -40,15 +40,15 @@ export default function Cart() {
           className="max-w-6xl mx-auto px-6 py-32 text-center"
         >
           <p className="text-6xl mb-8 text-gray-200">○</p>
-          <h2 className="text-xl font-light tracking-[0.1em] text-gray-800 mb-3">
+          <h2 className="text-2xl font-light tracking-[0.1em] text-gray-800 mb-3">
             YOUR BAG IS EMPTY
           </h2>
-          <p className="text-sm text-gray-400 mb-10 tracking-wide">
+          <p className="text-base text-gray-400 mb-10 tracking-wide">
             Looks like you haven't added anything yet.
           </p>
           <Link
             to="/"
-            className="inline-block rounded-full bg-[#E8DED6] px-10 py-3 text-[11px] uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#d8c9bd]"
+            className="inline-block rounded-full bg-[#E8DED6] px-10 py-3 text-sm uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#d8c9bd]"
           >
             CONTINUE SHOPPING
           </Link>

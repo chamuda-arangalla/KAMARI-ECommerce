@@ -21,10 +21,10 @@
 }
 
 .checkout-right {
-  width: 380px;
+  width: 400px;
   flex-shrink: 0;
   background-color: #f8f5f2;
-  padding: 52px 32px 80px 48px;
+  padding: 52px 32px 80px 40px;
   position: sticky;
   top: 70px;
   height: calc(100vh - 70px);
@@ -61,6 +61,10 @@
 .checkout-breadcrumb a,
 .checkout-breadcrumb .step-link {
   color: #7d746c;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;
@@ -438,6 +442,66 @@
   background-color: #2e2622;
 }
 
+.checkout-btn-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.checkout-btn-link {
+  box-sizing: border-box;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.checkout-btn-loading {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.checkout-spinner {
+  animation: checkout-spin 0.8s linear infinite;
+}
+
+.checkout-error {
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  color: #be123c;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 12px;
+  padding: 12px 14px;
+}
+
+.checkout-success-card {
+  border: 1px solid #ddd8d2;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.checkout-success-message,
+.checkout-success-order,
+.checkout-empty-summary {
+  color: #7d746c;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.checkout-success-order {
+  color: #3b302a;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+@keyframes checkout-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .checkout-btn-secondary {
   display: block;
   width: 100%;
@@ -469,14 +533,22 @@
 
 .order-item {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8e2dc;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .order-item-img-wrap {
   position: relative;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .order-item-img {
@@ -505,6 +577,7 @@
 
 .order-item-details {
   flex: 1;
+  min-width: 0;
 }
 
 .order-item-name {
@@ -513,6 +586,9 @@
   color: #3b302a;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .order-item-meta {
@@ -526,6 +602,8 @@
   font-weight: 500;
   color: #3b302a;
   white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 /* Discount code */
@@ -619,6 +697,450 @@
 .order-discount-value {
   color: #5a8a5a;
   font-weight: 500;
+}
+
+/* ── Order Confirmed ──────────────────────────── */
+.checkout-order-confirmed {
+  text-align: center;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid #e8e2dc;
+  margin-bottom: 28px;
+}
+
+.checkout-confirmed-icon {
+  width: 52px;
+  height: 52px;
+  background-color: #3b302a;
+  color: #f8f5f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin: 0 auto 16px;
+}
+
+.checkout-confirmed-title {
+  font-size: 22px;
+  font-weight: 500;
+  color: #3b302a;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.checkout-confirmed-sub {
+  font-size: 15px;
+  color: #7d746c;
+  margin-bottom: 10px;
+}
+
+.checkout-confirmed-id {
+  font-size: 14px;
+  color: #7d746c;
+}
+
+.checkout-confirmed-id strong {
+  color: #3b302a;
+}
+
+/* ── Bank Transfer Card ────────────────────────── */
+.bank-transfer-card {
+  border: 1px solid #ddd8d2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cod-confirmation-card {
+  border: 1px solid #ddd8d2;
+  border-radius: 10px;
+  background-color: #f8f5f2;
+  padding: 22px 24px;
+}
+
+.bank-transfer-header {
+  background-color: #f8f5f2;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e8e2dc;
+}
+
+.bank-transfer-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7d746c;
+  background-color: #efe7df;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.bank-transfer-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: #3b302a;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+.bank-transfer-note {
+  font-size: 14px;
+  color: #7d746c;
+  line-height: 1.6;
+}
+
+.bank-details {
+  padding: 4px 0;
+}
+
+.bank-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid #f0ebe5;
+}
+
+.bank-detail-row:last-child {
+  border-bottom: none;
+}
+
+.bank-detail-label {
+  font-size: 13px;
+  color: #a3948b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+.bank-detail-value {
+  font-size: 15px;
+  color: #3b302a;
+  font-weight: 500;
+  text-align: right;
+}
+
+.bank-detail-account {
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  font-family: 'Courier New', monospace;
+}
+
+.bank-detail-amount {
+  background-color: #faf8f6;
+}
+
+.bank-detail-total {
+  font-size: 20px;
+  font-weight: 600;
+  color: #3b302a;
+}
+
+.bank-transfer-steps {
+  padding: 20px 24px;
+  background-color: #f8f5f2;
+  border-top: 1px solid #e8e2dc;
+}
+
+.bank-steps-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #7d746c;
+  margin-bottom: 12px;
+}
+
+.bank-steps-list {
+  padding-left: 18px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bank-steps-list li {
+  font-size: 14px;
+  color: #6e625c;
+  line-height: 1.6;
+}
+
+.bank-steps-list li strong {
+  color: #3b302a;
+}
+
+/* ── Payment Slip Upload ──────────────────────── */
+.slip-upload-card {
+  margin-top: 20px;
+  border: 1px solid #ddd8d2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.slip-upload-header {
+  padding: 18px 24px;
+  background-color: #f8f5f2;
+  border-bottom: 1px solid #e8e2dc;
+}
+
+.slip-upload-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #3b302a;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.slip-upload-sub {
+  font-size: 13px;
+  color: #7d746c;
+  line-height: 1.5;
+}
+
+.slip-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 24px;
+  padding: 28px 16px;
+  border: 2px dashed #ddd8d2;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  width: calc(100% - 48px);
+  font-family: inherit;
+}
+
+.slip-drop-zone:hover {
+  border-color: #3b302a;
+  background-color: #faf8f6;
+}
+
+.slip-upload-icon {
+  color: #a3948b;
+}
+
+.slip-drop-label {
+  font-size: 14px;
+  color: #3b302a;
+  font-weight: 500;
+}
+
+.slip-drop-hint {
+  font-size: 12px;
+  color: #a3948b;
+}
+
+.slip-preview-wrap {
+  margin: 20px 24px;
+  position: relative;
+  display: inline-block;
+  width: calc(100% - 48px);
+}
+
+.slip-preview-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e8e2dc;
+  background-color: #f8f5f2;
+  display: block;
+}
+
+.slip-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #7d746c;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.slip-remove-btn:hover {
+  color: #be123c;
+}
+
+.slip-submit-btn {
+  display: block;
+  width: calc(100% - 48px);
+  margin: 0 24px 20px;
+  padding: 13px;
+  background-color: #3b302a;
+  color: #f8f5f2;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.2s;
+}
+
+.slip-submit-btn:hover:not(:disabled) {
+  background-color: #2e2622;
+}
+
+.slip-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.slip-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 24px;
+  padding: 14px 16px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #15803d;
+  font-weight: 500;
+}
+
+.slip-success-icon {
+  flex-shrink: 0;
+  color: #16a34a;
+}
+
+.slip-error {
+  margin: 0 24px 16px;
+  font-size: 13px;
+  color: #be123c;
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+/* ── District Searchable Dropdown ─────────────── */
+.district-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.district-trigger {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ddd8d2;
+  background: #ffffff;
+  font-size: 15px;
+  color: #3b302a;
+  outline: none;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.district-trigger.placeholder span {
+  color: #b0a9a2;
+}
+
+.district-trigger:focus,
+.district-trigger:hover {
+  border-color: #3b302a;
+}
+
+.district-chevron {
+  flex-shrink: 0;
+  color: #7d746c;
+  transition: transform 0.2s;
+}
+
+.district-chevron.open {
+  transform: rotate(180deg);
+}
+
+.district-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #ffffff;
+  border: 1px solid #ddd8d2;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(59, 48, 42, 0.1);
+  overflow: hidden;
+}
+
+.district-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e8e2dc;
+}
+
+.district-search-icon {
+  color: #a3948b;
+  flex-shrink: 0;
+}
+
+.district-search {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #3b302a;
+  font-family: inherit;
+  background: transparent;
+}
+
+.district-search::placeholder {
+  color: #b0a9a2;
+}
+
+.district-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.district-option {
+  padding: 10px 16px;
+  font-size: 15px;
+  color: #3b302a;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.district-option:hover {
+  background-color: #f8f5f2;
+}
+
+.district-option.selected {
+  background-color: #efe7df;
+  font-weight: 500;
+}
+
+.district-no-result {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #a3948b;
+  text-align: center;
 }
 
 /* Mobile summary toggle */

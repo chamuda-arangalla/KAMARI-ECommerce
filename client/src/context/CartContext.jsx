@@ -1,46 +1,29 @@
-import { createContext, useContext, useState } from "react";
-
-const CartContext = createContext(null);
-
-const initialItems = [
-  {
-    id: 1,
-    name: "Inndia Corset Top",
-    variant: "Ivory",
-    size: "S",
-    price: 4590,
-    qty: 1,
-    img: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80",
-  },
-  {
-    id: 2,
-    name: "Marbella Midi Dress",
-    variant: "Sage",
-    size: "M",
-    price: 7990,
-    qty: 1,
-    img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80",
-  },
-  {
-    id: 3,
-    name: "Sylvia Bodysuit",
-    variant: "Black",
-    size: "S",
-    price: 4590,
-    qty: 2,
-    img: "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=400&q=80",
-  },
-];
+import { useEffect, useState } from "react";
+import { CartContext } from "./cartContextValue";
 
 const FREE_DELIVERY_THRESHOLD = 10000;
 const DELIVERY_FEE = 350;
+const CART_STORAGE_KEY = "kamariCartItems";
+
+const getStoredItems = () => {
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState(getStoredItems);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
 
   const handleUpdateQty = (id, delta) =>
     setItems((prev) =>
@@ -53,6 +36,33 @@ export function CartProvider({ children }) {
 
   const handleRemove = (id) =>
     setItems((prev) => prev.filter((item) => item.id !== id));
+
+  const handleAddItem = (item) => {
+    const quantity = Number(item.qty || 1);
+
+    setItems((prev) => {
+      const existingItem = prev.find(
+        (cartItem) =>
+          cartItem.id === item.id &&
+          cartItem.variant === item.variant &&
+          cartItem.size === item.size,
+      );
+
+      if (existingItem) {
+        return prev.map((cartItem) =>
+          cartItem.id === item.id &&
+          cartItem.variant === item.variant &&
+          cartItem.size === item.size
+            ? { ...cartItem, qty: cartItem.qty + quantity }
+            : cartItem,
+        );
+      }
+
+      return [...prev, { ...item, qty: quantity }];
+    });
+
+    setIsDrawerOpen(true);
+  };
 
   const handlePromoChange = (value) => {
     setPromoCode(value);
@@ -79,12 +89,18 @@ export function CartProvider({ children }) {
     setPromoError("");
   };
 
+  const clearCart = () => {
+    setItems([]);
+    handleRemovePromo();
+    setIsDrawerOpen(false);
+  };
+
   const totalItems = items.reduce((sum, i) => sum + i.qty, 0);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
   const discount = promoApplied ? Math.round(subtotal * 0.1) : 0;
   const afterDiscount = subtotal - discount;
   const freeDelivery = afterDiscount >= FREE_DELIVERY_THRESHOLD;
-  const deliveryFee = freeDelivery ? 0 : DELIVERY_FEE;
+  const deliveryFee = items.length === 0 || freeDelivery ? 0 : DELIVERY_FEE;
   const total = afterDiscount + deliveryFee;
 
   return (
@@ -104,15 +120,15 @@ export function CartProvider({ children }) {
         deliveryFee,
         total,
         handleUpdateQty,
+        handleAddItem,
         handleRemove,
         handlePromoChange,
         handleApplyPromo,
         handleRemovePromo,
+        clearCart,
       }}
     >
       {children}
     </CartContext.Provider>
   );
 }
-
-export const useCart = () => useContext(CartContext);
