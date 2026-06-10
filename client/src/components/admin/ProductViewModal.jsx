@@ -37,7 +37,7 @@ const createDraft = (product) => ({
 
 const createEmptyColor = () => ({
   colorName: "",
-  colorCode: "#f8f5f2",
+  colorCode: "#eae0d6",
   images: [],
   sizes: [
     { size: "XS", stock: 0 },
@@ -356,14 +356,14 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
   return (
     <>
       <div className="fixed inset-0 z-[120] flex items-stretch justify-center p-0 sm:items-center sm:p-4">
-        <div className="absolute inset-0 bg-[#3b302a]/25 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden border border-[#e5ddd5] bg-white shadow-xl sm:h-auto sm:max-h-[92vh] sm:rounded-3xl">
-        <div className="shrink-0 bg-[#fcfaf7] border-b border-[#e5ddd5] px-4 py-4 sm:px-8 sm:py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:rounded-t-3xl">
+        <div className="absolute inset-0 bg-[#2c2b28]/25 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden border border-[#d7c9b8] bg-white shadow-xl sm:h-auto sm:max-h-[92vh] sm:rounded-3xl">
+        <div className="shrink-0 bg-[#fcfaf7] border-b border-[#d7c9b8] px-4 py-4 sm:px-8 sm:py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:rounded-t-3xl">
           <div className="min-w-0">
-            <h3 className="truncate text-xl font-bold text-[#3b302a] sm:text-2xl">
+            <h3 className="truncate text-xl font-bold text-[#2c2b28] sm:text-2xl">
               {product?.name || "Product View"}
             </h3>
-            <p className="mt-0.5 truncate text-sm text-[#a3948b] sm:text-base">{productId}</p>
+            <p className="mt-0.5 truncate text-sm text-[#8f8376] sm:text-base">{productId}</p>
           </div>
 
           <div className="grid grid-cols-[1fr_1fr_44px] gap-2 sm:flex sm:items-center">
@@ -373,7 +373,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                   type="button"
                   onClick={() => setEditMode((value) => !value)}
                   disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d8ccc2] bg-white px-3 py-2.5 text-sm font-medium text-[#5f5149] hover:bg-[#f8f5f2] hover:text-[#3b302a] sm:px-5 sm:text-base"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d8ccc2] bg-white px-3 py-2.5 text-sm font-medium text-[#5f5149] hover:bg-[#eae0d6] hover:text-[#2c2b28] sm:px-5 sm:text-base"
                 >
                   <Edit2 size={18} />
                   {editMode ? "Cancel Edit" : "Edit"}
@@ -392,7 +392,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             <button
               type="button"
               onClick={onClose}
-              className="flex h-11 w-11 items-center justify-center rounded-xl text-[#6b5e55] hover:bg-white"
+              className="flex h-11 w-11 items-center justify-center rounded-xl text-[#5f564d] hover:bg-white"
             >
               <X size={24} />
             </button>
@@ -401,7 +401,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {loading && (
-          <div className="p-12 flex items-center justify-center gap-3 text-base text-[#6b5e55]">
+          <div className="p-12 flex items-center justify-center gap-3 text-base text-[#5f564d]">
             <Loader2 size={22} className="animate-spin" />
             Loading product...
           </div>
@@ -420,7 +420,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                 <img
                   src={mainImage}
                   alt={product.name}
-                  className="w-full max-h-[420px] aspect-square object-cover bg-[#f8f5f2] border border-[#e5ddd5]"
+                  className="w-full max-h-[420px] aspect-square object-cover bg-[#eae0d6] border border-[#d7c9b8]"
                 />
                 <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-4">
                   {images.map((image) => (
@@ -428,7 +428,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                       key={image.publicId || image.url}
                       src={image.url}
                       alt={product.name}
-                      className="w-full aspect-square object-cover border border-[#e5ddd5]"
+                      className="w-full aspect-square object-cover border border-[#d7c9b8]"
                     />
                   ))}
                 </div>
@@ -449,7 +449,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
 
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h4 className="text-sm font-bold text-[#a3948b] uppercase tracking-widest">
+                <h4 className="text-sm font-bold text-[#8f8376] uppercase tracking-widest">
                   Colors And Size Quantity
                 </h4>
                 {editMode && (
@@ -465,8 +465,8 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
               </div>
 
               {(editMode ? draft.colors : product.colors || []).map((color, colorIndex) => (
-                <div key={`${color.colorName}-${colorIndex}`} className="overflow-hidden border border-[#e5ddd5]">
-                  <div className="flex flex-col gap-3 border-b border-[#e5ddd5] bg-[#fcfaf7] px-4 py-3 sm:flex-row sm:items-center">
+                <div key={`${color.colorName}-${colorIndex}`} className="overflow-hidden border border-[#d7c9b8]">
+                  <div className="flex flex-col gap-3 border-b border-[#d7c9b8] bg-[#fcfaf7] px-4 py-3 sm:flex-row sm:items-center">
                     <span
                       className="h-6 w-6 shrink-0 border border-[#d7ccc3]"
                       style={{ backgroundColor: color.colorCode || "#ffffff" }}
@@ -478,7 +478,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                           onChange={(event) =>
                             updateColor(colorIndex, "colorName", event.target.value)
                           }
-                          className="px-3 py-2 rounded-lg border border-[#e5ddd5] text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+                          className="px-3 py-2 rounded-lg border border-[#d7c9b8] text-sm focus:ring-1 focus:ring-[#c2b2a6] outline-none"
                           placeholder="Color name"
                         />
                         <input
@@ -487,7 +487,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                           onChange={(event) =>
                             updateColor(colorIndex, "colorCode", event.target.value)
                           }
-                          className="h-10 rounded-lg border border-[#e5ddd5]"
+                          className="h-10 rounded-lg border border-[#d7c9b8]"
                         />
                         <button
                           type="button"
@@ -501,19 +501,19 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                       </div>
                     ) : (
                       <div>
-                        <p className="font-semibold text-[#3b302a]">{color.colorName}</p>
-                        <p className="text-xs text-[#a3948b]">{color.colorCode || "No color code"}</p>
+                        <p className="font-semibold text-[#2c2b28]">{color.colorName}</p>
+                        <p className="text-xs text-[#8f8376]">{color.colorCode || "No color code"}</p>
                       </div>
                     )}
                   </div>
                   {editMode && (
-                    <div className="px-4 py-4 border-b border-[#e5ddd5]">
+                    <div className="px-4 py-4 border-b border-[#d7c9b8]">
                       <div className="flex items-center justify-between gap-3 mb-3">
-                        <p className="text-xs font-bold text-[#a3948b] uppercase tracking-widest">
+                        <p className="text-xs font-bold text-[#8f8376] uppercase tracking-widest">
                           Color Images
                         </p>
                         <label
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#3b302a] hover:underline cursor-pointer"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#2c2b28] hover:underline cursor-pointer"
                         >
                           <Plus size={13} />
                           Upload Image
@@ -541,7 +541,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                                 key={image.url}
                                 type="button"
                                 onClick={() => toggleColorImage(colorIndex, image)}
-                                className={`relative rounded-lg overflow-hidden border-2 ${selected ? "border-[#8d7667]" : "border-[#e5ddd5]"}`}
+                                className={`relative rounded-lg overflow-hidden border-2 ${selected ? "border-[#8d7667]" : "border-[#d7c9b8]"}`}
                               >
                                 <img
                                   src={image.url}
@@ -570,7 +570,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                               key={image.url}
                               type="button"
                               onClick={() => toggleColorImage(colorIndex, image)}
-                              className="inline-flex items-center gap-1 rounded-lg border border-[#e5ddd5] px-2 py-1 text-xs text-[#6b5e55] hover:bg-rose-50 hover:text-rose-600"
+                              className="inline-flex items-center gap-1 rounded-lg border border-[#d7c9b8] px-2 py-1 text-xs text-[#5f564d] hover:bg-rose-50 hover:text-rose-600"
                             >
                               <X size={12} />
                               Remove linked image
@@ -582,7 +582,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                   )}
                   <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                     {(color.sizes || []).map((item, sizeIndex) => (
-                      <div key={`${item.size}-${sizeIndex}`} className="border border-[#e5ddd5] px-3 py-2">
+                      <div key={`${item.size}-${sizeIndex}`} className="border border-[#d7c9b8] px-3 py-2">
                         {editMode ? (
                           <div className="space-y-2">
                             <input
@@ -590,7 +590,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                               onChange={(event) =>
                                 updateSize(colorIndex, sizeIndex, "size", event.target.value)
                               }
-                              className="w-full rounded-md text-xs uppercase font-bold border border-[#e5ddd5] px-2 py-1 focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+                              className="w-full rounded-md text-xs uppercase font-bold border border-[#d7c9b8] px-2 py-1 focus:ring-1 focus:ring-[#c2b2a6] outline-none"
                             />
                             <input
                               type="number"
@@ -599,7 +599,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                               onChange={(event) =>
                                 updateSize(colorIndex, sizeIndex, "stock", event.target.value)
                               }
-                              className="w-full rounded-md text-lg font-semibold border border-[#e5ddd5] px-2 py-1 focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+                              className="w-full rounded-md text-lg font-semibold border border-[#d7c9b8] px-2 py-1 focus:ring-1 focus:ring-[#c2b2a6] outline-none"
                             />
                             <button
                               type="button"
@@ -612,8 +612,8 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                           </div>
                         ) : (
                           <>
-                            <p className="text-xs text-[#a3948b] uppercase font-bold">{item.size}</p>
-                            <p className="text-lg font-semibold text-[#3b302a]">{item.stock}</p>
+                            <p className="text-xs text-[#8f8376] uppercase font-bold">{item.size}</p>
+                            <p className="text-lg font-semibold text-[#2c2b28]">{item.stock}</p>
                           </>
                         )}
                       </div>
@@ -622,7 +622,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                       <button
                         type="button"
                         onClick={() => addSize(colorIndex)}
-                        className="min-h-[84px] rounded-xl border border-dashed border-[#c2b2a6] text-[#6b5e55] text-xs uppercase tracking-wider hover:bg-[#fcfaf7]"
+                        className="min-h-[84px] rounded-xl border border-dashed border-[#c2b2a6] text-[#5f564d] text-xs uppercase tracking-wider hover:bg-[#fcfaf7]"
                       >
                         + Add Size
                       </button>
@@ -633,7 +633,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             </div>
 
             {editMode && (
-              <div className="sticky bottom-0 flex justify-end border-t border-[#e5ddd5] bg-white px-0 py-4 sm:px-2 sm:py-5">
+              <div className="sticky bottom-0 flex justify-end border-t border-[#d7c9b8] bg-white px-0 py-4 sm:px-2 sm:py-5">
                 <button
                   type="button"
                   onClick={handleSave}
@@ -687,11 +687,11 @@ const EditForm = ({ draft, collections, sizeChartUpload, onSizeChartUpload, upda
       <Area label="Product Care" value={draft.productCare} onChange={(value) => updateDraft("productCare", value)} />
     </div>
     <div>
-      <span className="block text-xs text-[#a3948b] uppercase tracking-widest font-bold mb-1">
+      <span className="block text-xs text-[#8f8376] uppercase tracking-widest font-bold mb-1">
         Size Chart Image
       </span>
       <label className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-[#c2b2a6] px-3 py-2 cursor-pointer hover:bg-[#fcfaf7]">
-        <span className="text-sm text-[#6b5e55]">
+        <span className="text-sm text-[#5f564d]">
           {sizeChartUpload ? sizeChartUpload.file.name : "Upload replacement size chart"}
         </span>
         <Plus size={15} />
@@ -709,7 +709,7 @@ const EditForm = ({ draft, collections, sizeChartUpload, onSizeChartUpload, upda
         <img
           src={sizeChartUpload?.preview || draft.sizeChartImage}
           alt="Size chart"
-          className="mt-3 w-32 aspect-square object-cover rounded-xl border border-[#e5ddd5]"
+          className="mt-3 w-32 aspect-square object-cover rounded-xl border border-[#d7c9b8]"
         />
       )}
     </div>
@@ -723,14 +723,14 @@ const EditForm = ({ draft, collections, sizeChartUpload, onSizeChartUpload, upda
 
 const CollectionSelect = ({ collections, value, onChange }) => (
   <label className="block">
-    <span className="block text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-2">
+    <span className="block text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-2">
       Collection
     </span>
     <select
       required
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-xl border border-[#e5ddd5] bg-white px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6]"
+      className="w-full rounded-xl border border-[#d7c9b8] bg-white px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6]"
     >
       <option value="">Select a collection</option>
       {collections.map((collection) => (
@@ -745,11 +745,11 @@ const CollectionSelect = ({ collections, value, onChange }) => (
 const ProductSummary = ({ product, totalStock }) => (
   <div className="space-y-4">
     <div>
-      <p className="text-xs text-[#a3948b] uppercase tracking-widest font-bold">
+      <p className="text-xs text-[#8f8376] uppercase tracking-widest font-bold">
         {product.collection} / {product.setName}
       </p>
-      <h2 className="text-3xl font-semibold text-[#3b302a] mt-1">{product.name}</h2>
-      <p className="text-2xl font-bold text-[#3b302a] mt-2">
+      <h2 className="text-3xl font-semibold text-[#2c2b28] mt-1">{product.name}</h2>
+      <p className="text-2xl font-bold text-[#2c2b28] mt-2">
         LKR {Number(product.price || 0).toLocaleString()}
       </p>
     </div>
@@ -772,54 +772,54 @@ const ProductSummary = ({ product, totalStock }) => (
 
 const Field = ({ label, type = "text", value, onChange }) => (
   <label className="block">
-    <span className="block text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-2">
+    <span className="block text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-2">
       {label}
     </span>
     <input
       type={type}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-xl border border-[#e5ddd5] px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6]"
+      className="w-full rounded-xl border border-[#d7c9b8] px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6]"
     />
   </label>
 );
 
 const Area = ({ label, value, onChange }) => (
   <label className="block">
-    <span className="block text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-2">
+    <span className="block text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-2">
       {label}
     </span>
     <textarea
       rows={3}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-xl border border-[#e5ddd5] px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6] resize-none"
+      className="w-full rounded-xl border border-[#d7c9b8] px-4 py-3 text-base outline-none focus:ring-1 focus:ring-[#c2b2a6] resize-none"
     />
   </label>
 );
 
 const CheckField = ({ label, checked, onChange }) => (
-  <label className="inline-flex items-center gap-3 text-base text-[#3b302a]">
+  <label className="inline-flex items-center gap-3 text-base text-[#2c2b28]">
     <input
       type="checkbox"
       checked={checked}
       onChange={(event) => onChange(event.target.checked)}
-      className="h-5 w-5 accent-[#3b302a]"
+      className="h-5 w-5 accent-[#2c2b28]"
     />
     {label}
   </label>
 );
 
 const DetailTile = ({ label, value }) => (
-  <div className="bg-[#fcfaf7] border border-[#e5ddd5] px-4 py-4 rounded-xl">
-    <p className="text-sm text-[#a3948b] uppercase font-bold mb-1">{label}</p>
-    <p className="text-xl font-bold text-[#3b302a]">{value}</p>
+  <div className="bg-[#fcfaf7] border border-[#d7c9b8] px-4 py-4 rounded-xl">
+    <p className="text-sm text-[#8f8376] uppercase font-bold mb-1">{label}</p>
+    <p className="text-xl font-bold text-[#2c2b28]">{value}</p>
   </div>
 );
 
 const DetailBlock = ({ label, value }) => (
   <div>
-    <p className="text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-1">
+    <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">
       {label}
     </p>
     <p className="text-base text-[#4f443d] leading-relaxed">{value || "N/A"}</p>

@@ -15,19 +15,19 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="mb-8 p-5 bg-[#F8F5F2] border border-[#3B302A]/10 rounded-xl"
+        className="mb-8 p-5 bg-[#EAE0D6] border border-[#2C2B28]/10 rounded-xl"
       >
-        <p className="text-base tracking-[0.16em] text-[#7D746C] mb-3">
+        <p className="text-base tracking-[0.16em] text-[#5F564D] mb-3">
           {freeDelivery
             ? "✓ YOU'VE UNLOCKED FREE DELIVERY"
             : `ADD LKR ${remaining.toLocaleString()} MORE FOR FREE DELIVERY`}
         </p>
-        <div className="h-[2px] bg-[#3B302A]/10 w-full">
+        <div className="h-[2px] bg-[#2C2B28]/10 w-full">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progressPct}%` }}
             transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-            className="h-full bg-[#3B302A]"
+            className="h-full bg-[#2C2B28]"
           />
         </div>
       </motion.div>
@@ -41,7 +41,7 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0, overflow: "hidden" }}
             transition={{ duration: 0.35, delay: i * 0.07 }}
-            className="flex gap-6 py-7 border-b border-[#3B302A]/10 last:border-b-0"
+            className="flex gap-6 py-7 border-b border-[#2C2B28]/10 last:border-b-0"
           >
             {/* Image */}
             <div className="w-[110px] h-[138px] flex-shrink-0 overflow-hidden bg-[#E8DED6] rounded-lg">
@@ -56,10 +56,10 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
             <div className="flex flex-col justify-between flex-1 py-0.5">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-xl font-medium tracking-[0.06em] text-[#3B302A] uppercase mb-1">
+                  <h3 className="text-xl font-medium tracking-[0.06em] text-[#2C2B28] uppercase mb-1">
                     {item.name}
                   </h3>
-                  <div className="flex gap-3 text-base tracking-[0.12em] text-[#7D746C] uppercase">
+                  <div className="flex gap-3 text-base tracking-[0.12em] text-[#5F564D] uppercase">
                     <span>{item.variant}</span>
                     <span>·</span>
                     <span>Size {item.size}</span>
@@ -67,7 +67,7 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
                 </div>
                 <button
                   onClick={() => onRemove(item.id)}
-                  className="text-[#7D746C] hover:text-[#3B302A] transition p-1"
+                  className="text-[#5F564D] hover:text-[#2C2B28] transition p-1"
                 >
                   <X size={18} strokeWidth={1.5} />
                 </button>
@@ -76,19 +76,19 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
               {/* Bottom Row */}
               <div className="flex items-center justify-between">
                 {/* Qty Controls */}
-                <div className="flex items-center border border-[#3B302A]/20 rounded-lg overflow-hidden">
+                <div className="flex items-center border border-[#2C2B28]/20 rounded-lg overflow-hidden">
                   <button
                     onClick={() => onUpdateQty(item.id, -1)}
-                    className="w-11 h-11 flex items-center justify-center text-[#7D746C] hover:text-[#3B302A] hover:bg-[#E8DED6] transition"
+                    className="w-11 h-11 flex items-center justify-center text-[#5F564D] hover:text-[#2C2B28] hover:bg-[#E8DED6] transition"
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="w-11 h-11 flex items-center justify-center text-base text-[#3B302A] border-x border-[#3B302A]/20">
+                  <span className="w-11 h-11 flex items-center justify-center text-base text-[#2C2B28] border-x border-[#2C2B28]/20">
                     {item.qty}
                   </span>
                   <button
                     onClick={() => onUpdateQty(item.id, 1)}
-                    className="w-11 h-11 flex items-center justify-center text-[#7D746C] hover:text-[#3B302A] hover:bg-[#E8DED6] transition"
+                    className="w-11 h-11 flex items-center justify-center text-[#5F564D] hover:text-[#2C2B28] hover:bg-[#E8DED6] transition"
                   >
                     <Plus size={14} />
                   </button>
@@ -96,11 +96,11 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
 
                 {/* Price */}
                 <div className="text-right">
-                  <p className="text-xl font-medium text-[#3B302A] tracking-wide">
+                  <p className="text-xl font-medium text-[#2C2B28] tracking-wide">
                     LKR {(item.price * item.qty).toLocaleString()}
                   </p>
                   {item.qty > 1 && (
-                    <p className="text-base text-[#7D746C]">
+                    <p className="text-base text-[#5F564D]">
                       LKR {item.price.toLocaleString()} each
                     </p>
                   )}
@@ -115,7 +115,7 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
       <div className="mt-8">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-base tracking-[0.15em] text-[#7D746C] hover:text-[#3B302A] transition uppercase"
+          className="inline-flex items-center gap-2 text-base tracking-[0.15em] text-[#5F564D] hover:text-[#2C2B28] transition uppercase"
         >
           ← Continue Shopping
         </Link>

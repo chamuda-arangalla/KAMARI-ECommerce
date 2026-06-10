@@ -49,33 +49,33 @@ const InventoryPage = () => {
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Inventory</h2>
-          <p className="text-base text-[#a3948b] mt-2">Manage stock levels across all collections</p>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[#2c2b28]">Inventory</h2>
+          <p className="text-base text-[#8f8376] mt-2">Manage stock levels across all collections</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-3">
           <button
             onClick={() => setIsAddOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#3b302a] text-white text-base font-semibold rounded-xl hover:bg-[#2e2622] transition-all shadow-sm"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#2c2b28] text-white text-base font-semibold rounded-xl hover:bg-[#544c43] transition-all shadow-sm"
           >
             <Plus size={20} />
             Add Product
           </button>
 
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8376]" size={20} />
             <input
               type="text"
               placeholder="Search inventory..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-11 pr-4 py-3 bg-white border border-[#e5ddd5] rounded-xl text-base w-full md:w-72 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
+              className="pl-11 pr-4 py-3 bg-white border border-[#d7c9b8] rounded-xl text-base w-full md:w-72 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
             />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e5ddd5] overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl border border-[#d7c9b8] overflow-hidden shadow-sm">
         {productsError && (
           <div className="px-6 py-4 bg-rose-50 text-rose-700 text-base border-b border-rose-100">
             {productsError}
@@ -87,18 +87,18 @@ const InventoryPage = () => {
           </div>
         )}
         {productsLoading && (
-          <div className="px-6 py-4 bg-[#fcfaf7] text-[#6b5e55] text-base border-b border-[#e5ddd5]">
+          <div className="px-6 py-4 bg-[#fcfaf7] text-[#5f564d] text-base border-b border-[#d7c9b8]">
             Loading products...
           </div>
         )}
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Product</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Collection</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Sizes & Stock</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Status</th>
+              <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Product</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Collection</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Sizes & Stock</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Status</th>
                 <th className="px-6 py-5" />
               </tr>
             </thead>
@@ -117,16 +117,16 @@ const InventoryPage = () => {
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-14 h-14 rounded-xl object-cover border border-[#e5ddd5]"
+                          className="w-14 h-14 rounded-xl object-cover border border-[#d7c9b8]"
                         />
                         <div>
-                          <p className="text-base font-semibold text-[#3b302a]">{product.name}</p>
-                          <p className="text-sm text-[#a3948b] mt-0.5">LKR {product.price?.toLocaleString()}</p>
+                          <p className="text-base font-semibold text-[#2c2b28]">{product.name}</p>
+                          <p className="text-sm text-[#8f8376] mt-0.5">LKR {product.price?.toLocaleString()}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="text-base text-[#6b5e55] px-3 py-1.5 bg-[#f8f5f2] rounded-full">
+                      <span className="text-base text-[#5f564d] px-3 py-1.5 bg-[#eae0d6] rounded-full">
                         {product.collection}
                       </span>
                     </td>
@@ -134,8 +134,8 @@ const InventoryPage = () => {
                       <div className="flex gap-4 flex-wrap">
                         {Object.entries(product.stock).map(([size, count]) => (
                           <div key={size} className="flex flex-col items-center">
-                            <span className="text-xs text-[#a3948b] font-bold mb-1 uppercase">{size}</span>
-                            <span className={`text-base font-semibold ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}>
+                            <span className="text-xs text-[#8f8376] font-bold mb-1 uppercase">{size}</span>
+                            <span className={`text-base font-semibold ${count < 5 ? "text-amber-600" : "text-[#2c2b28]"}`}>
                               {count}
                             </span>
                           </div>
@@ -161,7 +161,7 @@ const InventoryPage = () => {
                           type="button"
                           onClick={() => openProductView(product, true)}
                           aria-label={`Edit ${product.name}`}
-                          className="p-2.5 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-xl transition-all"
+                          className="p-2.5 text-[#8f8376] hover:text-[#2c2b28] hover:bg-[#eae0d6] rounded-xl transition-all"
                         >
                           <Edit2 size={20} />
                         </button>
@@ -172,7 +172,7 @@ const InventoryPage = () => {
                             setDeleteTarget(product);
                           }}
                           aria-label={`Delete ${product.name}`}
-                          className="p-2.5 text-[#a3948b] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                          className="p-2.5 text-[#8f8376] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
                         >
                           <Trash2 size={20} />
                         </button>
@@ -204,12 +204,12 @@ const InventoryPage = () => {
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="h-20 w-20 shrink-0 rounded-xl border border-[#e5ddd5] object-cover"
+                    className="h-20 w-20 shrink-0 rounded-xl border border-[#d7c9b8] object-cover"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-base font-semibold text-[#3b302a]">{product.name}</p>
-                    <p className="mt-1 text-sm text-[#a3948b]">LKR {product.price?.toLocaleString()}</p>
-                    <span className="mt-2 inline-flex rounded-full bg-[#f8f5f2] px-3 py-1 text-sm text-[#6b5e55]">
+                    <p className="line-clamp-2 text-base font-semibold text-[#2c2b28]">{product.name}</p>
+                    <p className="mt-1 text-sm text-[#8f8376]">LKR {product.price?.toLocaleString()}</p>
+                    <span className="mt-2 inline-flex rounded-full bg-[#eae0d6] px-3 py-1 text-sm text-[#5f564d]">
                       {product.collection}
                     </span>
                   </div>
@@ -217,9 +217,9 @@ const InventoryPage = () => {
 
                 <div className="mt-4 flex flex-wrap gap-3">
                   {Object.entries(product.stock).map(([size, count]) => (
-                    <div key={size} className="min-w-12 rounded-lg border border-[#e5ddd5] bg-[#fcfaf7] px-3 py-2 text-center">
-                      <p className="text-[11px] font-bold uppercase text-[#a3948b]">{size}</p>
-                      <p className={`text-sm font-semibold ${count < 5 ? "text-amber-600" : "text-[#3b302a]"}`}>
+                    <div key={size} className="min-w-12 rounded-lg border border-[#d7c9b8] bg-[#fcfaf7] px-3 py-2 text-center">
+                      <p className="text-[11px] font-bold uppercase text-[#8f8376]">{size}</p>
+                      <p className={`text-sm font-semibold ${count < 5 ? "text-amber-600" : "text-[#2c2b28]"}`}>
                         {count}
                       </p>
                     </div>
@@ -244,7 +244,7 @@ const InventoryPage = () => {
                       type="button"
                       onClick={() => openProductView(product, true)}
                       aria-label={`Edit ${product.name}`}
-                      className="p-2.5 text-[#a3948b] hover:text-[#3b302a] hover:bg-[#f8f5f2] rounded-xl transition-all"
+                      className="p-2.5 text-[#8f8376] hover:text-[#2c2b28] hover:bg-[#eae0d6] rounded-xl transition-all"
                     >
                       <Edit2 size={20} />
                     </button>
@@ -255,7 +255,7 @@ const InventoryPage = () => {
                         setDeleteTarget(product);
                       }}
                       aria-label={`Delete ${product.name}`}
-                      className="p-2.5 text-[#a3948b] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                      className="p-2.5 text-[#8f8376] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
                     >
                       <Trash2 size={20} />
                     </button>

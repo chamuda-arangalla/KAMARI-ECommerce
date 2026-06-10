@@ -16,7 +16,7 @@ export default function HomeNewsletter() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.6 }}
-        className="rounded-2xl bg-[#3B302A] px-8 py-12 text-center text-white"
+        className="rounded-2xl bg-[#2C2B28] px-8 py-12 text-center text-white"
       >
         <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#E8DED6]">
           Stay Connected
@@ -26,13 +26,13 @@ export default function HomeNewsletter() {
           Be the first to know about new arrivals, exclusive offers and style
           tips.
         </p>
-        <div className="mx-auto flex max-w-md overflow-hidden rounded-full border border-white/20">
+        <div className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row sm:items-center sm:overflow-hidden sm:rounded-full sm:border sm:border-white/20 sm:bg-white/5">
           <input
             type="email"
             placeholder="Enter your email address"
-            className="w-full bg-white/10 px-6 py-3.5 text-sm text-white placeholder-white/40 outline-none"
+            className="min-w-0 flex-1 rounded-full border border-white/20 bg-white/10 px-6 py-3.5 text-sm text-white placeholder-white/40 outline-none sm:w-full sm:rounded-none sm:border-0 sm:bg-transparent"
           />
-          <button className="flex-shrink-0 rounded-full bg-white px-7 py-3.5 text-xs uppercase tracking-[0.16em] text-[#3B302A] transition hover:bg-[#F8F5F2]">
+          <button className="w-full flex-shrink-0 rounded-full bg-white px-7 py-3.5 text-xs font-medium uppercase tracking-[0.16em] text-[#2C2B28] transition hover:bg-[#EAE0D6] sm:mr-0.5 sm:w-auto sm:min-w-[92px]">
             Join
           </button>
         </div>

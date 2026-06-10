@@ -13,23 +13,23 @@ export default function CustomerRegisterForm({
   onSubmit,
 }) {
   return (
-    <div className="flex-1 overflow-y-auto bg-[#F8F5F2]">
+    <div className="flex-1 overflow-y-auto bg-[#EAE0D6]">
       <div className="flex min-h-full items-center justify-center px-8 py-12 xl:px-14">
         <div className="w-full max-w-xl">
           <div className="mb-8 text-center lg:hidden">
             <Link
               to="/"
-              className="text-3xl font-light tracking-[0.25em] text-[#3B302A]"
+              className="text-3xl font-light tracking-[0.25em] text-[#2C2B28]"
             >
               KAMARI
             </Link>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#3b302a]">
+            <h1 className="text-3xl font-bold text-[#2c2b28]">
               Create your account
             </h1>
-            <p className="mt-2 text-base text-[#a3948b]">
+            <p className="mt-2 text-base text-[#8f8376]">
               Fill in your details to get started
             </p>
           </div>
@@ -97,38 +97,38 @@ export default function CustomerRegisterForm({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-[#3b302a] py-3.5 text-base font-semibold tracking-wide text-white transition hover:bg-[#2e2622] disabled:opacity-60"
+                className="w-full rounded-xl bg-[#2c2b28] py-3.5 text-base font-semibold tracking-wide text-white transition hover:bg-[#544c43] disabled:opacity-60"
               >
                 {loading ? "Creating account..." : "Create Account"}
               </button>
 
-              <p className="text-center text-base text-[#a3948b]">
+              <p className="text-center text-base text-[#8f8376]">
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="font-medium text-[#3b302a] underline underline-offset-2"
+                  className="font-medium text-[#2c2b28] underline underline-offset-2"
                 >
                   Sign in
                 </Link>
               </p>
 
               <div className="flex items-center gap-3">
-                <div className="h-px flex-1 bg-[#e5ddd5]" />
-                <span className="text-sm text-[#a3948b]">or sign up with</span>
-                <div className="h-px flex-1 bg-[#e5ddd5]" />
+                <div className="h-px flex-1 bg-[#d7c9b8]" />
+                <span className="text-sm text-[#8f8376]">or sign up with</span>
+                <div className="h-px flex-1 bg-[#d7c9b8]" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <a
                   href={`${apiUrl}/api/auth/google`}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-[#e5ddd5] bg-white py-3 text-sm font-medium text-[#3b302a] transition hover:bg-[#f8f5f2]"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-[#d7c9b8] bg-white py-3 text-sm font-medium text-[#2c2b28] transition hover:bg-[#eae0d6]"
                 >
                   <GoogleIcon />
                   Google
                 </a>
                 <a
                   href={`${apiUrl}/api/auth/facebook`}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-[#e5ddd5] bg-white py-3 text-sm font-medium text-[#3b302a] transition hover:bg-[#f8f5f2]"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-[#d7c9b8] bg-white py-3 text-sm font-medium text-[#2c2b28] transition hover:bg-[#eae0d6]"
                 >
                   <FacebookIcon />
                   Facebook

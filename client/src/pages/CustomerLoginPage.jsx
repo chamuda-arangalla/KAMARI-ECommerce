@@ -42,7 +42,7 @@ const CustomerLoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F8F5F2] px-4 font-['Poppins']">
+    <div className="flex min-h-screen items-center justify-center bg-[#EAE0D6] px-4 font-['Poppins']">
       <CustomerLoginCard
         apiUrl={API_URL}
         error={error}

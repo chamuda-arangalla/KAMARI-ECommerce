@@ -48,7 +48,7 @@ export default function Cart() {
           </p>
           <Link
             to="/"
-            className="inline-block rounded-full bg-[#E8DED6] px-10 py-3 text-sm uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#d8c9bd]"
+            className="inline-block rounded-full bg-[#E8DED6] px-10 py-3 text-sm uppercase tracking-[0.18em] text-[#2C2B28] transition hover:bg-[#d8c9bd]"
           >
             CONTINUE SHOPPING
           </Link>

@@ -16,8 +16,8 @@ const SidebarLink = ({ to, icon: Icon, label, onClick }) => (
     className={({ isActive }) =>
       `flex items-center gap-3 px-4 py-3 rounded-xl text-sm sm:text-base font-medium transition-all duration-200 ${
         isActive
-          ? 'bg-[#e5ddd5] text-[#3b302a] shadow-sm'
-          : 'text-[#6b5e55] hover:bg-[#f3ede8] hover:text-[#3b302a]'
+          ? 'bg-[#d7c9b8] text-[#2c2b28] shadow-sm'
+          : 'text-[#5f564d] hover:bg-[#f3ede8] hover:text-[#2c2b28]'
       }`
     }
   >
@@ -39,13 +39,13 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       )}
 
       <aside className={`
-        fixed top-0 left-0 bottom-0 z-50 w-[min(84vw,16rem)] bg-[#fcfaf7] border-r border-[#e5ddd5]
+        fixed top-0 left-0 bottom-0 z-50 w-[min(84vw,16rem)] bg-[#fcfaf7] border-r border-[#d7c9b8]
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex h-full flex-col overflow-y-auto p-5 sm:p-6">
           <div className="flex items-center justify-between mb-8 sm:mb-10">
-            <Link to="/" onClick={closeMobileSidebar} className="text-2xl sm:text-3xl font-bold tracking-wider text-[#3b302a] hover:opacity-70 transition-opacity">
+            <Link to="/" onClick={closeMobileSidebar} className="text-2xl sm:text-3xl font-bold tracking-wider text-[#2c2b28] hover:opacity-70 transition-opacity">
               KAMARI
             </Link>
             <button className="lg:hidden" onClick={() => setIsOpen(false)}>
@@ -62,9 +62,9 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
             <SidebarLink to="/admin/collections"     icon={Layers}  label="Collections" onClick={closeMobileSidebar} />
           </nav>
 
-          <div className="pt-6 border-t border-[#e5ddd5]">
-            <p className="text-sm text-[#a3948b] uppercase tracking-widest font-semibold mb-3">Support</p>
-            <p className="text-base text-[#6b5e55]">v1.0.0 Stable</p>
+          <div className="pt-6 border-t border-[#d7c9b8]">
+            <p className="text-sm text-[#8f8376] uppercase tracking-widest font-semibold mb-3">Support</p>
+            <p className="text-base text-[#5f564d]">v1.0.0 Stable</p>
           </div>
         </div>
       </aside>

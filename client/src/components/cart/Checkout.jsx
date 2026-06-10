@@ -26,20 +26,20 @@ export default function Checkout({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <div className="sticky top-28">
-        <div className="border border-[#3B302A]/10 bg-[#F8F5F2] p-8 rounded-2xl">
+        <div className="border border-[#2C2B28]/10 bg-[#EAE0D6] p-8 rounded-2xl">
 
           {/* Title */}
-          <h2 className="text-sm tracking-[0.2em] text-[#3B302A] uppercase mb-8 font-semibold">
+          <h2 className="text-sm tracking-[0.2em] text-[#2C2B28] uppercase mb-8 font-semibold">
             Order Summary
           </h2>
 
           {/* Prices */}
           <div className="space-y-4 text-base mb-6">
-            <div className="flex justify-between text-[#7D746C]">
+            <div className="flex justify-between text-[#5F564D]">
               <span>
                 Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})
               </span>
-              <span className="text-[#3B302A]">
+              <span className="text-[#2C2B28]">
                 LKR {subtotal.toLocaleString()}
               </span>
             </div>
@@ -51,14 +51,14 @@ export default function Checkout({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="flex justify-between text-[#3B302A] text-[15px]"
+                  className="flex justify-between text-[#2C2B28] text-[15px]"
                 >
                   <span className="flex items-center gap-1.5">
                     <Tag size={12} />
                     <span>KAMARI10 (10% off)</span>
                     <button
                       onClick={onRemovePromo}
-                      className="text-[#7D746C] hover:text-[#3B302A] ml-1 transition"
+                      className="text-[#5F564D] hover:text-[#2C2B28] ml-1 transition"
                     >
                       <X size={11} />
                     </button>
@@ -69,26 +69,26 @@ export default function Checkout({
             </AnimatePresence>
 
             {/* Delivery */}
-            <div className="flex justify-between text-[#7D746C]">
+            <div className="flex justify-between text-[#5F564D]">
               <span>Delivery</span>
-              <span className="text-[#3B302A]">
+              <span className="text-[#2C2B28]">
                 {freeDelivery ? "Free" : `LKR ${deliveryFee.toLocaleString()}`}
               </span>
             </div>
           </div>
 
-          <div className="border-t border-[#3B302A]/10 my-6" />
+          <div className="border-t border-[#2C2B28]/10 my-6" />
 
           {/* Total */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="text-base tracking-[0.15em] uppercase text-[#3B302A] font-semibold">
+            <span className="text-base tracking-[0.15em] uppercase text-[#2C2B28] font-semibold">
               Total
             </span>
             <div className="text-right">
-              <p className="text-2xl font-light text-[#3B302A]">
+              <p className="text-2xl font-light text-[#2C2B28]">
                 LKR {total.toLocaleString()}
               </p>
-              <p className="text-sm text-[#7D746C] mt-0.5">
+              <p className="text-sm text-[#5F564D] mt-0.5">
                 Incl. taxes
               </p>
             </div>
@@ -99,7 +99,7 @@ export default function Checkout({
             <div className="mb-6">
               <button
                 onClick={() => setPromoOpen(!promoOpen)}
-                className="flex items-center justify-between w-full text-sm tracking-[0.15em] text-[#7D746C] hover:text-[#3B302A] transition uppercase mb-3"
+                className="flex items-center justify-between w-full text-sm tracking-[0.15em] text-[#5F564D] hover:text-[#2C2B28] transition uppercase mb-3"
               >
                 <span className="flex items-center gap-2">
                   <Tag size={12} />
@@ -116,18 +116,18 @@ export default function Checkout({
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="flex border border-[#3B302A]/20">
+                    <div className="flex border border-[#2C2B28]/20">
                       <input
                         type="text"
                         value={promoCode}
                         onChange={(e) => onPromoChange(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && onApplyPromo()}
                         placeholder="Enter code"
-                        className="flex-1 px-4 py-3 text-base text-[#3B302A] placeholder-[#7D746C] outline-none bg-[#F8F5F2] uppercase"
+                        className="flex-1 px-4 py-3 text-base text-[#2C2B28] placeholder-[#5F564D] outline-none bg-[#EAE0D6] uppercase"
                       />
                       <button
                         onClick={onApplyPromo}
-                        className="px-5 bg-[#E8DED6] text-[#3B302A] text-sm tracking-[0.15em] hover:bg-[#d8c9bd] transition"
+                        className="px-5 bg-[#E8DED6] text-[#2C2B28] text-sm tracking-[0.15em] hover:bg-[#d8c9bd] transition"
                       >
                         APPLY
                       </button>
@@ -149,22 +149,22 @@ export default function Checkout({
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="w-full rounded-full bg-[#3B302A] text-[#F8F5F2] py-4 flex items-center justify-center gap-3 text-sm tracking-[0.2em] uppercase hover:bg-[#2e2622] transition"
+              className="w-full rounded-full bg-[#2C2B28] text-[#EAE0D6] py-4 flex items-center justify-center gap-3 text-sm tracking-[0.2em] uppercase hover:bg-[#544c43] transition"
             >
               <span>Checkout</span>
               <ArrowRight size={13} strokeWidth={1.5} />
             </motion.button>
           </Link>
 
-          <p className="text-center text-sm text-[#7D746C] mt-5 tracking-widest uppercase">
+          <p className="text-center text-sm text-[#5F564D] mt-5 tracking-widest uppercase">
             Pay in installments with Koko & Mintpay
           </p>
 
-          <div className="flex justify-center gap-6 mt-6 pt-6 border-t border-[#3B302A]/10">
+          <div className="flex justify-center gap-6 mt-6 pt-6 border-t border-[#2C2B28]/10">
             {["Secure Checkout", "Free Returns", "Authentic"].map((t) => (
               <span
                 key={t}
-                className="text-xs text-[#7D746C] uppercase text-center"
+                className="text-xs text-[#5F564D] uppercase text-center"
               >
                 {t}
               </span>

@@ -16,7 +16,7 @@ export default function OrderPaymentSlipSection({
 }) {
   if (isCodOrder) {
     return (
-      <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-700">
+      <div className="rounded-2xl border border-[#d7c9b8] bg-[#ead9c4] px-4 py-3 text-sm text-[#5f564d]">
         This order is Cash on Delivery. Please pay when your order arrives.
       </div>
     );
@@ -25,14 +25,14 @@ export default function OrderPaymentSlipSection({
   return (
     <div>
       {slipUploaded && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#d7c9b8] bg-[#ead9c4] px-4 py-3 text-sm font-medium text-[#544c43]">
           <CheckCircle2 size={15} className="flex-shrink-0" />
           Payment slip uploaded successfully!
         </div>
       )}
 
       {isPaymentComplete && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#d7c9b8] bg-[#ead9c4] px-4 py-3 text-sm font-medium text-[#544c43]">
           <CheckCircle2 size={15} className="flex-shrink-0" />
           Payment verified.
         </div>
@@ -41,14 +41,14 @@ export default function OrderPaymentSlipSection({
       {order.paymentSlip?.url && (
         <div className="mb-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#544c43]">
               {isPaymentComplete ? "" : "Slip uploaded"}
             </span>
             {!isPaymentComplete && (
               <button
                 type="button"
                 onClick={() => slipInputRef.current?.click()}
-                className="cursor-pointer border-none bg-transparent p-0 font-inherit text-xs text-[#a3948b] underline underline-offset-2 transition-colors hover:text-[#3b302a]"
+                className="cursor-pointer border-none bg-transparent p-0 font-inherit text-xs text-[#8f8376] underline underline-offset-2 transition-colors hover:text-[#2c2b28]"
               >
                 Replace
               </button>
@@ -58,12 +58,12 @@ export default function OrderPaymentSlipSection({
             href={order.paymentSlip.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block overflow-hidden rounded-xl border border-[#e5ddd5]"
+            className="block overflow-hidden rounded-xl border border-[#d7c9b8]"
           >
             <img
               src={order.paymentSlip.url}
               alt="Payment slip"
-              className="max-h-52 w-full bg-[#f8f5f2] object-contain"
+              className="max-h-52 w-full bg-[#eae0d6] object-contain"
             />
           </a>
         </div>
@@ -74,12 +74,12 @@ export default function OrderPaymentSlipSection({
           <img
             src={slipPreview}
             alt="Preview"
-            className="max-h-48 w-full rounded-xl border border-[#e5ddd5] bg-[#f8f5f2] object-contain"
+            className="max-h-48 w-full rounded-xl border border-[#d7c9b8] bg-[#eae0d6] object-contain"
           />
           <button
             type="button"
             onClick={onSlipRemove}
-            className="mt-2 inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-inherit text-xs text-[#a3948b] transition-colors hover:text-rose-600"
+            className="mt-2 inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-inherit text-xs text-[#8f8376] transition-colors hover:text-[#544c43]"
           >
             <X size={11} /> Remove
           </button>
@@ -90,15 +90,15 @@ export default function OrderPaymentSlipSection({
         <button
           type="button"
           onClick={() => slipInputRef.current?.click()}
-          className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-[#ddd8d2] bg-[#fdfcfb] py-7 font-inherit transition-all hover:border-[#3b302a] hover:bg-[#faf8f6]"
+          className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-[#b7aa9a] bg-[#eae0d6] py-7 font-inherit transition-all hover:border-[#2c2b28] hover:bg-[#ead9c4]"
         >
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e5ddd5] bg-[#f0ebe5]">
-            <Upload size={18} className="text-[#a3948b]" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d7c9b8] bg-[#ead9c4]">
+            <Upload size={18} className="text-[#8f8376]" />
           </div>
-          <span className="text-sm font-medium text-[#3b302a]">
+          <span className="text-sm font-medium text-[#2c2b28]">
             {order.paymentSlip?.url ? "Upload new slip" : "Upload payment slip"}
           </span>
-          <span className="text-xs text-[#a3948b]">JPG, PNG or WEBP - Max 5MB</span>
+          <span className="text-xs text-[#8f8376]">JPG, PNG or WEBP - Max 5MB</span>
         </button>
       )}
 
@@ -113,7 +113,7 @@ export default function OrderPaymentSlipSection({
       )}
 
       {slipError && (
-        <p className="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-4 py-2.5 text-xs text-rose-600">
+        <p className="mt-3 rounded-xl border border-[#b7aa9a] bg-[#ead9c4] px-4 py-2.5 text-xs text-[#544c43]">
           {slipError}
         </p>
       )}
@@ -123,7 +123,7 @@ export default function OrderPaymentSlipSection({
           type="button"
           onClick={onSlipUpload}
           disabled={slipUploading}
-          className="mt-4 w-full rounded-xl bg-[#3b302a] py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#2e2622] disabled:opacity-60"
+          className="mt-4 w-full rounded-xl bg-[#2c2b28] py-3.5 text-sm font-semibold text-[#f3ebe2] transition-all hover:bg-[#544c43] disabled:opacity-60"
         >
           {slipUploading ? (
             <span className="inline-flex items-center justify-center gap-2">

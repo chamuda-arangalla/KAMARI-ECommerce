@@ -120,18 +120,18 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-50 w-full bg-[#F8F5F2]/90 backdrop-blur-sm">
+      <header className="fixed top-0 left-0 z-50 w-full bg-[#EAE0D6]/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
           <Link
             to="/"
             onClick={handleHomeClick}
-            className="text-xl font-light tracking-[0.25em] text-[#3B302A]"
+            className="text-xl font-light tracking-[0.25em] text-[#2C2B28]"
           >
             KAMARI
           </Link>
 
-          <nav className="hidden items-center gap-10 text-[11px] uppercase tracking-[0.18em] text-[#3B302A] md:flex">
+          <nav className="hidden items-center gap-10 text-[11px] uppercase tracking-[0.18em] text-[#2C2B28] md:flex">
             <Link to="/shop">Shop</Link>
 
             {/* Collections with dropdown */}
@@ -141,45 +141,45 @@ const Header = () => {
               className="relative"
             >
               <button
-                className="uppercase tracking-[0.18em] text-[11px] text-[#3B302A] bg-transparent border-none cursor-pointer font-[inherit] p-0"
+                className="uppercase tracking-[0.18em] text-[11px] text-[#2C2B28] bg-transparent border-none cursor-pointer font-[inherit] p-0"
                 onClick={() => setDropdownOpen((v) => !v)}
               >
                 Collections
               </button>
             </div>
 
-            <Link to="/about"   className="transition hover:text-[#7D746C]">About</Link>
-            <Link to="/contact" className="transition hover:text-[#7D746C]">Contact</Link>
+            <Link to="/about"   className="transition hover:text-[#5F564D]">About</Link>
+            <Link to="/contact" className="transition hover:text-[#5F564D]">Contact</Link>
           </nav>
 
-          <div className="flex items-center gap-5 text-[#3B302A]">
+          <div className="flex items-center gap-5 text-[#2C2B28]">
             <Search size={16} strokeWidth={1.5} className="cursor-pointer" />
             {customer ? (
               <div className="relative" ref={accountRef}>
                 <button
                   onClick={() => setAccountOpen((v) => !v)}
-                  className="flex items-center gap-1.5 text-[#3B302A]"
+                  className="flex items-center gap-1.5 text-[#2C2B28]"
                 >
-                  <div className="w-7 h-7 rounded-full bg-[#3B302A] text-[#F8F5F2] flex items-center justify-center text-[10px] font-semibold">
+                  <div className="w-7 h-7 rounded-full bg-[#2C2B28] text-[#EAE0D6] flex items-center justify-center text-[10px] font-semibold">
                     {customer.firstName?.[0]?.toUpperCase() || customer.email?.[0]?.toUpperCase()}
                   </div>
                   <ChevronDown size={13} strokeWidth={1.5} className={`transition-transform ${accountOpen ? "rotate-180" : ""}`} />
                 </button>
 
                 {accountOpen && (
-                  <div className="absolute right-0 top-10 w-52 bg-white border border-[#e5ddd5] rounded-2xl shadow-xl py-2 z-50">
-                    <div className="px-4 py-3 border-b border-[#e5ddd5]">
-                      <p className="text-sm font-semibold text-[#3b302a]">
+                  <div className="absolute right-0 top-10 w-52 bg-white border border-[#d7c9b8] rounded-2xl shadow-xl py-2 z-50">
+                    <div className="px-4 py-3 border-b border-[#d7c9b8]">
+                      <p className="text-sm font-semibold text-[#2c2b28]">
                         {customer.firstName} {customer.lastName}
                       </p>
-                      <p className="text-xs text-[#a3948b] truncate mt-0.5">{customer.email}</p>
+                      <p className="text-xs text-[#8f8376] truncate mt-0.5">{customer.email}</p>
                     </div>
 
                     {customer.role === "admin" && (
                       <Link
                         to="/admin"
                         onClick={() => setAccountOpen(false)}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#2c2b28] hover:bg-[#eae0d6] transition"
                       >
                         <LayoutDashboard size={15} />
                         Admin Dashboard
@@ -191,7 +191,7 @@ const Header = () => {
                         <Link
                           to="/profile"
                           onClick={() => setAccountOpen(false)}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#2c2b28] hover:bg-[#eae0d6] transition"
                         >
                           <User size={15} />
                           My Profile
@@ -199,7 +199,7 @@ const Header = () => {
                         <Link
                           to="/orders"
                           onClick={() => setAccountOpen(false)}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#2c2b28] hover:bg-[#eae0d6] transition"
                         >
                           <PackageSearch size={15} />
                           My Orders
@@ -232,7 +232,7 @@ const Header = () => {
             >
               <ShoppingBag size={16} strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#3B302A] text-[9px] text-[#F8F5F2]">
+                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#2C2B28] text-[9px] text-[#EAE0D6]">
                   {totalItems}
                 </span>
               )}

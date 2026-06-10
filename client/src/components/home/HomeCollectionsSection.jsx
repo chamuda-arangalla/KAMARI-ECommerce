@@ -27,7 +27,7 @@ export default function HomeCollectionsSection({
         className="mb-10 flex items-end justify-between"
       >
         <div>
-          <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#7D746C]">
+          <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#5F564D]">
             Browse
           </p>
           <h2 className="text-3xl font-light tracking-wide">Shop by Collection</h2>
@@ -40,7 +40,7 @@ export default function HomeCollectionsSection({
             type="button"
             aria-label="Previous collections"
             onClick={() => onScroll(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#3B302A]/15 bg-white/70 text-[#3B302A] shadow-sm backdrop-blur transition hover:bg-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2C2B28]/15 bg-white/70 text-[#2C2B28] shadow-sm backdrop-blur transition hover:bg-white"
           >
             <ChevronLeft size={18} />
           </button>
@@ -48,7 +48,7 @@ export default function HomeCollectionsSection({
             type="button"
             aria-label="Next collections"
             onClick={() => onScroll(1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#3B302A]/15 bg-white/70 text-[#3B302A] shadow-sm backdrop-blur transition hover:bg-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2C2B28]/15 bg-white/70 text-[#2C2B28] shadow-sm backdrop-blur transition hover:bg-white"
           >
             <ChevronRight size={18} />
           </button>
@@ -86,8 +86,8 @@ export default function HomeCollectionsSection({
                 ) : (
                   <div className="h-full w-full bg-[#E8DED6]" />
                 )}
-                <div className="absolute inset-0 bg-[#3B302A]/20 transition duration-300 group-hover:bg-[#3B302A]/10" />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3B302A]/70 p-4">
+                <div className="absolute inset-0 bg-[#2C2B28]/20 transition duration-300 group-hover:bg-[#2C2B28]/10" />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#2C2B28]/70 p-4">
                   <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-white">
                     {collection.name}
                   </p>

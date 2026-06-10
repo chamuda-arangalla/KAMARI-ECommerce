@@ -18,7 +18,7 @@ export default function ContactForm({
       transition={{ duration: 0.7 }}
       className="rounded-2xl border border-[#e8e2dc] bg-white p-10 shadow-sm"
     >
-      <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#7D746C]">
+      <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#5F564D]">
         Send a Message
       </p>
       <h2 className="mb-8 text-3xl font-light">We'll get back to you soon</h2>
@@ -46,14 +46,14 @@ export default function ContactForm({
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <ContactField label="Phone" name="phone" value={form.phone} onChange={onChange} placeholder="+94 77 123 4567" />
             <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#7D746C]">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#5F564D]">
                 Subject
               </label>
               <select
                 name="subject"
                 value={form.subject}
                 onChange={onChange}
-                className="w-full rounded-xl border border-[#e5ddd5] bg-[#F8F5F2] px-4 py-3 text-sm text-[#3B302A] outline-none transition focus:border-[#3B302A]"
+                className="w-full rounded-xl border border-[#d7c9b8] bg-[#EAE0D6] px-4 py-3 text-sm text-[#2C2B28] outline-none transition focus:border-[#2C2B28]"
               >
                 <option value="">Select a topic</option>
                 <option value="order">Order Inquiry</option>
@@ -65,7 +65,7 @@ export default function ContactForm({
             </div>
           </div>
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#7D746C]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#5F564D]">
               Message *
             </label>
             <textarea
@@ -75,14 +75,14 @@ export default function ContactForm({
               required
               rows={5}
               placeholder="How can we help you?"
-              className="w-full resize-none rounded-xl border border-[#e5ddd5] bg-[#F8F5F2] px-4 py-3 text-sm text-[#3B302A] outline-none transition focus:border-[#3B302A]"
+              className="w-full resize-none rounded-xl border border-[#d7c9b8] bg-[#EAE0D6] px-4 py-3 text-sm text-[#2C2B28] outline-none transition focus:border-[#2C2B28]"
             />
           </div>
           <motion.button
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
-            className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#3B302A] py-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#2e2622]"
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#2C2B28] py-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#544c43]"
           >
             <Send size={16} />
             Send Message

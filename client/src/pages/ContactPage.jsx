@@ -48,7 +48,7 @@ export default function ContactPage() {
 
   return (
     <main
-      className="bg-[#F8F5F2] text-[#3B302A]"
+      className="bg-[#EAE0D6] text-[#2C2B28]"
       style={{
         fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
         paddingTop: "70px",

@@ -13,7 +13,7 @@ export default function HomeHero({
   return (
     <section
       ref={heroRevealRef}
-      className="relative mt-16 h-[calc(100svh-64px)] min-h-[560px] overflow-hidden bg-[#3B302A] md:min-h-[640px]"
+      className="relative mt-16 h-[calc(100svh-64px)] min-h-[560px] overflow-hidden bg-[#2C2B28] md:min-h-[640px]"
     >
       <motion.div
         className="absolute inset-0"
@@ -39,7 +39,7 @@ export default function HomeHero({
           />
         </picture>
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#3B302A]/72 via-[#3B302A]/28 to-transparent md:bg-gradient-to-r md:from-[#3B302A]/64 md:via-[#3B302A]/20 md:to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2B28]/72 via-[#2C2B28]/28 to-transparent md:bg-gradient-to-r md:from-[#2C2B28]/64 md:via-[#2C2B28]/20 md:to-transparent" />
 
       <motion.div
         variants={fadeUp}
@@ -63,7 +63,7 @@ export default function HomeHero({
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => onNavigate("/shop")}
-            className="rounded-full bg-white px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#F8F5F2]"
+            className="rounded-full bg-white px-8 py-3.5 text-xs uppercase tracking-[0.18em] text-[#2C2B28] transition hover:bg-[#EAE0D6]"
           >
             Shop Now
           </motion.button>

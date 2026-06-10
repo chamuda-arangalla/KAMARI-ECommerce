@@ -1,6 +1,6 @@
 export default function RegisterSectionTitle({ children }) {
   return (
-    <h3 className="border-b border-[#e5ddd5] pb-2 text-sm font-semibold uppercase tracking-wider text-[#a3948b]">
+    <h3 className="border-b border-[#d7c9b8] pb-2 text-sm font-semibold uppercase tracking-wider text-[#8f8376]">
       {children}
     </h3>
   );

@@ -30,19 +30,19 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f5f2] flex items-center justify-center px-4 font-['Poppins']">
-      <div className="relative bg-white w-full max-w-sm rounded-3xl border border-[#e5ddd5] shadow-[0_20px_60px_rgba(59,48,42,0.12)] p-10">
+    <div className="min-h-screen bg-[#eae0d6] flex items-center justify-center px-4 font-['Poppins']">
+      <div className="relative bg-white w-full max-w-sm rounded-3xl border border-[#d7c9b8] shadow-[0_20px_60px_rgba(59,48,42,0.12)] p-10">
         <Link
           to="/"
           aria-label="Back to home"
-          className="absolute left-5 top-5 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5ddd5] text-[#6b5e55] transition hover:bg-[#f8f5f2] hover:text-[#3b302a]"
+          className="absolute left-5 top-5 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#d7c9b8] text-[#5f564d] transition hover:bg-[#eae0d6] hover:text-[#2c2b28]"
         >
           <ArrowLeft size={20} strokeWidth={1.6} />
         </Link>
 
         <div className="mb-10 text-center">
-          <h1 className="text-3xl font-bold text-[#3b302a] tracking-wide">KAMARI</h1>
-          <p className="text-base text-[#a3948b] mt-2">Admin Portal</p>
+          <h1 className="text-3xl font-bold text-[#2c2b28] tracking-wide">KAMARI</h1>
+          <p className="text-base text-[#8f8376] mt-2">Admin Portal</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -62,7 +62,7 @@ const AdminLoginPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#a3948b] uppercase tracking-wider mb-2">
+            <label className="block text-sm font-semibold text-[#8f8376] uppercase tracking-wider mb-2">
               Password
             </label>
             <input
@@ -72,7 +72,7 @@ const AdminLoginPage = () => {
               onChange={handleChange}
               required
               autoComplete="current-password"
-              className="w-full px-4 py-3 bg-white border border-[#e5ddd5] rounded-xl text-base focus:ring-1 focus:ring-[#c2b2a6] outline-none"
+              className="w-full px-4 py-3 bg-white border border-[#d7c9b8] rounded-xl text-base focus:ring-1 focus:ring-[#c2b2a6] outline-none"
             />
           </div>
 
@@ -85,7 +85,7 @@ const AdminLoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-60 mt-2 transition"
+            className="w-full py-3.5 rounded-xl bg-[#2c2b28] text-white text-base font-semibold hover:bg-[#544c43] disabled:opacity-60 mt-2 transition"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>

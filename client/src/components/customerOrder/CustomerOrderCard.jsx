@@ -21,7 +21,7 @@ export default function CustomerOrderCard({
   onSlipUpload,
 }) {
   return (
-    <div className="overflow-hidden rounded-3xl border border-[#e5ddd5] bg-white shadow-[0_8px_40px_rgba(59,48,42,0.10)]">
+    <div className="overflow-hidden rounded-3xl border border-[#d7c9b8] bg-[#f3ebe2] shadow-[0_8px_40px_rgba(44,43,40,0.12)]">
       <div className={`h-1.5 w-full ${status.bar}`} />
 
       <div className="space-y-6 px-7 py-7">

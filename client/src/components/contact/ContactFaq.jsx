@@ -13,7 +13,7 @@ export default function ContactFaq({ faqs, openFaq, onToggle }) {
           transition={{ duration: 0.6 }}
           className="mb-12 text-center"
         >
-          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#7D746C]">
+          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#5F564D]">
             Quick Answers
           </p>
           <h2 className="text-4xl font-light">Frequently Asked Questions</h2>
@@ -33,11 +33,11 @@ export default function ContactFaq({ faqs, openFaq, onToggle }) {
               className="overflow-hidden rounded-xl border border-[#e8e2dc]"
             >
               <button
-                className="flex w-full items-center justify-between px-6 py-5 text-left text-sm font-semibold text-[#3B302A] transition hover:bg-[#F8F5F2]"
+                className="flex w-full items-center justify-between px-6 py-5 text-left text-sm font-semibold text-[#2C2B28] transition hover:bg-[#EAE0D6]"
                 onClick={() => onToggle(index)}
               >
                 <span>{question}</span>
-                <span className="ml-4 flex-shrink-0 text-xl font-light text-[#a3948b]">
+                <span className="ml-4 flex-shrink-0 text-xl font-light text-[#8f8376]">
                   {openFaq === index ? "-" : "+"}
                 </span>
               </button>
@@ -47,7 +47,7 @@ export default function ContactFaq({ faqs, openFaq, onToggle }) {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="border-t border-[#e8e2dc] bg-[#F8F5F2] px-6 py-5"
+                  className="border-t border-[#e8e2dc] bg-[#EAE0D6] px-6 py-5"
                 >
                   <p className="text-sm leading-7 text-[#6E625C]">{answer}</p>
                 </motion.div>
