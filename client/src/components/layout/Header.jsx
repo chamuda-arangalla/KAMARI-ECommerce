@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard, PackageSearch } from "lucide-react";
+import { Search, ShoppingBag, User, LogOut, ChevronDown, LayoutDashboard, PackageSearch, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/useCart";
@@ -13,17 +13,20 @@ import "../../styles/Header.css";
 const Header = () => {
   const { totalItems, setIsDrawerOpen } = useCart();
   const [collections, setCollections] = useState([]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [collectionsExpanded, setCollectionsExpanded] = useState(false);
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [customer, setCustomer] = useState(() => {
     const stored = localStorage.getItem("customerUser");
     const adminStored = localStorage.getItem("adminUser");
     return stored ? JSON.parse(stored) : adminStored ? JSON.parse(adminStored) : null;
   });
-  const closeTimer = useRef(null);
   const accountRef = useRef(null);
+  const headerRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,6 +62,29 @@ const Header = () => {
     };
 
     loadCollections();
+  }, []);
+
+  useEffect(() => {
+    const lastScrollY = { current: window.scrollY };
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY <= 0) {
+        setHeaderHidden(false);
+        setIsScrolled(false);
+      } else if (currentScrollY > lastScrollY.current) {
+        setHeaderHidden(true);
+      } else {
+        setHeaderHidden(false);
+        setIsScrolled(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -99,71 +125,62 @@ const Header = () => {
     }
   };
 
-  const openDropdown = () => {
-    clearTimeout(closeTimer.current);
-    setDropdownOpen(true);
+  const handleHomeClick = () => {
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   };
 
-  const closeDropdown = () => {
-    closeTimer.current = setTimeout(() => setDropdownOpen(false), 120);
-  };
-
-  const handleCollectionClick = (categoryName) => {
-    setDropdownOpen(false);
+  const handleMenuCollectionClick = (categoryName) => {
+    setMenuOpen(false);
+    setCollectionsExpanded(false);
     navigate(`/collections?category=${encodeURIComponent(categoryName)}`);
   };
 
-  const handleHomeClick = () => {
-    setDropdownOpen(false);
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  const handleMenuLinkClick = (path) => {
+    setMenuOpen(false);
+    setCollectionsExpanded(false);
+    navigate(path);
   };
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-50 w-full bg-[#EAE0D6]/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <header
+        ref={headerRef}
+        className={`fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out ${
+          headerHidden ? "-translate-y-full" : "translate-y-0"
+        } ${isScrolled ? "bg-white shadow-sm" : "bg-transparent"}`}
+      >
+        <div className="relative flex w-full items-center justify-between px-4 py-4 sm:px-6">
+
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            className={`flex cursor-pointer items-center gap-2 ${isScrolled ? "text-[#2C2B28]" : "text-white"}`}
+          >
+            <Menu size={26} strokeWidth={1.5} />
+            <span className="text-sm uppercase tracking-[0.18em]">Menu</span>
+          </button>
 
           <Link
             to="/"
             onClick={handleHomeClick}
-            className="text-xl font-light tracking-[0.25em] text-[#2C2B28]"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Cormorant_Garamond'] text-4xl font-bold tracking-[0.25em] text-[#2C2B28]"
           >
             KAMARI
           </Link>
 
-          <nav className="hidden items-center gap-10 text-[11px] uppercase tracking-[0.18em] text-[#2C2B28] md:flex">
-            <Link to="/shop">Shop</Link>
-
-            {/* Collections with dropdown */}
-            <div
-              onMouseEnter={openDropdown}
-              onMouseLeave={closeDropdown}
-              className="relative"
-            >
-              <button
-                className="uppercase tracking-[0.18em] text-[11px] text-[#2C2B28] bg-transparent border-none cursor-pointer font-[inherit] p-0"
-                onClick={() => setDropdownOpen((v) => !v)}
-              >
-                Collections
-              </button>
-            </div>
-
-            <Link to="/about"   className="transition hover:text-[#5F564D]">About</Link>
-            <Link to="/contact" className="transition hover:text-[#5F564D]">Contact</Link>
-          </nav>
-
-          <div className="flex items-center gap-5 text-[#2C2B28]">
-            <Search size={16} strokeWidth={1.5} className="cursor-pointer" />
+          <div className={`flex items-center gap-5 ${isScrolled ? "text-[#2C2B28]" : "text-white"}`}>
+            <Search size={20} strokeWidth={1.5} className="cursor-pointer" />
             {customer ? (
               <div className="relative" ref={accountRef}>
                 <button
                   onClick={() => setAccountOpen((v) => !v)}
-                  className="flex items-center gap-1.5 text-[#2C2B28]"
+                  className={`flex items-center gap-1.5 ${isScrolled ? "text-[#2C2B28]" : "text-white"}`}
                 >
-                  <div className="w-7 h-7 rounded-full bg-[#2C2B28] text-[#EAE0D6] flex items-center justify-center text-[10px] font-semibold">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${isScrolled ? "bg-[#2C2B28] text-white" : "bg-white text-[#2C2B28]"}`}>
                     {customer.firstName?.[0]?.toUpperCase() || customer.email?.[0]?.toUpperCase()}
                   </div>
-                  <ChevronDown size={13} strokeWidth={1.5} className={`transition-transform ${accountOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown size={16} strokeWidth={1.5} className={`transition-transform ${accountOpen ? "rotate-180" : ""}`} />
                 </button>
 
                 {accountOpen && (
@@ -222,7 +239,7 @@ const Header = () => {
               </div>
             ) : (
               <Link to="/login" aria-label="Sign in">
-                <User size={16} strokeWidth={1.5} />
+                <User size={20} strokeWidth={1.5} />
               </Link>
             )}
             <button
@@ -230,9 +247,9 @@ const Header = () => {
               aria-label="Open cart"
               className="relative cursor-pointer"
             >
-              <ShoppingBag size={16} strokeWidth={1.5} />
+              <ShoppingBag size={20} strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#2C2B28] text-[9px] text-[#EAE0D6]">
+                <span className={`absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full text-[9px] ${isScrolled ? "bg-[#2C2B28] text-white" : "bg-white text-[#2C2B28]"}`}>
                   {totalItems}
                 </span>
               )}
@@ -242,96 +259,97 @@ const Header = () => {
         </div>
       </header>
 
-      {/* ── Collections Dropdown ─────────────────── */}
+      {/* ── Nav Drawer ───────────────────────────── */}
       <AnimatePresence>
-        {dropdownOpen && (
-          <motion.div
-            className="collections-dropdown"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            onMouseEnter={openDropdown}
-            onMouseLeave={closeDropdown}
-          >
-            <div className="collections-dropdown-inner">
+        {menuOpen && (
+          <>
+            <motion.div
+              className="nav-drawer-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => {
+                setMenuOpen(false);
+                setCollectionsExpanded(false);
+              }}
+            />
+            <motion.div
+              className="nav-drawer"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              <button
+                className="nav-drawer-close"
+                aria-label="Close menu"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setCollectionsExpanded(false);
+                }}
+              >
+                <X size={20} strokeWidth={1.5} />
+              </button>
 
-              {/* Left — 2-col link grid */}
-              <div className="collections-dropdown-left">
-                <p className="collections-dropdown-heading">Collections</p>
+              <nav className="nav-drawer-links">
+                <button className="nav-drawer-link" onClick={() => handleMenuLinkClick("/shop")}>
+                  Shop
+                </button>
 
-                <Link
-                  to="/collections"
-                  className="collections-dropdown-all"
-                  onClick={() => setDropdownOpen(false)}
+                <button
+                  className="nav-drawer-link nav-drawer-link-toggle"
+                  onClick={() => setCollectionsExpanded((v) => !v)}
                 >
-                  All Collections →
-                </Link>
+                  Collections
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={1.5}
+                    className={`transition-transform ${collectionsExpanded ? "rotate-180" : ""}`}
+                  />
+                </button>
 
-                <div className="collections-dropdown-divider" />
-
-                {/* All 10 categories in 2 columns */}
-                <div className="collections-dropdown-links">
-                  {collections.map((col) => (
+                {collectionsExpanded && (
+                  <div className="nav-drawer-sublinks">
                     <button
-                      key={col._id}
-                      className="collections-dropdown-link"
-                      onClick={() => handleCollectionClick(col.name)}
+                      className="nav-drawer-sublink"
+                      onClick={() => handleMenuLinkClick("/collections")}
                     >
-                      {col.name}
-                      <span className="collections-dropdown-link-arrow">→</span>
+                      All Collections
                     </button>
-                  ))}
-                </div>
-
-                <div className="collections-dropdown-divider" />
-
-                {/* Quick links */}
-                <div className="collections-dropdown-links-extra">
-                  <button
-                    className="collections-dropdown-link"
-                    onClick={() => { setDropdownOpen(false); navigate("/collections?sort=newest"); }}
-                  >
-                    New Arrivals
-                    <span className="collections-dropdown-link-arrow">→</span>
-                  </button>
-                  <button
-                    className="collections-dropdown-link"
-                    onClick={() => { setDropdownOpen(false); navigate("/collections?sort=best-selling"); }}
-                  >
-                    Best Sellers
-                    <span className="collections-dropdown-link-arrow">→</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Right — featured image cards */}
-              <div className="collections-dropdown-right">
-                {collections.map((col) => (
-                  <div
-                    key={col._id}
-                    className="collections-dropdown-card"
-                    onClick={() => handleCollectionClick(col.name)}
-                  >
-                    <div className="collections-dropdown-card-img-wrap">
-                      {col.image?.url ? (
-                        <img
-                          src={col.image.url}
-                          alt={col.name}
-                          className="collections-dropdown-card-img"
-                        />
-                      ) : (
-                        <div className="collections-dropdown-card-placeholder" />
-                      )}
-                    </div>
-                    <p className="collections-dropdown-card-name">{col.name}</p>
-                    <p className="collections-dropdown-card-sub">{col.subtitle}</p>
+                    {collections.map((col) => (
+                      <button
+                        key={col._id}
+                        className="nav-drawer-sublink"
+                        onClick={() => handleMenuCollectionClick(col.name)}
+                      >
+                        {col.name}
+                      </button>
+                    ))}
+                    <button
+                      className="nav-drawer-sublink"
+                      onClick={() => handleMenuLinkClick("/collections?sort=newest")}
+                    >
+                      New Arrivals
+                    </button>
+                    <button
+                      className="nav-drawer-sublink"
+                      onClick={() => handleMenuLinkClick("/collections?sort=best-selling")}
+                    >
+                      Best Sellers
+                    </button>
                   </div>
-                ))}
-              </div>
+                )}
 
-            </div>
-          </motion.div>
+                <button className="nav-drawer-link" onClick={() => handleMenuLinkClick("/about")}>
+                  About
+                </button>
+                <button className="nav-drawer-link" onClick={() => handleMenuLinkClick("/contact")}>
+                  Contact
+                </button>
+              </nav>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 

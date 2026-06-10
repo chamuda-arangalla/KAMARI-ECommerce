@@ -1,12 +1,13 @@
-import homeHeroImg from "../../assets/images/Home.jpg";
-import homeHeroMobileImg from "../../assets/images/Home-mobile.jpg";
+import heroBanner1 from "../../assets/images/banner1-flowset.png";
+import heroBanner2 from "../../assets/images/banner2-playset.png";
+import heroBanner3 from "../../assets/images/banner3-eas-set.png";
+import heroBanner4 from "../../assets/images/banner4-bold-set.png";
 import content01Img from "../../assets/images/Content01.png";
 
 export const HOME_FALLBACK_IMG =
   "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
 
-export const HERO_IMG = homeHeroImg;
-export const HERO_MOBILE_IMG = homeHeroMobileImg;
+export const HERO_BANNERS = [heroBanner1, heroBanner2, heroBanner3, heroBanner4];
 export const BRAND_IMG = content01Img;
 
 export const fadeUp = {
