@@ -53,7 +53,7 @@ export default function ContactForm({
                 name="subject"
                 value={form.subject}
                 onChange={onChange}
-                className="w-full rounded-xl border border-[#d7c9b8] bg-[#EAE0D6] px-4 py-3 text-sm text-[#2C2B28] outline-none transition focus:border-[#2C2B28]"
+                className="w-full rounded-xl border border-[#E8E2DC] bg-white px-4 py-3 text-sm text-[#2C2B28] outline-none transition focus:border-[#BDAF9F] focus:ring-4 focus:ring-[#EAE0D6]/60"
               >
                 <option value="">Select a topic</option>
                 <option value="order">Order Inquiry</option>
@@ -75,14 +75,14 @@ export default function ContactForm({
               required
               rows={5}
               placeholder="How can we help you?"
-              className="w-full resize-none rounded-xl border border-[#d7c9b8] bg-[#EAE0D6] px-4 py-3 text-sm text-[#2C2B28] outline-none transition focus:border-[#2C2B28]"
+              className="w-full resize-none rounded-xl border border-[#E8E2DC] bg-white px-4 py-3 text-sm text-[#2C2B28] outline-none transition placeholder:text-[#9A8F86] focus:border-[#BDAF9F] focus:ring-4 focus:ring-[#EAE0D6]/60"
             />
           </div>
           <motion.button
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
-            className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#2C2B28] py-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#544c43]"
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#2C2B28] py-4 text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-[#4B443D]"
           >
             <Send size={16} />
             Send Message

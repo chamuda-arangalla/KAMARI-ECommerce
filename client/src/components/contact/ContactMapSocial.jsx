@@ -34,27 +34,27 @@ export default function ContactMapSocial({ data }) {
             href={`https://wa.me/${data.whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 rounded-xl border border-[#25D366]/20 bg-[#25D366]/10 px-5 py-4 text-sm font-medium text-[#128C7E] transition hover:bg-[#25D366]/20"
+            className="flex items-center gap-4 rounded-xl border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-medium text-[#2C2B28] transition hover:border-[#D7C9B8] hover:bg-[#FAF7F3]"
           >
-            <MessageCircle size={20} className="text-[#25D366]" />
+            <MessageCircle size={20} className="text-[#5F564D]" />
             Chat on WhatsApp - +{data.whatsappNumber}
           </a>
           <a
             href={`https://instagram.com/${data.instagramHandle}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 rounded-xl border border-pink-100 bg-pink-50 px-5 py-4 text-sm font-medium text-pink-700 transition hover:bg-pink-100"
+            className="flex items-center gap-4 rounded-xl border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-medium text-[#2C2B28] transition hover:border-[#D7C9B8] hover:bg-[#FAF7F3]"
           >
-            <Globe size={20} />
+            <Globe size={20} className="text-[#5F564D]" />
             Follow us on Instagram @{data.instagramHandle}
           </a>
           <a
             href={`https://facebook.com/${data.facebookHandle}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
+            className="flex items-center gap-4 rounded-xl border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-medium text-[#2C2B28] transition hover:border-[#D7C9B8] hover:bg-[#FAF7F3]"
           >
-            <Link2 size={20} />
+            <Link2 size={20} className="text-[#5F564D]" />
             Like us on Facebook @{data.facebookHandle}
           </a>
         </div>

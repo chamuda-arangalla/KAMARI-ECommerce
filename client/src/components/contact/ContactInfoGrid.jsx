@@ -17,7 +17,7 @@ export default function ContactInfoGrid({ items }) {
             variants={contactFadeUp}
             className="rounded-2xl border border-[#e8e2dc] bg-white p-8 text-center shadow-sm"
           >
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#EFE7DF]">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-[#E8E2DC] bg-white">
               <Icon size={22} className="text-[#2C2B28]" />
             </div>
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-[0.14em]">
