@@ -4,6 +4,7 @@ import AuthTextField from "./AuthTextField";
 import FacebookIcon from "./FacebookIcon";
 import GoogleIcon from "./GoogleIcon";
 import SocialAuthLink from "./SocialAuthLink";
+import BrandLogo from "../common/BrandLogo";
 
 export default function CustomerLoginCard({
   apiUrl,
@@ -27,8 +28,8 @@ export default function CustomerLoginCard({
       </Link>
 
       <div className="mb-10 text-center">
-        <Link to="/" className="text-3xl font-light tracking-[0.25em] text-[#2C2B28]">
-          KAMARI
+        <Link to="/" className="inline-flex justify-center" aria-label="KAMARI home">
+          <BrandLogo className="h-10 w-auto object-contain" />
         </Link>
         <p className="mt-2 text-base text-[#8f8376]">Sign in to your account</p>
       </div>

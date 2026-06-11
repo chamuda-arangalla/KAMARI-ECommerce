@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import BrandLogo from "../common/BrandLogo";
 
 const REGISTER_IMAGE =
   "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=1000&q=90";
@@ -16,8 +17,8 @@ export default function RegisterSidePanel() {
       <div className="absolute bottom-0 left-0 h-28 w-28 border-b-2 border-l-2 border-white/20" />
 
       <div className="absolute left-8 right-8 top-8 z-10 flex items-center justify-between">
-        <Link to="/" className="text-xl font-light tracking-[0.35em] text-white">
-          KAMARI
+        <Link to="/" className="inline-flex" aria-label="KAMARI home">
+          <BrandLogo tone="light" className="h-9 w-auto object-contain" />
         </Link>
         <span className="text-xs uppercase tracking-[0.22em] text-white/50">
           Est. 2024

@@ -8,6 +8,7 @@ import {
   X,
   Layers,
 } from 'lucide-react';
+import BrandLogo from '../common/BrandLogo';
 
 const SidebarLink = ({ to, icon: Icon, label, onClick }) => (
   <NavLink
@@ -45,8 +46,8 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       `}>
         <div className="flex h-full flex-col overflow-y-auto p-5 sm:p-6">
           <div className="flex items-center justify-between mb-8 sm:mb-10">
-            <Link to="/" onClick={closeMobileSidebar} className="text-2xl sm:text-3xl font-bold tracking-wider text-[#2c2b28] hover:opacity-70 transition-opacity">
-              KAMARI
+            <Link to="/" onClick={closeMobileSidebar} className="inline-flex transition-opacity hover:opacity-70" aria-label="KAMARI home">
+              <BrandLogo className="h-9 w-auto object-contain sm:h-10" />
             </Link>
             <button className="lg:hidden" onClick={() => setIsOpen(false)}>
               <X size={26} />

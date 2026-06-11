@@ -3,6 +3,7 @@ import AuthTextField from "./AuthTextField";
 import FacebookIcon from "./FacebookIcon";
 import GoogleIcon from "./GoogleIcon";
 import RegisterSectionTitle from "./RegisterSectionTitle";
+import BrandLogo from "../common/BrandLogo";
 
 export default function CustomerRegisterForm({
   apiUrl,
@@ -19,9 +20,10 @@ export default function CustomerRegisterForm({
           <div className="mb-8 text-center lg:hidden">
             <Link
               to="/"
-              className="text-3xl font-light tracking-[0.25em] text-[#2C2B28]"
+              className="inline-flex justify-center"
+              aria-label="KAMARI home"
             >
-              KAMARI
+              <BrandLogo className="h-10 w-auto object-contain" />
             </Link>
           </div>
 

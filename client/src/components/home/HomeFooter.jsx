@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import BrandLogo from "../common/BrandLogo";
 
 const FOOTER_COLUMNS = [
   {
@@ -39,7 +40,7 @@ export default function HomeFooter() {
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
           <div className="col-span-2 md:col-span-1">
-            <h2 className="mb-3 text-xl font-light tracking-[0.22em]">KAMARI</h2>
+            <BrandLogo className="mb-3 h-9 w-auto object-contain" />
             <p className="text-xs leading-relaxed text-[#5F564D]">
               Contemporary women's fashion for everyday Sri Lankan life.
             </p>

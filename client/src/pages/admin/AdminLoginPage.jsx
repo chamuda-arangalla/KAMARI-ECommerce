@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginAdmin } from "../../services/authApi";
+import BrandLogo from "../../components/common/BrandLogo";
 
 const AdminLoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -41,7 +42,7 @@ const AdminLoginPage = () => {
         </Link>
 
         <div className="mb-10 text-center">
-          <h1 className="text-3xl font-bold text-[#2c2b28] tracking-wide">KAMARI</h1>
+          <BrandLogo className="mx-auto h-10 w-auto object-contain" />
           <p className="text-base text-[#8f8376] mt-2">Admin Portal</p>
         </div>
 
