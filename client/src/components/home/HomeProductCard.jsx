@@ -16,8 +16,7 @@ export default function HomeProductCard({ product, badge, onClick }) {
       onClick={onClick}
     >
       <div
-        className="relative mb-3 overflow-hidden rounded-xl bg-[#f8f8f8]"
-        style={{ aspectRatio: "3/4" }}
+        className="relative mb-3 aspect-square overflow-hidden rounded-xl bg-[#f8f8f8]"
       >
         <img
           src={img1}

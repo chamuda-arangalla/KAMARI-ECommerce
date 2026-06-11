@@ -152,7 +152,7 @@
 
 .shop-card-img-wrap {
   position: relative;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   background: #f8f8f8;
   border-radius: 10px;
@@ -388,7 +388,7 @@
 
 .skeleton-img {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   border-radius: 4px;
 }
 
