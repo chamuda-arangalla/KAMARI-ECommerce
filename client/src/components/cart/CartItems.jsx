@@ -44,7 +44,7 @@ export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove 
             className="flex gap-6 py-7 border-b border-[#2C2B28]/10 last:border-b-0"
           >
             {/* Image */}
-            <div className="w-[110px] h-[138px] flex-shrink-0 overflow-hidden bg-[#E8DED6] rounded-lg">
+            <div className="h-[110px] w-[110px] flex-shrink-0 overflow-hidden rounded-lg bg-[#E8DED6]">
               <img
                 src={item.img}
                 alt={item.name}

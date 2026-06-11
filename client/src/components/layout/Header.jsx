@@ -145,15 +145,17 @@ const Header = () => {
           headerHidden && !menuOpen ? "-translate-y-full" : "translate-y-0"
         }`}
       >
-        <div className="relative flex w-full items-center justify-between px-4 py-4 sm:px-6">
+        <div className="relative flex w-full items-center justify-between px-3 py-3 sm:px-6 sm:py-4">
 
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className="flex cursor-pointer items-center gap-2 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]"
+            className="flex cursor-pointer items-center gap-1.5 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] sm:gap-2"
           >
-            <Menu size={26} strokeWidth={1.5} />
-            <span className="text-sm uppercase tracking-[0.18em]">Menu</span>
+            <Menu size={24} strokeWidth={1.5} />
+            <span className="hidden text-sm uppercase tracking-[0.18em] min-[430px]:inline">
+              Menu
+            </span>
           </button>
 
           <Link
@@ -165,22 +167,22 @@ const Header = () => {
             <img
               src="/Kamari-logo.png"
               alt="KAMARI"
-              className="h-14 w-auto object-contain mix-blend-multiply contrast-125 sm:h-16"
+              className="h-8 w-auto max-w-[148px] object-contain mix-blend-multiply contrast-125 min-[430px]:h-10 min-[430px]:max-w-[190px] sm:h-16 sm:max-w-none"
             />
           </Link>
 
-          <div className="flex items-center gap-5 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
-            <Search size={20} strokeWidth={1.5} className="cursor-pointer" />
+          <div className="flex items-center gap-2 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] min-[430px]:gap-3 sm:gap-5">
+            <Search size={20} strokeWidth={1.5} className="hidden cursor-pointer min-[430px]:block" />
             {customer ? (
               <div className="relative" ref={accountRef}>
                 <button
                   onClick={() => setAccountOpen((v) => !v)}
                   className="flex items-center gap-1.5 text-[#2C2B28]"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2C2B28] text-xs font-semibold text-white">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2C2B28] text-[11px] font-semibold text-white sm:h-8 sm:w-8 sm:text-xs">
                     {customer.firstName?.[0]?.toUpperCase() || customer.email?.[0]?.toUpperCase()}
                   </div>
-                  <ChevronDown size={16} strokeWidth={1.5} className={`transition-transform ${accountOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown size={14} strokeWidth={1.5} className={`transition-transform ${accountOpen ? "rotate-180" : ""}`} />
                 </button>
 
                 {accountOpen && (

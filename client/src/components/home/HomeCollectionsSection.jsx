@@ -20,6 +20,25 @@ export default function HomeCollectionsSection({
       className="w-full bg-white px-4 py-12 sm:px-8 md:px-12 lg:px-16"
     >
       <div className="relative">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-full items-center justify-center px-4 text-center text-white sm:w-[calc((100%_-_0.25rem)/2)] md:w-[calc((100%_-_0.5rem)/3)] lg:w-[calc((100%_-_0.75rem)/4)]">
+          <div className="pointer-events-auto">
+            <p className="mb-8 text-3xl font-light uppercase leading-none tracking-[0.03em] drop-shadow-sm">
+              Shop by Collection
+            </p>
+            <Link
+              to="/collections"
+              className="inline-flex min-h-12 items-center justify-center bg-white px-12 shadow-sm transition hover:bg-[#F4F1EE]"
+            >
+              <span
+                className="text-sm font-bold uppercase leading-none tracking-[0.04em]"
+                style={{ color: "#5F564D" }}
+              >
+                View All
+              </span>
+            </Link>
+          </div>
+        </div>
+
         <button
           type="button"
           aria-label="Previous collections"
@@ -45,7 +64,7 @@ export default function HomeCollectionsSection({
           viewport={{ once: true, amount: 0.15 }}
           className="flex snap-x snap-mandatory gap-1 overflow-x-auto bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {collections.map((collection, index) => (
+          {collections.map((collection) => (
             <motion.div
               key={collection._id}
               variants={fadeUp}
@@ -69,25 +88,6 @@ export default function HomeCollectionsSection({
                   <div className="h-full w-full bg-[#E8DED6]" />
                 )}
                 <div className="absolute inset-0 bg-[#2C2B28]/12 transition duration-300 group-hover:bg-[#2C2B28]/6" />
-                {index === 0 && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#2C2B28]/16 px-4 text-center text-white">
-                    <p className="mb-8 text-3xl font-light uppercase leading-none tracking-[0.03em] drop-shadow-sm">
-                      Shop by Collection
-                    </p>
-                    <Link
-                      to="/collections"
-                      onClick={(event) => event.stopPropagation()}
-                      className="relative z-10 inline-flex min-h-12 items-center justify-center bg-white px-12 shadow-sm transition hover:bg-[#F4F1EE]"
-                    >
-                      <span
-                        className="text-sm font-bold uppercase leading-none tracking-[0.04em]"
-                        style={{ color: "#5F564D" }}
-                      >
-                        View All
-                      </span>
-                    </Link>
-                  </div>
-                )}
               </div>
             </motion.div>
           ))}

@@ -1,7 +1,7 @@
 /* ── Layout ──────────────────────────────────── */
 .checkout-page {
   min-height: 100vh;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: var(--kamari-font-body);
   background-color: #ffffff;
   padding-top: 70px;
 }
@@ -552,8 +552,8 @@
 }
 
 .order-item-img {
-  width: 64px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   object-fit: cover;
   border-radius: 6px;
   background-color: #e8ded6;

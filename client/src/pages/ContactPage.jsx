@@ -50,7 +50,7 @@ export default function ContactPage() {
     <main
       className="bg-[#EAE0D6] text-[#2C2B28]"
       style={{
-        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontFamily: "var(--kamari-font-body)",
         paddingTop: "70px",
       }}
     >

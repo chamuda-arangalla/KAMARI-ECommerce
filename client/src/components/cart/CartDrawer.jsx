@@ -85,7 +85,7 @@ export default function CartDrawer() {
                       className="flex gap-4 border-b border-[#2C2B28]/10 py-5 last:border-b-0"
                     >
 
-                      <div className="h-[110px] w-[85px] flex-shrink-0 overflow-hidden rounded-lg bg-[#E8DED6]">
+                      <div className="h-[96px] w-[96px] flex-shrink-0 overflow-hidden rounded-lg bg-[#E8DED6]">
                         <img
                           src={item.img}
                           alt={item.name}

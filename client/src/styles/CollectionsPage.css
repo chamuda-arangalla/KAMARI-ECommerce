@@ -3,7 +3,7 @@
   min-height: 100vh;
   padding-top: 70px;
   background: #ffffff;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: var(--kamari-font-body);
 }
 
 /* ── Page Header ─────────────────────────────── */
@@ -524,6 +524,12 @@
 
 .product-card-skeleton .product-card-img-wrap {
   background: none;
+}
+
+.skeleton-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
 }
 
 .skeleton-colors {

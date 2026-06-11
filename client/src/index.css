@@ -1,8 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --kamari-font-season: "The Seasons", "Cormorant Garamond", "Times New Roman", serif;
+  --kamari-font-body: var(--kamari-font-season);
+  font-family: var(--kamari-font-body);
   color: #2c2b28;
   background-color: #eae0d6;
   font-synthesis: none;
@@ -23,7 +24,7 @@ body {
   margin: 0;
   background-color: #eae0d6;
   color: #2c2b28;
-  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--kamari-font-body);
 }
 
 a {
@@ -47,7 +48,7 @@ a {
   min-height: 100vh;
   background-color: #eae0d6;
   color: #2c2b28;
-  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--kamari-font-body);
 }
 
 .customer-theme ::selection {

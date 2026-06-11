@@ -28,7 +28,7 @@ export default function Cart() {
   return (
     <div
       className="min-h-screen bg-white"
-      style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+      style={{ fontFamily: "var(--kamari-font-body)" }}
     >
       <CartHeader totalItems={totalItems} />
 
