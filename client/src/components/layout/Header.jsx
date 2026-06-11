@@ -19,7 +19,6 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [collectionsExpanded, setCollectionsExpanded] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [customer, setCustomer] = useState(() => {
     const stored = localStorage.getItem("customerUser");
     const adminStored = localStorage.getItem("adminUser");
@@ -70,14 +69,10 @@ const Header = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY <= 0) {
+      if (currentScrollY <= 0 || currentScrollY < lastScrollY.current) {
         setHeaderHidden(false);
-        setIsScrolled(false);
-      } else if (currentScrollY > lastScrollY.current) {
+      } else if (currentScrollY > 80 && currentScrollY > lastScrollY.current) {
         setHeaderHidden(true);
-      } else {
-        setHeaderHidden(false);
-        setIsScrolled(true);
       }
 
       lastScrollY.current = currentScrollY;
@@ -146,16 +141,16 @@ const Header = () => {
     <>
       <header
         ref={headerRef}
-        className={`fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out ${
-          headerHidden ? "-translate-y-full" : "translate-y-0"
-        } ${isScrolled ? "bg-white shadow-sm" : "bg-transparent"}`}
+        className={`fixed top-0 left-0 z-50 w-full bg-transparent transition-transform duration-300 ease-in-out ${
+          headerHidden && !menuOpen ? "-translate-y-full" : "translate-y-0"
+        }`}
       >
         <div className="relative flex w-full items-center justify-between px-4 py-4 sm:px-6">
 
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className={`flex cursor-pointer items-center gap-2 ${isScrolled ? "text-[#2C2B28]" : "text-white"}`}
+            className="flex cursor-pointer items-center gap-2 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]"
           >
             <Menu size={26} strokeWidth={1.5} />
             <span className="text-sm uppercase tracking-[0.18em]">Menu</span>
@@ -164,20 +159,25 @@ const Header = () => {
           <Link
             to="/"
             onClick={handleHomeClick}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Cormorant_Garamond'] text-4xl font-bold tracking-[0.25em] text-[#2C2B28]"
+            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center"
+            aria-label="KAMARI home"
           >
-            KAMARI
+            <img
+              src="/Kamari-logo.png"
+              alt="KAMARI"
+              className="h-14 w-auto object-contain mix-blend-multiply contrast-125 sm:h-16"
+            />
           </Link>
 
-          <div className={`flex items-center gap-5 ${isScrolled ? "text-[#2C2B28]" : "text-white"}`}>
+          <div className="flex items-center gap-5 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
             <Search size={20} strokeWidth={1.5} className="cursor-pointer" />
             {customer ? (
               <div className="relative" ref={accountRef}>
                 <button
                   onClick={() => setAccountOpen((v) => !v)}
-                  className={`flex items-center gap-1.5 ${isScrolled ? "text-[#2C2B28]" : "text-white"}`}
+                  className="flex items-center gap-1.5 text-[#2C2B28]"
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${isScrolled ? "bg-[#2C2B28] text-white" : "bg-white text-[#2C2B28]"}`}>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2C2B28] text-xs font-semibold text-white">
                     {customer.firstName?.[0]?.toUpperCase() || customer.email?.[0]?.toUpperCase()}
                   </div>
                   <ChevronDown size={16} strokeWidth={1.5} className={`transition-transform ${accountOpen ? "rotate-180" : ""}`} />
@@ -249,7 +249,7 @@ const Header = () => {
             >
               <ShoppingBag size={20} strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className={`absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full text-[9px] ${isScrolled ? "bg-[#2C2B28] text-white" : "bg-white text-[#2C2B28]"}`}>
+                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#2C2B28] text-[9px] text-white">
                   {totalItems}
                 </span>
               )}

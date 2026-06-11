@@ -15,6 +15,13 @@ export default function HomeProductSection({
 }) {
   if (!products.length) return null;
 
+  const sectionWidth =
+    products.length >= 4
+      ? "max-w-7xl"
+      : products.length === 3
+        ? "max-w-5xl"
+        : "max-w-3xl";
+
   return (
     <motion.section
       variants={sectionReveal}
@@ -23,7 +30,7 @@ export default function HomeProductSection({
       viewport={{ once: true, amount: 0.16 }}
       className={variant === "white" ? "bg-white py-16" : "bg-[#EAE0D6] py-16"}
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className={`mx-auto ${sectionWidth} px-6`}>
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -51,7 +58,7 @@ export default function HomeProductSection({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="grid grid-cols-2 gap-6 md:grid-cols-4"
+          className="grid grid-cols-1 justify-center gap-6 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]"
         >
           {products.map((product) => (
             <HomeProductCard

@@ -152,6 +152,7 @@ export default function Home() {
             products={bestSellers}
             title="Best Sellers"
             viewAllTo="/shop"
+            variant="white"
             onOpenProduct={navigateToProduct}
           />
 
