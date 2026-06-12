@@ -13,7 +13,7 @@ export default function ContactHero({ title, subtitle }) {
         <p className="mb-3 text-xs uppercase tracking-[0.3em] text-white/60">
           Get in Touch
         </p>
-        <h1 className="mb-4 text-5xl font-light tracking-[0.12em]">{title}</h1>
+        <h1 className="mb-4 text-5xl">{title}</h1>
         <p className="mx-auto max-w-md text-sm leading-relaxed text-white/70">
           {subtitle}
         </p>

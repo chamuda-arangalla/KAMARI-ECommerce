@@ -3,16 +3,16 @@ import ShopCardSkeleton from "./ShopCardSkeleton";
 import { SHOP_PRODUCTS_PER_PAGE } from "./shopUtils";
 
 export default function ShopProductGrid({
+  cols,
   error,
   loading,
   products,
   onClearFilters,
   onOpenProduct,
-  onQuickAdd,
 }) {
   if (loading) {
     return (
-      <div className="shop-grid">
+      <div className={`pg-grid cols-${cols}`}>
         {Array.from({ length: SHOP_PRODUCTS_PER_PAGE }).map((_, index) => (
           <ShopCardSkeleton key={index} />
         ))}
@@ -43,13 +43,12 @@ export default function ShopProductGrid({
   }
 
   return (
-    <div className="shop-grid">
+    <div className={`pg-grid cols-${cols}`}>
       {products.map((product) => (
         <ShopCard
           key={product._id}
           product={product}
           onOpen={() => onOpenProduct(product)}
-          onQuickAdd={(color) => onQuickAdd(product, color)}
         />
       ))}
     </div>
