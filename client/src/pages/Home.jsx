@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import HomeCollectionsSection from "../components/home/HomeCollectionsSection";
 import HomeFooter from "../components/home/HomeFooter";
 import HomeHero from "../components/home/HomeHero";
-import HomeMoodGrid from "../components/home/HomeMoodGrid";
-import HomeNewsletter from "../components/home/HomeNewsletter";
+import HomeProductQuickView from "../components/home/HomeProductQuickView";
 import HomeProductSection from "../components/home/HomeProductSection";
 import HomeQuoteFeature from "../components/home/HomeQuoteFeature";
 import { getCollections } from "../services/collectionApi";
@@ -33,6 +32,7 @@ export default function Home() {
   const [bestSellers, setBestSellers] = useState([]);
   const [heroReady, setHeroReady] = useState(false);
   const [showBelowContent, setShowBelowContent] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   const navigateToCollection = (collection) => {
     navigate(`/collections?category=${encodeURIComponent(collection.name)}`);
@@ -56,6 +56,63 @@ export default function Home() {
     const fallbackTimer = window.setTimeout(() => setHeroReady(true), 1800);
     return () => window.clearTimeout(fallbackTimer);
   }, []);
+
+  useEffect(() => {
+    const slider = collectionSliderRef.current;
+    if (!slider) return undefined;
+
+    const handleWheel = (event) => {
+      const delta =
+        Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.deltaY;
+
+      if (delta === 0) return;
+
+      const { scrollLeft, scrollWidth, clientWidth } = slider;
+      const atStart = scrollLeft <= 0;
+      const atEnd = scrollLeft + clientWidth >= scrollWidth - 1;
+
+      if ((delta < 0 && atStart) || (delta > 0 && atEnd)) return;
+
+      event.preventDefault();
+      slider.scrollLeft += delta;
+    };
+
+    slider.addEventListener("wheel", handleWheel, { passive: false });
+
+    let isDragging = false;
+    let startX = 0;
+    let startScrollLeft = 0;
+
+    const handlePointerDown = (event) => {
+      isDragging = true;
+      startX = event.clientX;
+      startScrollLeft = slider.scrollLeft;
+      slider.classList.add("cursor-grabbing");
+    };
+
+    const handlePointerMove = (event) => {
+      if (!isDragging) return;
+      slider.scrollLeft = startScrollLeft - (event.clientX - startX);
+    };
+
+    const handlePointerUp = () => {
+      isDragging = false;
+      slider.classList.remove("cursor-grabbing");
+    };
+
+    slider.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      slider.removeEventListener("wheel", handleWheel);
+      slider.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [showBelowContent]);
 
   useEffect(() => {
     if (!heroReady) return undefined;
@@ -94,7 +151,7 @@ export default function Home() {
             (featured.length
               ? featured
               : products.filter((product) => !product.isSoldOut)
-            ).slice(0, 4),
+            ).slice(0, 3),
           );
         })
         .catch(() => {});
@@ -141,6 +198,8 @@ export default function Home() {
             title="New Arrivals"
             viewAllTo="/collections?sort=newest"
             variant="white"
+            imageAspect="aspect-[3/4]"
+            fullBleed
             onOpenProduct={navigateToProduct}
           />
 
@@ -153,18 +212,20 @@ export default function Home() {
             title="Best Sellers"
             viewAllTo="/shop"
             variant="white"
-            onOpenProduct={navigateToProduct}
+            imageAspect="aspect-[3/4]"
+            fullBleed
+            cols={3}
+            onOpenProduct={setQuickViewProduct}
           />
 
-          <HomeMoodGrid
-            products={[...newArrivals, ...bestSellers]}
-            onOpenProduct={(productId) => navigate(`/products/${productId}`)}
-          />
-
-          <HomeNewsletter />
           <HomeFooter />
         </>
       )}
+
+      <HomeProductQuickView
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
     </main>
   );
 }

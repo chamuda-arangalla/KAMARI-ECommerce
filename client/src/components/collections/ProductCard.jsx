@@ -9,6 +9,11 @@ export default function ProductCard({ product, onOpen }) {
   const frontImg = activeColor?.img || product.img;
   const backImg = activeColor?.img2 || product.img2;
 
+  const badges = [
+    !product.inStock && "Sold Out",
+    product.inStock && product.badge,
+  ].filter(Boolean);
+
   const handleColorEnter = useCallback((event, index) => {
     event.stopPropagation();
     setHoveredColorIndex(index);
@@ -20,51 +25,34 @@ export default function ProductCard({ product, onOpen }) {
   }, []);
 
   return (
-    <div className="product-card" onClick={onOpen}>
-      <div className="product-card-img-wrap">
-        <img src={frontImg} alt={product.name} className="product-card-img front" />
-        <img src={backImg} alt={product.name} className="product-card-img back" />
+    <div className="pg-card" onClick={onOpen}>
+      <div className="pg-card-img-wrap">
+        <img src={frontImg} alt={product.name} className="pg-card-img front" />
+        <img src={backImg} alt={product.name} className="pg-card-img back" />
 
-        {product.badge && product.inStock && (
-          <span
-            className={`product-badge ${
-              product.badge === "BEST SELLER" ? "best-seller" : "new"
-            }`}
-          >
-            {product.badge}
-          </span>
-        )}
-
-        {!product.inStock && (
-          <div className="product-sold-out-overlay">
-            <span className="product-sold-out-tag">Sold Out</span>
+        {badges.length > 0 && (
+          <div className="pg-badges">
+            {badges.map((badge) => (
+              <span key={badge} className="pg-badge">
+                {badge}
+              </span>
+            ))}
           </div>
-        )}
-
-        {product.inStock && (
-          <button
-            className="product-quick-add"
-            onClick={(event) => {
-              event.stopPropagation();
-              onOpen();
-            }}
-          >
-            View Product
-          </button>
         )}
       </div>
 
-      <div className="product-card-info">
-        {product.category && (
-          <p className="product-card-category">{product.category}</p>
-        )}
-        <p className="product-card-name">{product.name}</p>
+      <div className="pg-card-info">
+        <p className="pg-card-name">{product.name}</p>
+        <p className="pg-card-price">LKR {product.price.toLocaleString()}</p>
+        <p className="pg-card-installment">
+          or 3 x LKR {installment} with Koko
+        </p>
 
-        <div className="product-card-colors">
+        <div className="pg-card-colors">
           {product.colors.slice(0, 4).map((color, index) => (
             <span
               key={color.name}
-              className={`product-color-dot ${
+              className={`pg-color-dot ${
                 hoveredColorIndex === index ? "active" : ""
               }`}
               style={{ backgroundColor: color.hex }}
@@ -74,16 +62,11 @@ export default function ProductCard({ product, onOpen }) {
             />
           ))}
           {product.colors.length > 4 && (
-            <span className="product-color-count">
+            <span className="pg-color-more">
               +{product.colors.length - 4}
             </span>
           )}
         </div>
-
-        <p className="product-card-price">LKR {product.price.toLocaleString()}</p>
-        <p className="product-card-installment">
-          or 3 x LKR {installment} with Koko
-        </p>
       </div>
     </div>
   );

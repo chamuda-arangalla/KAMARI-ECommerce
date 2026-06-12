@@ -11,6 +11,9 @@ export default function HomeProductSection({
   title,
   viewAllTo,
   variant = "light",
+  imageAspect,
+  fullBleed = false,
+  cols = 2,
   onOpenProduct,
 }) {
   if (!products.length) return null;
@@ -21,6 +24,26 @@ export default function HomeProductSection({
       : products.length === 3
         ? "max-w-5xl"
         : "max-w-3xl";
+
+  if (fullBleed) {
+    return (
+      <section className={variant === "white" ? "bg-white py-16" : "bg-[#EAE0D6] py-16"}>
+        <div className={`grid gap-0 ${cols === 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2"}`}>
+          {products.map((product) => (
+            <HomeProductCard
+              key={product._id}
+              product={product}
+              badge={badge}
+              imageAspect={imageAspect}
+              rounded={false}
+              fullBleed
+              onClick={() => onOpenProduct(product)}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <motion.section
@@ -43,7 +66,7 @@ export default function HomeProductSection({
             <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#5F564D]">
               {eyebrow}
             </p>
-            <h2 className="text-3xl font-light tracking-wide">{title}</h2>
+            <h2 className="text-3xl">{title}</h2>
           </div>
           <Link
             to={viewAllTo}
@@ -65,6 +88,7 @@ export default function HomeProductSection({
               key={product._id}
               product={product}
               badge={badge}
+              imageAspect={imageAspect}
               onClick={() => onOpenProduct(product)}
             />
           ))}

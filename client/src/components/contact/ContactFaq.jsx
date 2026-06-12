@@ -16,7 +16,7 @@ export default function ContactFaq({ faqs, openFaq, onToggle }) {
           <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#5F564D]">
             Quick Answers
           </p>
-          <h2 className="text-4xl font-light">Frequently Asked Questions</h2>
+          <h2 className="text-4xl">Frequently Asked Questions</h2>
         </motion.div>
 
         <motion.div

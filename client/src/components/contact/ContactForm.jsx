@@ -21,7 +21,7 @@ export default function ContactForm({
       <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#5F564D]">
         Send a Message
       </p>
-      <h2 className="mb-8 text-3xl font-light">We'll get back to you soon</h2>
+      <h2 className="mb-8 text-3xl">We'll get back to you soon</h2>
 
       {submitted ? (
         <motion.div

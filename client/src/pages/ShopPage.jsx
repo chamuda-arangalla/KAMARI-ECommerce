@@ -1,24 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ShopActiveFilter from "../components/shop/ShopActiveFilter";
-import ShopControls from "../components/shop/ShopControls";
+import FilterSortDrawer from "../components/common/FilterSortDrawer";
+import ProductGridTopbar from "../components/common/ProductGridTopbar";
+import ShopFilters from "../components/shop/ShopFilters";
 import ShopHero from "../components/shop/ShopHero";
 import ShopPagination from "../components/shop/ShopPagination";
 import ShopProductGrid from "../components/shop/ShopProductGrid";
-import {
-  FALLBACK_IMAGE,
-  getFirstAvailableVariant,
-  getProductImages,
-  isProductInStock,
-  SHOP_PRODUCTS_PER_PAGE,
-} from "../components/shop/shopUtils";
-import { useCart } from "../context/useCart";
+import { SHOP_PRODUCTS_PER_PAGE } from "../components/shop/shopUtils";
 import { getProducts } from "../services/productApi";
+import "../styles/ProductGridMimosa.css";
 import "../styles/ShopPage.css";
 
 export default function ShopPage() {
   const navigate = useNavigate();
-  const { handleAddItem } = useCart();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,6 +21,8 @@ export default function ShopPage() {
   const [collection, setCollection] = useState("All");
   const [sort, setSort] = useState("featured");
   const [page, setPage] = useState(1);
+  const [cols, setCols] = useState(4);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -114,60 +110,25 @@ export default function ShopPage() {
     handleCollectionChange("All");
   };
 
-  const quickAdd = (product, color) => {
-    if (!isProductInStock(product)) return;
-
-    const images = color?.images?.length ? color.images : getProductImages(product);
-    const variant = color
-      ? {
-          colorName: color.colorName,
-          size:
-            color.sizes?.find((size) => Number(size.stock || 0) > 0)?.size ||
-            color.sizes?.[0]?.size ||
-            "S",
-        }
-      : getFirstAvailableVariant(product);
-
-    handleAddItem({
-      id: `${product._id}-${variant.colorName}-${variant.size}`,
-      productId: product._id,
-      name: product.name,
-      variant: variant.colorName,
-      size: variant.size,
-      price: Number(product.price || 0),
-      qty: 1,
-      img: images[0]?.url || FALLBACK_IMAGE,
-    });
-  };
-
   return (
     <main className="shop-page">
       <ShopHero />
 
-      <ShopControls
-        collection={collection}
-        collections={collections}
-        filteredCount={filteredProducts.length}
+      <ProductGridTopbar
+        cols={cols}
+        count={filteredProducts.length}
         loading={loading}
-        sort={sort}
-        tab={tab}
-        onCollectionChange={handleCollectionChange}
-        onSortChange={handleSortChange}
-        onTabChange={handleTabChange}
-      />
-
-      <ShopActiveFilter
-        collection={collection}
-        onClear={() => handleCollectionChange("All")}
+        onColsChange={setCols}
+        onFilterClick={() => setFilterOpen(true)}
       />
 
       <ShopProductGrid
+        cols={cols}
         error={error}
         loading={loading}
         products={paginatedProducts}
         onClearFilters={clearFilters}
         onOpenProduct={(product) => navigate(`/products/${product._id}`)}
-        onQuickAdd={quickAdd}
       />
 
       <ShopPagination
@@ -175,6 +136,18 @@ export default function ShopPage() {
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
+
+      <FilterSortDrawer open={filterOpen} onClose={() => setFilterOpen(false)}>
+        <ShopFilters
+          collection={collection}
+          collections={collections}
+          sort={sort}
+          tab={tab}
+          onCollectionChange={handleCollectionChange}
+          onSortChange={handleSortChange}
+          onTabChange={handleTabChange}
+        />
+      </FilterSortDrawer>
     </main>
   );
 }

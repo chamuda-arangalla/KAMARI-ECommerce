@@ -15,7 +15,7 @@ export default function CustomerOrdersHero({
         <p className="mb-1 text-xs uppercase tracking-[0.28em] text-[#ead9c4]/70">
           My Account
         </p>
-        <h1 className="text-4xl font-light tracking-wide">Hello, {firstName}</h1>
+        <h1 className="text-4xl">Hello, {firstName}</h1>
         <p className="mt-2 text-sm text-[#eae0d6]/75">
           Here's a summary of your KAMARI orders.
         </p>

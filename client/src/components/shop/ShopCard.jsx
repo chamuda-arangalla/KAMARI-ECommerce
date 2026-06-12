@@ -6,7 +6,7 @@ import {
   isProductInStock,
 } from "./shopUtils";
 
-export default function ShopCard({ product, onOpen, onQuickAdd }) {
+export default function ShopCard({ product, onOpen }) {
   const colors = product.colors || [];
   const inStock = isProductInStock(product);
   const images = getProductImages(product);
@@ -17,50 +17,42 @@ export default function ShopCard({ product, onOpen, onQuickAdd }) {
     activeColor?.images?.[0]?.url || images[0]?.url || FALLBACK_IMAGE;
   const displayImg2 =
     activeColor?.images?.[1]?.url || images[1]?.url || displayImg;
-  const badge = product.isFeatured
-    ? "Best Seller"
-    : product.isNewArrival
-      ? "New"
-      : null;
+
+  const badges = [
+    !inStock && "Sold Out",
+    inStock && product.isFeatured && "Best Seller",
+    inStock && product.isNewArrival && "New",
+  ].filter(Boolean);
 
   return (
-    <article className="shop-card" onClick={onOpen}>
-      <div className="shop-card-img-wrap">
-        <img src={displayImg} alt={product.name} className="shop-card-img front" />
-        <img src={displayImg2} alt={product.name} className="shop-card-img back" />
+    <article className="pg-card" onClick={onOpen}>
+      <div className="pg-card-img-wrap">
+        <img src={displayImg} alt={product.name} className="pg-card-img front" />
+        <img src={displayImg2} alt={product.name} className="pg-card-img back" />
 
-        {badge && inStock && (
-          <span className={`shop-card-badge ${badge === "Best Seller" ? "best" : "new"}`}>
-            {badge}
-          </span>
-        )}
-
-        {!inStock && (
-          <div className="shop-card-sold-out">
-            <span>Sold Out</span>
+        {badges.length > 0 && (
+          <div className="pg-badges">
+            {badges.map((badge) => (
+              <span key={badge} className="pg-badge">
+                {badge}
+              </span>
+            ))}
           </div>
-        )}
-
-        {inStock && (
-          <button
-            className="shop-card-quick-add"
-            onClick={(event) => {
-              event.stopPropagation();
-              onQuickAdd(activeColor);
-            }}
-          >
-            Quick Add
-          </button>
         )}
       </div>
 
-      <div className="shop-card-info">
-        <p className="shop-card-collection">
-          {product.setName || product.collection}
+      <div className="pg-card-info">
+        <p className="pg-card-name">{product.name}</p>
+        <p className="pg-card-price">
+          LKR {Number(product.price || 0).toLocaleString()}
         </p>
-        <p className="shop-card-name">{product.name}</p>
+        <p className="pg-card-installment">
+          or 3 x LKR{" "}
+          {Math.round(Number(product.price || 0) / 3).toLocaleString()} with
+          Koko
+        </p>
 
-        <div className="shop-card-swatches">
+        <div className="pg-card-colors">
           {colors.slice(0, 5).map((color) => {
             const soldOut = isColorSoldOut(color);
 
@@ -68,7 +60,7 @@ export default function ShopCard({ product, onOpen, onQuickAdd }) {
               <button
                 key={color._id || color.colorName}
                 type="button"
-                className={`shop-card-swatch ${soldOut ? "sold-out" : ""} ${
+                className={`pg-color-dot ${soldOut ? "sold-out" : ""} ${
                   activeColor === color ? "active" : ""
                 }`}
                 style={{ backgroundColor: color.colorCode || "#ccc" }}
@@ -83,18 +75,9 @@ export default function ShopCard({ product, onOpen, onQuickAdd }) {
             );
           })}
           {colors.length > 5 && (
-            <span className="shop-card-more-colors">+{colors.length - 5}</span>
+            <span className="pg-color-more">+{colors.length - 5}</span>
           )}
         </div>
-
-        <p className="shop-card-price">
-          LKR {Number(product.price || 0).toLocaleString()}
-        </p>
-        <p className="shop-card-installment">
-          or 3 x LKR{" "}
-          {Math.round(Number(product.price || 0) / 3).toLocaleString()} with
-          Koko
-        </p>
       </div>
     </article>
   );

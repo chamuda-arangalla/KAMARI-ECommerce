@@ -19,6 +19,7 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [collectionsExpanded, setCollectionsExpanded] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [customer, setCustomer] = useState(() => {
     const stored = localStorage.getItem("customerUser");
     const adminStored = localStorage.getItem("adminUser");
@@ -74,6 +75,8 @@ const Header = () => {
       } else if (currentScrollY > 80 && currentScrollY > lastScrollY.current) {
         setHeaderHidden(true);
       }
+
+      setScrolled(currentScrollY > 0 && currentScrollY < lastScrollY.current);
 
       lastScrollY.current = currentScrollY;
     };
@@ -141,9 +144,9 @@ const Header = () => {
     <>
       <header
         ref={headerRef}
-        className={`fixed top-0 left-0 z-50 w-full bg-transparent transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 ease-in-out ${
           headerHidden && !menuOpen ? "-translate-y-full" : "translate-y-0"
-        }`}
+        } ${scrolled ? "bg-white shadow-sm" : "bg-transparent"}`}
       >
         <div className="relative flex w-full items-center justify-between px-3 py-3 sm:px-6 sm:py-4">
 

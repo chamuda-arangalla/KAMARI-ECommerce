@@ -65,7 +65,7 @@ export default function AboutPage() {
             transition={{ duration: 0.7 }}
           >
             <p className="mb-4 text-xs uppercase tracking-[0.28em] text-[#8B7164]">The Brand Story</p>
-            <h2 className="text-4xl font-light leading-tight text-[#342C27] sm:text-5xl">
+            <h2 className="text-4xl leading-tight text-[#342C27] sm:text-5xl">
               Rest, made intentional.
             </h2>
           </motion.div>

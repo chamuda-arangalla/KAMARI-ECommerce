@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import FilterSortDrawer from "../components/common/FilterSortDrawer";
+import ProductGridTopbar from "../components/common/ProductGridTopbar";
+import CollectionsFilters from "../components/collections/CollectionsFilters";
 import CollectionsPagination from "../components/collections/CollectionsPagination";
-import CollectionsSidebar from "../components/collections/CollectionsSidebar";
-import CollectionsTopbar from "../components/collections/CollectionsTopbar";
 import ProductCard from "../components/collections/ProductCard";
 import ProductCardSkeleton from "../components/collections/ProductCardSkeleton";
 import {
@@ -13,6 +14,7 @@ import {
   getProducts,
   mapBackendProductToCollectionProduct,
 } from "../services/productApi";
+import "../styles/ProductGridMimosa.css";
 import "../styles/CollectionsPage.css";
 
 export default function CollectionsPage() {
@@ -25,7 +27,8 @@ export default function CollectionsPage() {
   const [inStockOnly, setInStockOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState(100000);
   const [sortBy, setSortBy] = useState("featured");
-  const [cols, setCols] = useState(3);
+  const [cols, setCols] = useState(4);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -210,16 +213,60 @@ export default function CollectionsPage() {
 
   return (
     <div className="collections-page">
-      <div className="collections-header">
-        <h1 className="collections-header-title">All Collections</h1>
-        <p className="collections-header-sub">
-          Curated pieces for the modern woman, designed to be worn, lived in,
-          and loved.
-        </p>
-      </div>
+      <p className="pg-description">
+        Curated pieces for the modern woman, designed to be worn, lived in,
+        and loved.
+      </p>
 
-      <div className="collections-body">
-        <CollectionsSidebar
+      <ProductGridTopbar
+        cols={cols}
+        count={filteredProducts.length}
+        loading={loadingProducts}
+        onColsChange={setCols}
+        onFilterClick={() => setFilterOpen(true)}
+      />
+
+      {productsError && (
+        <div className="collections-empty" style={{ marginBottom: "24px" }}>
+          <p className="collections-empty-title">Products unavailable</p>
+          <p className="collections-empty-sub">{productsError}</p>
+        </div>
+      )}
+
+      {loadingProducts ? (
+        <div className={`pg-grid cols-${cols}`}>
+          {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, index) => (
+            <ProductCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : paginatedProducts.length === 0 ? (
+        <div className="collections-empty">
+          <p className="collections-empty-title">No products found</p>
+          <p className="collections-empty-sub">Try adjusting your filters.</p>
+          <button className="filter-clear-btn" onClick={clearFilters}>
+            Clear all filters
+          </button>
+        </div>
+      ) : (
+        <div className={`pg-grid cols-${cols}`}>
+          {paginatedProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onOpen={() => navigate(`/products/${product.id}`)}
+            />
+          ))}
+        </div>
+      )}
+
+      <CollectionsPagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
+      <FilterSortDrawer open={filterOpen} onClose={() => setFilterOpen(false)}>
+        <CollectionsFilters
           category={category}
           categoryOptions={categoryOptions}
           colorOptions={colorOptions}
@@ -229,6 +276,7 @@ export default function CollectionsPage() {
           selectedColors={selectedColors}
           selectedSizes={selectedSizes}
           sizeOptions={sizeOptions}
+          sortBy={sortBy}
           onCategoryChange={(value) => {
             setCategory(value);
             resetPage();
@@ -244,61 +292,12 @@ export default function CollectionsPage() {
             resetPage();
           }}
           onSizeToggle={toggleSize}
+          onSortChange={(value) => {
+            setSortBy(value);
+            resetPage();
+          }}
         />
-
-        <main className="collections-main">
-          <CollectionsTopbar
-            cols={cols}
-            productCount={filteredProducts.length}
-            loadingProducts={loadingProducts}
-            sortBy={sortBy}
-            onColsChange={setCols}
-            onSortChange={(value) => {
-              setSortBy(value);
-              resetPage();
-            }}
-          />
-
-          {productsError && (
-            <div className="collections-empty" style={{ marginBottom: "24px" }}>
-              <p className="collections-empty-title">Products unavailable</p>
-              <p className="collections-empty-sub">{productsError}</p>
-            </div>
-          )}
-
-          {loadingProducts ? (
-            <div className={`product-grid cols-${cols}`}>
-              {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, index) => (
-                <ProductCardSkeleton key={index} />
-              ))}
-            </div>
-          ) : paginatedProducts.length === 0 ? (
-            <div className="collections-empty">
-              <p className="collections-empty-title">No products found</p>
-              <p className="collections-empty-sub">Try adjusting your filters.</p>
-              <button className="filter-clear-btn" onClick={clearFilters}>
-                Clear all filters
-              </button>
-            </div>
-          ) : (
-            <div className={`product-grid cols-${cols}`}>
-              {paginatedProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onOpen={() => navigate(`/products/${product.id}`)}
-                />
-              ))}
-            </div>
-          )}
-
-          <CollectionsPagination
-            page={page}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </main>
-      </div>
+      </FilterSortDrawer>
     </div>
   );
 }

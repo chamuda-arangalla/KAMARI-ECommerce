@@ -40,7 +40,7 @@ export default function Cart() {
           className="max-w-6xl mx-auto px-6 py-32 text-center"
         >
           <p className="text-6xl mb-8 text-gray-200">○</p>
-          <h2 className="text-2xl font-light tracking-[0.1em] text-gray-800 mb-3">
+          <h2 className="text-2xl text-gray-800 mb-3">
             YOUR BAG IS EMPTY
           </h2>
           <p className="text-base text-gray-400 mb-10 tracking-wide">
