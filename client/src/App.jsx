@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { CartProvider } from "./context/CartContext";
 import Header from "./components/layout/Header";
 import CartDrawer from "./components/cart/CartDrawer";
+import HomeFooter from "./components/home/HomeFooter";
 import Home from "./pages/Home";
 import ShopPage from "./pages/ShopPage";
 import ProductDetails from "./pages/ProductDetails";
@@ -43,10 +44,18 @@ const ScrollToTop = () => {
 };
 
 const CustomerShell = ({ children }) => (
-  <div className="customer-theme">
+  <div className="customer-theme flex min-h-screen flex-col">
     <Header />
     <CartDrawer />
+    <div className="flex-1">{children}</div>
+    <HomeFooter />
+  </div>
+);
+
+const CustomerAuthShell = ({ children }) => (
+  <div className="customer-theme">
     {children}
+    <HomeFooter />
   </div>
 );
 
@@ -67,8 +76,8 @@ function App() {
           <Route path="/contact" element={<CustomerShell><ContactPage /></CustomerShell>} />
           <Route path="/orders" element={<CustomerShell><CustomerOrdersPage /></CustomerShell>} />
           <Route path="/orders/:id" element={<CustomerShell><CustomerOrderDetailsPage /></CustomerShell>} />
-          <Route path="/login" element={<CustomerLoginPage />} />
-          <Route path="/register" element={<CustomerRegisterPage />} />
+          <Route path="/login" element={<CustomerAuthShell><CustomerLoginPage /></CustomerAuthShell>} />
+          <Route path="/register" element={<CustomerAuthShell><CustomerRegisterPage /></CustomerAuthShell>} />
           <Route path="/auth/callback" element={<OAuthCallbackPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
