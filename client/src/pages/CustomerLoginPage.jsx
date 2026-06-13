@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import CustomerLoginCard from "../components/auth/CustomerLoginCard";
 import { API_URL, REDIRECT_MAP } from "../components/auth/authConstants";
 import { login } from "../services/authApi";
+import { setCustomerSession } from "../utils/customerSession";
 
 const CustomerLoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -31,8 +32,8 @@ const CustomerLoginPage = () => {
         return;
       }
 
-      localStorage.setItem("customerToken", data.token);
-      localStorage.setItem("customerUser", JSON.stringify(data.user));
+      setCustomerSession(data.token, data.user);
+      window.dispatchEvent(new Event("kamari:user-updated"));
       navigate(redirectTo);
     } catch (err) {
       setError(err.response?.data?.message || "Sign in failed");

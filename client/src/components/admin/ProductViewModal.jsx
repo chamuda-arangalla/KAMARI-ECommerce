@@ -101,12 +101,14 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
 
   if (!productId) return null;
 
-  const images = product?.colors?.flatMap((color) => color.images || []) || [];
-  const uniqueImages = images.filter(
+  const savedImages = product?.colors?.flatMap((color) => color.images || []) || [];
+  const draftImages = draft?.colors?.flatMap((color) => color.images || []) || [];
+  const displayedImages = editMode ? draftImages : savedImages;
+  const uniqueImages = displayedImages.filter(
     (image, index, list) =>
       image?.url && list.findIndex((item) => item.url === image.url) === index,
   );
-  const mainImage = images[0]?.url || fallbackImage;
+  const mainImage = displayedImages[0]?.url || fallbackImage;
   const totalStock =
     product?.colors?.reduce(
       (total, color) =>
@@ -193,10 +195,11 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
             ? color.images.filter((item) => item.url !== image.url)
             : [
                 ...color.images,
-                {
-                  url: image.url,
-                  publicId: image.publicId || image.url,
-                },
+                 {
+                   url: image.url,
+                   publicId: image.publicId || image.url,
+                   ...(image.uploadId ? { uploadId: image.uploadId } : {}),
+                 },
               ],
         };
       }),
@@ -227,6 +230,26 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
           : color,
       ),
     }));
+  };
+
+  const removeProductImage = (image) => {
+    if (!image?.url) return;
+
+    setDraft((prev) => ({
+      ...prev,
+      colors: prev.colors.map((color) => ({
+        ...color,
+        images: color.images.filter((item) => item.url !== image.url),
+      })),
+    }));
+
+    if (image.uploadId) {
+      setLocalImageUploads((prev) => {
+        const upload = prev.find((item) => item.uploadId === image.uploadId);
+        if (upload) URL.revokeObjectURL(upload.preview);
+        return prev.filter((item) => item.uploadId !== image.uploadId);
+      });
+    }
   };
 
   const handleSizeChartUpload = (file) => {
@@ -423,7 +446,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                   className="w-full max-h-[420px] aspect-square object-cover bg-[#eae0d6] border border-[#d7c9b8]"
                 />
                 <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-4">
-                  {images.map((image) => (
+                  {uniqueImages.map((image) => (
                     <img
                       key={image.publicId || image.url}
                       src={image.url}
@@ -509,9 +532,14 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                   {editMode && (
                     <div className="px-4 py-4 border-b border-[#d7c9b8]">
                       <div className="flex items-center justify-between gap-3 mb-3">
-                        <p className="text-xs font-bold text-[#8f8376] uppercase tracking-widest">
-                          Color Images
-                        </p>
+                        <div>
+                          <p className="text-xs font-bold text-[#8f8376] uppercase tracking-widest">
+                            Color Images
+                          </p>
+                          <p className="mt-1 text-xs text-[#8c7d73]">
+                            Click an image to link it. Use the trash button to remove it from the product.
+                          </p>
+                        </div>
                         <label
                           className="inline-flex items-center gap-1 text-xs font-semibold text-[#2c2b28] hover:underline cursor-pointer"
                         >
@@ -537,23 +565,33 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                             );
 
                             return (
-                              <button
-                                key={image.url}
-                                type="button"
-                                onClick={() => toggleColorImage(colorIndex, image)}
-                                className={`relative rounded-lg overflow-hidden border-2 ${selected ? "border-[#8d7667]" : "border-[#d7c9b8]"}`}
-                              >
-                                <img
-                                  src={image.url}
-                                  alt="Product"
-                                  className="w-full aspect-square object-cover"
-                                />
-                                {selected && (
-                                  <span className="absolute left-1 top-1 rounded-md bg-[#8d7667] text-white text-[10px] px-1.5 py-0.5">
-                                    Linked
-                                  </span>
-                                )}
-                              </button>
+                              <div key={image.url} className="group relative">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleColorImage(colorIndex, image)}
+                                  className={`block w-full overflow-hidden rounded-lg border-2 ${selected ? "border-[#8d7667]" : "border-[#d7c9b8]"}`}
+                                >
+                                  <img
+                                    src={image.url}
+                                    alt="Product"
+                                    className="w-full aspect-square object-cover"
+                                  />
+                                  {selected && (
+                                    <span className="absolute left-1 top-1 rounded-md bg-[#8d7667] text-white text-[10px] px-1.5 py-0.5">
+                                      Linked
+                                    </span>
+                                  )}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => removeProductImage(image)}
+                                  aria-label="Remove image from product"
+                                  title="Remove image from product"
+                                  className="absolute right-1 top-1 rounded-md bg-white/95 p-1.5 text-rose-600 shadow-sm transition hover:bg-rose-50"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
                             );
                           })}
                         </div>
@@ -563,21 +601,6 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                         </p>
                       )}
 
-                      {color.images.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {color.images.map((image) => (
-                            <button
-                              key={image.url}
-                              type="button"
-                              onClick={() => toggleColorImage(colorIndex, image)}
-                              className="inline-flex items-center gap-1 rounded-lg border border-[#d7c9b8] px-2 py-1 text-xs text-[#5f564d] hover:bg-rose-50 hover:text-rose-600"
-                            >
-                              <X size={12} />
-                              Remove linked image
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   )}
                   <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -754,11 +777,12 @@ const ProductSummary = ({ product, totalStock }) => (
       </p>
     </div>
 
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
       <DetailTile label="Total Stock" value={totalStock} />
       <DetailTile label="Colors" value={product.colors?.length || 0} />
       <DetailTile label="Best Seller" value={product.isFeatured ? "Yes" : "No"} />
       <DetailTile label="New Arrival" value={product.isNewArrival ? "Yes" : "No"} />
+      <DetailTile label="Sold Out" value={product.isSoldOut ? "Yes" : "No"} />
     </div>
 
     <DetailBlock label="Description" value={product.description || "No description"} />

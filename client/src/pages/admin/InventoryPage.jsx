@@ -5,6 +5,9 @@ import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { useAdmin } from "../../context/useAdmin";
 import { deleteProduct } from "../../services/productApi";
 import { AlertCircle, Search, Edit2, Plus, Trash2 } from "lucide-react";
+import AdminPagination from "../../components/admin/AdminPagination";
+
+const PAGE_SIZE = 10;
 
 const InventoryPage = () => {
   const navigate = useNavigate();
@@ -14,6 +17,7 @@ const InventoryPage = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const openProductView = (product, editMode = false) => {
     navigate(`/admin/products/${product.id}`, {
@@ -25,6 +29,12 @@ const InventoryPage = () => {
     (p) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.collection?.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedProducts = filteredProducts.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
   );
 
   const confirmDeleteProduct = async () => {
@@ -68,7 +78,10 @@ const InventoryPage = () => {
               type="text"
               placeholder="Search inventory..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className="pl-11 pr-4 py-3 bg-white border border-[#d7c9b8] rounded-xl text-base w-full md:w-72 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
             />
           </div>
@@ -103,7 +116,7 @@ const InventoryPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
-              {filteredProducts.map((product) => {
+              {paginatedProducts.map((product) => {
                 const totalStock = Object.values(product.stock).reduce((a, b) => a + b, 0);
                 const isLowStock = Object.values(product.stock).some((count) => count < 5);
                 return (
@@ -143,7 +156,7 @@ const InventoryPage = () => {
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      {totalStock === 0 ? (
+                      {product.isSoldOut || totalStock === 0 ? (
                         <span className="flex items-center gap-1.5 text-rose-600 text-sm font-semibold uppercase">
                           <AlertCircle size={16} /> Sold Out
                         </span>
@@ -190,7 +203,7 @@ const InventoryPage = () => {
             <div className="px-5 py-10 text-center text-[#8c7d73]">No products found.</div>
           )}
 
-          {filteredProducts.map((product) => {
+          {paginatedProducts.map((product) => {
             const totalStock = Object.values(product.stock).reduce((a, b) => a + b, 0);
             const isLowStock = Object.values(product.stock).some((count) => count < 5);
 
@@ -227,7 +240,7 @@ const InventoryPage = () => {
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-3">
-                  {totalStock === 0 ? (
+                  {product.isSoldOut || totalStock === 0 ? (
                     <span className="flex items-center gap-1.5 text-sm font-semibold uppercase text-rose-600">
                       <AlertCircle size={16} /> Sold Out
                     </span>
@@ -265,6 +278,14 @@ const InventoryPage = () => {
             );
           })}
         </div>
+        {!productsLoading && !productsError && (
+          <AdminPagination
+            currentPage={safePage}
+            totalItems={filteredProducts.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       <AddProductModal

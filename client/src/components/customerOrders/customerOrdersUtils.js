@@ -1,5 +1,6 @@
-export const getStoredCustomer = () =>
-  JSON.parse(localStorage.getItem("customerUser") || "{}");
+import { getCustomerUser } from "../../utils/customerSession";
+
+export const getStoredCustomer = () => getCustomerUser() || {};
 
 export const formatCurrency = (value) =>
   `LKR ${Number(value || 0).toLocaleString()}`;

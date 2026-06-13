@@ -1,7 +1,8 @@
 import { PAYMENT_METHODS } from "./constants";
+import { getCustomerUser } from "../../utils/customerSession";
 
 export const createReceiverDraft = () => {
-  const customer = JSON.parse(localStorage.getItem("customerUser") || "{}");
+  const customer = getCustomerUser() || {};
   const address =
     customer.addresses?.find((item) => item.isDefault) ||
     customer.addresses?.[0];
@@ -43,8 +44,7 @@ export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
 });
 
 export const buildUpdatedCustomer = (receiverDetails, updatedUser) => {
-  const customer =
-    updatedUser || JSON.parse(localStorage.getItem("customerUser") || "{}");
+  const customer = updatedUser || getCustomerUser() || {};
   const existingAddresses = Array.isArray(customer.addresses)
     ? customer.addresses
     : [];

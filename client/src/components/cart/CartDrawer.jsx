@@ -11,7 +11,7 @@ export default function CartDrawer() {
     setIsDrawerOpen,
     totalItems,
     total,
-    freeDelivery,
+    // freeDelivery,
     deliveryFee,
     handleRemove,
   } = useCart();
@@ -136,9 +136,8 @@ export default function CartDrawer() {
                   </span>
                 </div>
                 <p className="cart-footer-delivery-note">
-                  {freeDelivery
-                    ? "Free delivery included"
-                    : `+ LKR ${deliveryFee.toLocaleString()} delivery`}
+                  {/* Free delivery disabled: previously displayed "Free delivery included". */}
+                  Includes LKR {deliveryFee.toLocaleString()} delivery
                 </p>
 
                 <div className="cart-footer-actions">

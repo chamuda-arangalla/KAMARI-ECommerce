@@ -12,6 +12,7 @@ export default function BrandLogo({
     <img
       src="/Kamari-logo.png"
       alt="KAMARI"
+      style={{ clipPath: "inset(0 2px 0 0)" }}
       className={`${logoTone[tone] || logoTone.dark} ${className} ${imageClassName}`.trim()}
     />
   );

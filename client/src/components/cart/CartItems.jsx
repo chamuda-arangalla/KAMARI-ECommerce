@@ -2,36 +2,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 
+/*
+Free delivery progress is currently disabled.
+
 const FREE_DELIVERY_THRESHOLD = 10000;
+const freeDelivery = afterDiscount >= FREE_DELIVERY_THRESHOLD;
+const remaining = FREE_DELIVERY_THRESHOLD - afterDiscount;
+const progressPct = Math.min(
+  (afterDiscount / FREE_DELIVERY_THRESHOLD) * 100,
+  100,
+);
 
-export default function CartItems({ items, afterDiscount, onUpdateQty, onRemove }) {
-  const freeDelivery = afterDiscount >= FREE_DELIVERY_THRESHOLD;
-  const remaining    = FREE_DELIVERY_THRESHOLD - afterDiscount;
-  const progressPct  = Math.min((afterDiscount / FREE_DELIVERY_THRESHOLD) * 100, 100);
+Messages:
+- "YOU'VE UNLOCKED FREE DELIVERY"
+- `ADD LKR ${remaining.toLocaleString()} MORE FOR FREE DELIVERY`
+*/
 
+export default function CartItems({ items, onUpdateQty, onRemove }) {
   return (
     <div>
-      {/* Free Delivery Progress */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="mb-8 p-5 bg-[#EAE0D6] border border-[#2C2B28]/10 rounded-xl"
-      >
-        <p className="text-base tracking-[0.16em] text-[#5F564D] mb-3">
-          {freeDelivery
-            ? "✓ YOU'VE UNLOCKED FREE DELIVERY"
-            : `ADD LKR ${remaining.toLocaleString()} MORE FOR FREE DELIVERY`}
-        </p>
-        <div className="h-[2px] bg-[#2C2B28]/10 w-full">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPct}%` }}
-            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-            className="h-full bg-[#2C2B28]"
-          />
-        </div>
-      </motion.div>
-
       {/* Items */}
       <AnimatePresence>
         {items.map((item, i) => (

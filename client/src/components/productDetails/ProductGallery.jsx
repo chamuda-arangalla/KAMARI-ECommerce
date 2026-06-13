@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { X } from "lucide-react";
 import { PRODUCT_FALLBACK_IMAGE } from "./productDetailsUtils";
 
 export default function ProductGallery({
@@ -7,6 +9,9 @@ export default function ProductGallery({
   inStock,
   onMainImageChange,
 }) {
+  const [fullImageOpen, setFullImageOpen] = useState(false);
+  const selectedImage = images[mainIdx]?.url || PRODUCT_FALLBACK_IMAGE;
+
   return (
     <>
       <div className="pd-thumbs">
@@ -24,9 +29,14 @@ export default function ProductGallery({
         ))}
       </div>
 
-      <div className="pd-main-img-wrap">
+      <button
+        type="button"
+        className="pd-main-img-wrap"
+        onClick={() => setFullImageOpen(true)}
+        aria-label={`View full image of ${product.name}`}
+      >
         <img
-          src={images[mainIdx]?.url || PRODUCT_FALLBACK_IMAGE}
+          src={selectedImage}
           alt={product.name}
           className="pd-main-img"
         />
@@ -41,7 +51,32 @@ export default function ProductGallery({
         {product.isFeatured && inStock && (
           <span className="pd-badge best">Best Seller</span>
         )}
-      </div>
+      </button>
+
+      {fullImageOpen && (
+        <div
+          className="pd-full-image-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${product.name} full image`}
+          onClick={() => setFullImageOpen(false)}
+        >
+          <button
+            type="button"
+            className="pd-full-image-close"
+            onClick={() => setFullImageOpen(false)}
+            aria-label="Close full image"
+          >
+            <X size={24} />
+          </button>
+          <img
+            src={selectedImage}
+            alt={product.name}
+            className="pd-full-image"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </>
   );
 }

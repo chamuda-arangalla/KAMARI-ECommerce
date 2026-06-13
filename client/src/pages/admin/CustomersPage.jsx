@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Edit2, Loader2, Mail, MapPin, Phone, Plus, Search, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import AdminPagination from "../../components/admin/AdminPagination";
 import { useAdmin } from "../../context/useAdmin";
+
+const PAGE_SIZE = 10;
 
 const createCustomerDraft = (customer) => ({
   firstName:    customer?.firstName || "",
@@ -45,6 +48,19 @@ const buildCustomerPayload = (draft) => {
   return payload;
 };
 
+const formatCustomerAddress = (address) => {
+  if (!address) return "No saved address";
+
+  return [
+    address.addressLine1,
+    address.addressLine2,
+    address.city,
+    address.district,
+    address.postalCode,
+    address.country,
+  ].filter(Boolean).join(", ");
+};
+
 const CustomersPage = () => {
   const { customers, customersLoading, customersError, refreshCustomers, addCustomer, editCustomer, deleteCustomer } = useAdmin();
   const [searchTerm, setSearchTerm]           = useState("");
@@ -55,11 +71,18 @@ const CustomersPage = () => {
   const [formError, setFormError]             = useState("");
   const [deleteTarget, setDeleteTarget]       = useState(null);
   const [deleting, setDeleting]               = useState(false);
+  const [currentPage, setCurrentPage]         = useState(1);
 
   const filteredCustomers = customers.filter((c) => {
     const q = searchTerm.toLowerCase();
     return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q);
   });
+  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedCustomers = filteredCustomers.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   const handleDraftChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -133,7 +156,10 @@ const CustomersPage = () => {
               type="text"
               placeholder="Search by name, email or phone..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className="pl-11 pr-4 py-3 bg-white border border-[#d7c9b8] rounded-xl text-base w-full md:w-80 focus:ring-1 focus:ring-[#c2b2a6] outline-none transition-all shadow-sm"
             />
           </div>
@@ -149,15 +175,22 @@ const CustomersPage = () => {
       </div>
 
       <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#d7c9b8] overflow-hidden shadow-sm">
-        <div className="hidden overflow-x-auto md:block">
-          <table className="w-full text-left">
+        <div className="hidden md:block">
+          <table className="w-full table-fixed text-left">
+            <colgroup>
+              <col className="w-[24%]" />
+              <col className="w-[28%]" />
+              <col className="w-[30%]" />
+              <col className="w-[11%]" />
+              <col className="w-[7%]" />
+            </colgroup>
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Default Address</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-5" />
+                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
+                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Contact</th>
+                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Default Address</th>
+                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Joined</th>
+                <th className="px-4 py-5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
@@ -185,39 +218,39 @@ const CustomersPage = () => {
                   <td colSpan="5" className="px-6 py-10 text-center text-base text-[#8c7d73]">No customers found.</td>
                 </tr>
               )}
-              {!customersLoading && !customersError && filteredCustomers.map((customer) => (
+              {!customersLoading && !customersError && paginatedCustomers.map((customer) => (
                 <tr key={customer.id} className="hover:bg-[#fcfaf7] transition-colors">
-                  <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[#f3ede8] flex items-center justify-center text-[#2c2b28] text-lg font-bold">
+                  <td className="px-4 py-5 align-top">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className="w-12 h-12 shrink-0 rounded-full bg-[#f3ede8] flex items-center justify-center text-[#2c2b28] text-lg font-bold">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <p className="text-base font-semibold text-[#2c2b28]">{customer.name}</p>
-                        <p className="text-sm text-[#8f8376] mt-0.5">ID: {customer.id}</p>
+                      <div className="min-w-0">
+                        <p className="break-words text-base font-semibold text-[#2c2b28]">{customer.name}</p>
+                        <p className="mt-0.5 break-all text-sm text-[#8f8376]">ID: {customer.id}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-4 py-5 align-top">
                     <div className="flex flex-col gap-1.5">
-                      <span className="flex items-center gap-2 text-base text-[#5f564d]">
-                        <Mail size={16} className="text-[#8f8376]" /> {customer.email}
+                      <span className="flex min-w-0 items-start gap-2 text-base text-[#5f564d]">
+                        <Mail size={16} className="mt-1 shrink-0 text-[#8f8376]" />
+                        <span className="break-all">{customer.email}</span>
                       </span>
-                      <span className="flex items-center gap-2 text-base text-[#5f564d]">
-                        <Phone size={16} className="text-[#8f8376]" /> {customer.phone}
+                      <span className="flex min-w-0 items-start gap-2 text-base text-[#5f564d]">
+                        <Phone size={16} className="mt-1 shrink-0 text-[#8f8376]" />
+                        <span className="break-words">{customer.phone}</span>
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-5 max-w-xs">
-                    <p className="text-base text-[#5f564d] truncate">
-                      {customer.defaultAddress
-                        ? `${customer.defaultAddress.addressLine1}, ${customer.defaultAddress.city}`
-                        : "No saved address"}
+                  <td className="px-4 py-5 align-top">
+                    <p className="break-words text-base leading-relaxed text-[#5f564d]">
+                      {formatCustomerAddress(customer.defaultAddress)}
                     </p>
                   </td>
-                  <td className="px-6 py-5 text-base text-[#5f564d]">{customer.joinedDate}</td>
-                  <td className="px-6 py-5">
-                    <div className="flex justify-end gap-2">
+                  <td className="px-4 py-5 align-top text-base text-[#5f564d]">{customer.joinedDate}</td>
+                  <td className="px-2 py-5 align-top">
+                    <div className="flex flex-col items-center gap-1">
                       <button type="button" onClick={() => openEditCustomer(customer)}
                         className="p-2.5 text-[#8c7d73] hover:text-[#2c2b28] hover:bg-[#f3ede8] rounded-xl transition-all">
                         <Edit2 size={19} />
@@ -256,7 +289,7 @@ const CustomersPage = () => {
             <div className="px-5 py-10 text-center text-base text-[#8c7d73]">No customers found.</div>
           )}
 
-          {!customersLoading && !customersError && filteredCustomers.map((customer) => (
+          {!customersLoading && !customersError && paginatedCustomers.map((customer) => (
             <div key={customer.id} className="p-4">
               <div className="flex items-start gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f3ede8] text-lg font-bold text-[#2c2b28]">
@@ -289,9 +322,7 @@ const CustomersPage = () => {
                 <span className="flex items-start gap-2">
                   <MapPin size={16} className="mt-0.5 shrink-0 text-[#8f8376]" />
                   <span>
-                    {customer.defaultAddress
-                      ? `${customer.defaultAddress.addressLine1}, ${customer.defaultAddress.city}`
-                      : "No saved address"}
+                    {formatCustomerAddress(customer.defaultAddress)}
                   </span>
                 </span>
               </div>
@@ -302,6 +333,14 @@ const CustomersPage = () => {
             </div>
           ))}
         </div>
+        {!customersLoading && !customersError && (
+          <AdminPagination
+            currentPage={safePage}
+            totalItems={filteredCustomers.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       {/* Drawer */}

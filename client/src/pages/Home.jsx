@@ -2,7 +2,6 @@ import { useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeCollectionsSection from "../components/home/HomeCollectionsSection";
-import HomeFooter from "../components/home/HomeFooter";
 import HomeHero from "../components/home/HomeHero";
 import HomeProductQuickView from "../components/home/HomeProductQuickView";
 import HomeProductSection from "../components/home/HomeProductSection";
@@ -218,7 +217,6 @@ export default function Home() {
             onOpenProduct={setQuickViewProduct}
           />
 
-          <HomeFooter />
         </>
       )}
 

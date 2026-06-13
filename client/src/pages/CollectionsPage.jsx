@@ -77,14 +77,9 @@ export default function CollectionsPage() {
     const urlSort = searchParams.get("sort");
 
     const timeoutId = setTimeout(() => {
-      if (urlCategory) {
-        setCategory(urlCategory);
-        setPage(1);
-      }
-      if (urlSort) {
-        setSortBy(urlSort);
-        setPage(1);
-      }
+      setCategory(urlCategory || "All");
+      setSortBy(urlSort || "featured");
+      setPage(1);
     }, 0);
 
     return () => clearTimeout(timeoutId);

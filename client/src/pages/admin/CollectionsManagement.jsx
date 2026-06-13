@@ -7,8 +7,10 @@ import {
   deleteCollection,
 } from "../../services/collectionApi";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import AdminPagination from "../../components/admin/AdminPagination";
 
 const token = () => localStorage.getItem("adminToken");
+const PAGE_SIZE = 10;
 
 const EMPTY_FORM = { name: "", subtitle: "", description: "", displayOrder: "" };
 
@@ -16,6 +18,7 @@ export default function CollectionsManagement() {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -29,6 +32,12 @@ export default function CollectionsManagement() {
   const [deleting, setDeleting] = useState(false);
 
   const fileInputRef = useRef(null);
+  const totalPages = Math.max(1, Math.ceil(collections.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedCollections = collections.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   const load = async () => {
     try {
@@ -159,14 +168,15 @@ export default function CollectionsManagement() {
           <p className="text-base">Click "Add Collection" to create your first one.</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:gap-5">
-          {collections.map((col) => (
-            <div
-              key={col._id}
-              className={`grid grid-cols-[72px_1fr] gap-4 bg-white rounded-2xl border p-4 transition sm:flex sm:items-center sm:gap-5 sm:p-5 ${
-                col.isActive ? "border-[#d7c9b8]" : "border-dashed border-[#ddd] opacity-60"
-              }`}
-            >
+        <div className="overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white">
+          <div className="grid gap-4 p-4 sm:gap-5 sm:p-5">
+            {paginatedCollections.map((col) => (
+              <div
+                key={col._id}
+                className={`grid grid-cols-[72px_1fr] gap-4 bg-white rounded-2xl border p-4 transition sm:flex sm:items-center sm:gap-5 sm:p-5 ${
+                  col.isActive ? "border-[#d7c9b8]" : "border-dashed border-[#ddd] opacity-60"
+                }`}
+              >
               {/* Drag handle */}
               <GripVertical size={24} className="hidden text-[#ccc] flex-shrink-0 sm:block" />
 
@@ -226,8 +236,15 @@ export default function CollectionsManagement() {
                   <Trash2 size={22} />
                 </button>
               </div>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
+          <AdminPagination
+            currentPage={safePage}
+            totalItems={collections.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
 

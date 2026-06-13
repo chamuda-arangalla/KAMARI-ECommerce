@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fadeUp, sectionReveal } from "./homeConstants";
+import BrandLogo from "../common/BrandLogo";
 
 const FOOTER_COLUMNS = [
   {
@@ -42,7 +43,7 @@ export default function HomeFooter() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="mx-auto max-w-7xl px-6 py-14 sm:py-20"
+        className="w-full px-5 pb-5 pt-14 sm:px-10 sm:pb-7 sm:pt-20 lg:px-14"
       >
         <motion.div
           variants={fadeUp}
@@ -83,15 +84,12 @@ export default function HomeFooter() {
       </motion.div>
 
       {/* Bottom bar */}
-      <div className="w-full pb-10 sm:pb-14">
-        <h2
-          className="w-full text-center font-bold uppercase leading-none"
-          style={{ fontSize: "24vw", letterSpacing: "-0.04em" }}
-        >
-          KAMARI
-        </h2>
+      <div className="w-full pb-8 sm:pb-10">
+        <div className="relative mx-4 aspect-[5.7/1] overflow-hidden sm:mx-10 lg:mx-14">
+          <BrandLogo className="absolute left-1/2 top-1/2 block h-auto w-full -translate-x-1/2 -translate-y-1/2 object-contain" />
+        </div>
 
-        <div className="mx-auto mt-8 flex max-w-7xl flex-col items-center gap-8 px-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-4 flex flex-col items-center gap-6 border-t border-black/15 pt-6 sm:mx-10 sm:flex-row sm:justify-between lg:mx-14">
           <p className="text-xs text-black/50">
             © 2026 KAMARI. All rights reserved.
           </p>

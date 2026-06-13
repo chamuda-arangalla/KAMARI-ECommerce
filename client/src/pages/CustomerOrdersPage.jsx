@@ -4,9 +4,10 @@ import CustomerOrdersHero from "../components/customerOrders/CustomerOrdersHero"
 import CustomerOrdersList from "../components/customerOrders/CustomerOrdersList";
 import { getStoredCustomer } from "../components/customerOrders/customerOrdersUtils";
 import { getOrdersByUserId } from "../services/orderApi";
+import { getCustomerToken } from "../utils/customerSession";
 
 export default function CustomerOrdersPage() {
-  const token = localStorage.getItem("customerToken");
+  const token = getCustomerToken();
   const customer = useMemo(() => getStoredCustomer(), []);
   const userId = customer.id || customer._id;
   const firstName = customer.firstName || "there";

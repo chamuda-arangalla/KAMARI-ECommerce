@@ -1,29 +1,106 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CartContext } from "./cartContextValue";
+import { getCustomerUser } from "../utils/customerSession";
 
-const FREE_DELIVERY_THRESHOLD = 10000;
+// Free delivery is currently disabled.
+// const FREE_DELIVERY_THRESHOLD = 10000;
 const DELIVERY_FEE = 350;
-const CART_STORAGE_KEY = "kamariCartItems";
+const LEGACY_CART_STORAGE_KEY = "kamariCartItems";
+const GUEST_CART_STORAGE_KEY = "kamariCartItems:guest";
 
-const getStoredItems = () => {
+const getCartStorage = (storageKey) =>
+  storageKey === GUEST_CART_STORAGE_KEY ? sessionStorage : localStorage;
+
+const getCustomerCartStorageKey = () => {
   try {
-    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    const customer = getCustomerUser();
+    const customerId = customer?._id || customer?.id || customer?.email;
+    return customerId
+      ? `kamariCartItems:customer:${customerId}`
+      : GUEST_CART_STORAGE_KEY;
+  } catch {
+    return GUEST_CART_STORAGE_KEY;
+  }
+};
+
+const getStoredItems = (storageKey) => {
+  try {
+    if (storageKey === GUEST_CART_STORAGE_KEY) {
+      localStorage.removeItem(LEGACY_CART_STORAGE_KEY);
+      localStorage.removeItem(GUEST_CART_STORAGE_KEY);
+    }
+
+    const stored = getCartStorage(storageKey).getItem(storageKey);
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
   }
 };
 
+const mergeCartItems = (currentItems, incomingItems) => {
+  const merged = [...currentItems];
+
+  incomingItems.forEach((item) => {
+    const existingIndex = merged.findIndex(
+      (current) =>
+        current.id === item.id &&
+        current.variant === item.variant &&
+        current.size === item.size,
+    );
+
+    if (existingIndex === -1) {
+      merged.push(item);
+    } else {
+      merged[existingIndex] = {
+        ...merged[existingIndex],
+        qty: merged[existingIndex].qty + item.qty,
+      };
+    }
+  });
+
+  return merged;
+};
+
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(getStoredItems);
+  const [storageKey, setStorageKey] = useState(getCustomerCartStorageKey);
+  const storageKeyRef = useRef(storageKey);
+  const [items, setItems] = useState(() => getStoredItems(storageKey));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
 
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    storageKeyRef.current = storageKey;
+    getCartStorage(storageKey).setItem(storageKey, JSON.stringify(items));
+  }, [items, storageKey]);
+
+  useEffect(() => {
+    const handleUserChange = () => {
+      const nextStorageKey = getCustomerCartStorageKey();
+      const previousStorageKey = storageKeyRef.current;
+      let nextItems = getStoredItems(nextStorageKey);
+
+      if (
+        previousStorageKey === GUEST_CART_STORAGE_KEY &&
+        nextStorageKey !== GUEST_CART_STORAGE_KEY
+      ) {
+        nextItems = mergeCartItems(nextItems, getStoredItems(GUEST_CART_STORAGE_KEY));
+        sessionStorage.removeItem(GUEST_CART_STORAGE_KEY);
+      }
+
+      storageKeyRef.current = nextStorageKey;
+      setStorageKey(nextStorageKey);
+      setItems(nextItems);
+      setPromoApplied(false);
+      setPromoCode("");
+      setPromoError("");
+      setIsDrawerOpen(false);
+    };
+
+    window.addEventListener("kamari:user-updated", handleUserChange);
+    return () => window.removeEventListener("kamari:user-updated", handleUserChange);
+  }, []);
 
   const handleUpdateQty = (id, delta) =>
     setItems((prev) =>
@@ -90,6 +167,7 @@ export function CartProvider({ children }) {
   };
 
   const clearCart = () => {
+    getCartStorage(storageKeyRef.current).removeItem(storageKeyRef.current);
     setItems([]);
     handleRemovePromo();
     setIsDrawerOpen(false);
@@ -99,8 +177,9 @@ export function CartProvider({ children }) {
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
   const discount = promoApplied ? Math.round(subtotal * 0.1) : 0;
   const afterDiscount = subtotal - discount;
-  const freeDelivery = afterDiscount >= FREE_DELIVERY_THRESHOLD;
-  const deliveryFee = items.length === 0 || freeDelivery ? 0 : DELIVERY_FEE;
+  // const freeDelivery = afterDiscount >= FREE_DELIVERY_THRESHOLD;
+  // const deliveryFee = items.length === 0 || freeDelivery ? 0 : DELIVERY_FEE;
+  const deliveryFee = items.length === 0 ? 0 : DELIVERY_FEE;
   const total = afterDiscount + deliveryFee;
 
   return (
@@ -116,7 +195,7 @@ export function CartProvider({ children }) {
         subtotal,
         discount,
         afterDiscount,
-        freeDelivery,
+        // freeDelivery,
         deliveryFee,
         total,
         handleUpdateQty,

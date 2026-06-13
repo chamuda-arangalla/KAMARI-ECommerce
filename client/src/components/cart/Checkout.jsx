@@ -7,9 +7,9 @@ export default function Checkout({
   subtotal,
   discount,
   deliveryFee,
+  // freeDelivery,
   total,
   totalItems,
-  freeDelivery,
   promoApplied,
   promoCode,
   promoError,
@@ -72,7 +72,8 @@ export default function Checkout({
             <div className="flex justify-between text-[#5F564D]">
               <span>Delivery</span>
               <span className="text-[#2C2B28]">
-                {freeDelivery ? "Free" : `LKR ${deliveryFee.toLocaleString()}`}
+                {/* Free delivery disabled: freeDelivery ? "Free" : fee */}
+                LKR {deliveryFee.toLocaleString()}
               </span>
             </div>
           </div>
@@ -156,9 +157,11 @@ export default function Checkout({
             </motion.button>
           </Link>
 
+          {/* Koko and Mintpay installment promotion currently disabled:
           <p className="text-center text-sm text-[#5F564D] mt-5 tracking-widest uppercase">
             Pay in installments with Koko & Mintpay
           </p>
+          */}
 
           <div className="flex justify-center gap-6 mt-6 pt-6 border-t border-[#2C2B28]/10">
             {["Secure Checkout", "Free Returns", "Authentic"].map((t) => (
