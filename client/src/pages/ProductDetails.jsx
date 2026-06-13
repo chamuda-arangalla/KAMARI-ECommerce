@@ -19,6 +19,7 @@ import {
 } from "../components/productDetails/productDetailsUtils";
 import { useCart } from "../context/useCart";
 import { getProductById, getProducts } from "../services/productApi";
+import { getCustomerToken } from "../utils/customerSession";
 import "../styles/ProductDetails.css";
 
 export default function ProductDetails() {
@@ -104,7 +105,7 @@ export default function ProductDetails() {
     setQty(1);
   };
 
-  const isLoggedIn = () => Boolean(localStorage.getItem("customerToken"));
+  const isLoggedIn = () => Boolean(getCustomerToken());
 
   const selectedCartItem = () => ({
     id: `${product._id}-${selColor.colorName}-${selSize}`,

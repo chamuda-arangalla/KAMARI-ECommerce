@@ -5,10 +5,11 @@ import CustomerOrderCard from "../components/customerOrder/CustomerOrderCard";
 import OrderDetailsSkeleton from "../components/customerOrder/OrderDetailsSkeleton";
 import { getStatus } from "../components/customerOrder/orderDetailsUtils";
 import { getOrderById, uploadPaymentSlip } from "../services/orderApi";
+import { getCustomerToken } from "../utils/customerSession";
 
 export default function CustomerOrderDetailsPage() {
   const { id } = useParams();
-  const token = localStorage.getItem("customerToken");
+  const token = getCustomerToken();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);

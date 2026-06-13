@@ -9,9 +9,13 @@ import { getCollections } from "../../services/collectionApi";
 import { getProducts } from "../../services/productApi";
 import { getProductImages } from "../../utils/shopProduct";
 import "../../styles/Header.css";
+import {
+  clearCustomerSession,
+  getCustomerUser,
+} from "../../utils/customerSession";
 
 const Header = () => {
-  const { totalItems, setIsDrawerOpen } = useCart();
+  const { totalItems, setIsDrawerOpen, clearCart } = useCart();
   const [collections, setCollections] = useState([]);
   const [accountOpen, setAccountOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -26,9 +30,9 @@ const Header = () => {
   const [headerHidden, setHeaderHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [customer, setCustomer] = useState(() => {
-    const stored = localStorage.getItem("customerUser");
+    const stored = getCustomerUser();
     const adminStored = localStorage.getItem("adminUser");
-    return stored ? JSON.parse(stored) : adminStored ? JSON.parse(adminStored) : null;
+    return stored || (adminStored ? JSON.parse(adminStored) : null);
   });
   const accountRef = useRef(null);
   const headerRef = useRef(null);
@@ -98,9 +102,9 @@ const Header = () => {
       }
     };
     const handleUserUpdate = () => {
-      const stored = localStorage.getItem("customerUser");
+      const stored = getCustomerUser();
       const adminStored = localStorage.getItem("adminUser");
-      setCustomer(stored ? JSON.parse(stored) : adminStored ? JSON.parse(adminStored) : null);
+      setCustomer(stored || (adminStored ? JSON.parse(adminStored) : null));
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -164,10 +168,11 @@ const Header = () => {
       setLoggingOut(true);
       await logout();
     } finally {
-      localStorage.removeItem("customerToken");
-      localStorage.removeItem("customerUser");
+      clearCustomerSession();
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminUser");
+      clearCart();
+      window.dispatchEvent(new Event("kamari:user-updated"));
       setCustomer(null);
       setAccountOpen(false);
       setLogoutOpen(false);

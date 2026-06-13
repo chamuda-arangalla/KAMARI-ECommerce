@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLoadingScreen from "../components/auth/AuthLoadingScreen";
 import { REDIRECT_MAP } from "../components/auth/authConstants";
+import { setCustomerSession } from "../utils/customerSession";
 
 const OAuthCallbackPage = () => {
   const navigate = useNavigate();
@@ -30,8 +31,8 @@ const OAuthCallbackPage = () => {
         localStorage.setItem("adminToken", token);
         localStorage.setItem("adminUser", JSON.stringify(user));
       } else {
-        localStorage.setItem("customerToken", token);
-        localStorage.setItem("customerUser", JSON.stringify(user));
+        setCustomerSession(token, user);
+        window.dispatchEvent(new Event("kamari:user-updated"));
       }
 
       navigate(user.role === "admin" ? "/" : redirectTo, { replace: true });

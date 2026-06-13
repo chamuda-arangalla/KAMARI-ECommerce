@@ -27,6 +27,9 @@ import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
+import { clearLegacyCustomerSession } from "./utils/customerSession";
+
+clearLegacyCustomerSession();
 
 const AdminGuard = ({ children }) => {
   const token = localStorage.getItem("adminToken");

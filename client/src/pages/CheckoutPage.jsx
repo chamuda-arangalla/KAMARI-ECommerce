@@ -15,6 +15,10 @@ import {
 } from "../components/checkout/checkoutHelpers";
 import { useCart } from "../context/useCart";
 import { createOrder, uploadPaymentSlip } from "../services/orderApi";
+import {
+  getCustomerToken,
+  updateCustomerSessionUser,
+} from "../utils/customerSession";
 import "../styles/CheckoutPage.css";
 
 export default function CheckoutPage() {
@@ -46,7 +50,7 @@ export default function CheckoutPage() {
   const [checkoutStep, setCheckoutStep] = useState(CHECKOUT_STEPS.RECEIVER);
   const slipInputRef = useRef(null);
 
-  const token = localStorage.getItem("customerToken");
+  const token = getCustomerToken();
   const isPaymentStep = checkoutStep === CHECKOUT_STEPS.PAYMENT;
   const isCodOrder = createdOrder?.paymentStatus === "COD";
 
@@ -112,7 +116,7 @@ export default function CheckoutPage() {
 
       setOrderTotal(total);
       setCreatedOrder(order);
-      localStorage.setItem("customerUser", JSON.stringify(updatedCustomer));
+      updateCustomerSessionUser(updatedCustomer);
       window.dispatchEvent(new Event("kamari:user-updated"));
       clearCart();
     } catch (submitError) {

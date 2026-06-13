@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Loader2, Save, User } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { getMyProfile, updateMyProfile } from "../services/customerApi";
+import {
+  getCustomerToken,
+  updateCustomerSessionUser,
+} from "../utils/customerSession";
 
 const emptyProfile = {
   firstName: "", lastName: "", email: "", phone: "",
@@ -76,7 +80,7 @@ const buildProfilePayload = (draft, currentProfile) => {
 };
 
 const CustomerProfilePage = () => {
-  const token = localStorage.getItem("customerToken");
+  const token = getCustomerToken();
   const [draft, setDraft]     = useState(emptyProfile);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -93,7 +97,7 @@ const CustomerProfilePage = () => {
         const response = await getMyProfile(token);
         setProfile(response.data);
         setDraft(createProfileDraft(response.data));
-        localStorage.setItem("customerUser", JSON.stringify(response.data));
+        updateCustomerSessionUser(response.data);
         window.dispatchEvent(new Event("kamari:user-updated"));
       } catch (loadError) {
         setError(loadError.response?.data?.message || "Failed to load profile");
@@ -120,7 +124,7 @@ const CustomerProfilePage = () => {
       const response = await updateMyProfile(buildProfilePayload(draft, profile), token);
       setProfile(response.data);
       setDraft(createProfileDraft(response.data));
-      localStorage.setItem("customerUser", JSON.stringify(response.data));
+      updateCustomerSessionUser(response.data);
       window.dispatchEvent(new Event("kamari:user-updated"));
       setSuccess("Profile updated successfully");
     } catch (saveError) {
