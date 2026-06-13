@@ -35,11 +35,13 @@ export default function RegisterSidePanel() {
         <p className="text-sm uppercase tracking-[0.18em] text-white/50">
           Effortless - Elegant - Yours
         </p>
+        {/* Free delivery promotion currently disabled:
         <div className="inline-flex items-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 backdrop-blur-sm">
           <span className="text-sm tracking-wide text-white/60">
             Free delivery across Sri Lanka
           </span>
         </div>
+        */}
       </div>
     </div>
   );

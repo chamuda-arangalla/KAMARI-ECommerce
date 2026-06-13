@@ -11,8 +11,8 @@ export default function Cart() {
     totalItems,
     subtotal,
     discount,
-    afterDiscount,
-    freeDelivery,
+    // afterDiscount,
+    // freeDelivery,
     deliveryFee,
     total,
     promoCode,
@@ -55,20 +55,20 @@ export default function Cart() {
         </motion.div>
       ) : (
         <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
+          {/* Free delivery disabled: CartItems previously received afterDiscount. */}
           <CartItems
             items={items}
-            afterDiscount={afterDiscount}
             onUpdateQty={handleUpdateQty}
             onRemove={handleRemove}
           />
 
+          {/* Free delivery disabled: Checkout previously received freeDelivery. */}
           <Checkout
             subtotal={subtotal}
             discount={discount}
             deliveryFee={deliveryFee}
             total={total}
             totalItems={totalItems}
-            freeDelivery={freeDelivery}
             promoApplied={promoApplied}
             promoCode={promoCode}
             promoError={promoError}

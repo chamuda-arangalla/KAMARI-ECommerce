@@ -24,7 +24,7 @@ export default function CheckoutPage() {
     discount,
     deliveryFee,
     total,
-    freeDelivery,
+    // freeDelivery,
     promoApplied,
     clearCart,
   } = useCart();
@@ -208,12 +208,12 @@ export default function CheckoutPage() {
           )}
         </div>
 
+        {/* Free delivery disabled: OrderSummary previously received freeDelivery. */}
         <OrderSummary
           createdOrder={createdOrder}
           deliveryFee={deliveryFee}
           discount={discount}
           discountCode={discountCode}
-          freeDelivery={freeDelivery}
           items={items}
           orderTotal={orderTotal}
           promoApplied={promoApplied}

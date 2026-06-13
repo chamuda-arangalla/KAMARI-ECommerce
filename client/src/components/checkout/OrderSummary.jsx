@@ -3,9 +3,9 @@ import OrderTotalRow from "./OrderTotalRow";
 export default function OrderSummary({
   createdOrder,
   deliveryFee,
+  // freeDelivery,
   discount,
   discountCode,
-  freeDelivery,
   items,
   orderTotal,
   promoApplied,
@@ -48,7 +48,8 @@ export default function OrderSummary({
         <OrderTotalRow label="Discount (KAMARI10)" value={`- LKR ${discount.toLocaleString()}`} valueClassName="order-discount-value" />
       )}
 
-      <OrderTotalRow label="Delivery" value={freeDelivery ? "Free" : `LKR ${deliveryFee.toLocaleString()}`} valueClassName={freeDelivery ? "order-free-badge" : "order-total-value"} />
+      {/* Free delivery disabled: value was freeDelivery ? "Free" : deliveryFee. */}
+      <OrderTotalRow label="Delivery" value={`LKR ${deliveryFee.toLocaleString()}`} valueClassName="order-total-value" />
 
       <div className="order-divider" />
 

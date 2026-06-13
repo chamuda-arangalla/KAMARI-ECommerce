@@ -22,6 +22,11 @@ export const DEFAULT_CONTACT_CONTENT = {
   instagramHandle: "kamarifashion",
   facebookHandle: "kamarifashion",
   faqs: [
+    // Free delivery FAQ currently disabled:
+    // {
+    //   question: "Do you offer free delivery?",
+    //   answer: "Yes! Orders over LKR 5,000 qualify for free delivery island-wide.",
+    // },
     {
       question: "How long does delivery take?",
       answer:
@@ -31,10 +36,6 @@ export const DEFAULT_CONTACT_CONTENT = {
       question: "What is your exchange policy?",
       answer:
         "We accept exchange requests within 7 days of delivery. Items must be unworn, unwashed and in original condition with tags attached.",
-    },
-    {
-      question: "Do you offer free delivery?",
-      answer: "Yes! Orders over LKR 5,000 qualify for free delivery island-wide.",
     },
     {
       question: "How can I track my order?",

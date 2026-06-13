@@ -1,4 +1,4 @@
-import { Package, RotateCcw, Shield } from "lucide-react";
+import { RotateCcw, Shield } from "lucide-react";
 import ProductOptions from "./ProductOptions";
 
 export default function ProductPanel({
@@ -90,10 +90,12 @@ export default function ProductPanel({
       </div>
 
       <div className="pd-trust">
+        {/* Free delivery message currently disabled:
         <div className="pd-trust-item">
           <Package size={15} />
           <span>Free delivery island-wide over LKR 5,000</span>
         </div>
+        */}
         <div className="pd-trust-item">
           <RotateCcw size={15} />
           <span>Easy 7-day exchange policy</span>

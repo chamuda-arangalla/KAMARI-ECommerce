@@ -7,9 +7,9 @@ export default function Checkout({
   subtotal,
   discount,
   deliveryFee,
+  // freeDelivery,
   total,
   totalItems,
-  freeDelivery,
   promoApplied,
   promoCode,
   promoError,
@@ -72,7 +72,8 @@ export default function Checkout({
             <div className="flex justify-between text-[#5F564D]">
               <span>Delivery</span>
               <span className="text-[#2C2B28]">
-                {freeDelivery ? "Free" : `LKR ${deliveryFee.toLocaleString()}`}
+                {/* Free delivery disabled: freeDelivery ? "Free" : fee */}
+                LKR {deliveryFee.toLocaleString()}
               </span>
             </div>
           </div>
