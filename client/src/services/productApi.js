@@ -39,6 +39,7 @@ export const mapBackendProductToAdminProduct = (product) => {
     image: images[0]?.url || FALLBACK_IMAGE,
     tags,
     stock,
+    isSoldOut: Boolean(product.isSoldOut),
     raw: product,
   };
 };

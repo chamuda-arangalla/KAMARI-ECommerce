@@ -156,7 +156,7 @@ const InventoryPage = () => {
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      {totalStock === 0 ? (
+                      {product.isSoldOut || totalStock === 0 ? (
                         <span className="flex items-center gap-1.5 text-rose-600 text-sm font-semibold uppercase">
                           <AlertCircle size={16} /> Sold Out
                         </span>
@@ -240,7 +240,7 @@ const InventoryPage = () => {
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-3">
-                  {totalStock === 0 ? (
+                  {product.isSoldOut || totalStock === 0 ? (
                     <span className="flex items-center gap-1.5 text-sm font-semibold uppercase text-rose-600">
                       <AlertCircle size={16} /> Sold Out
                     </span>

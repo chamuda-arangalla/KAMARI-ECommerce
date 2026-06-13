@@ -777,11 +777,12 @@ const ProductSummary = ({ product, totalStock }) => (
       </p>
     </div>
 
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
       <DetailTile label="Total Stock" value={totalStock} />
       <DetailTile label="Colors" value={product.colors?.length || 0} />
       <DetailTile label="Best Seller" value={product.isFeatured ? "Yes" : "No"} />
       <DetailTile label="New Arrival" value={product.isNewArrival ? "Yes" : "No"} />
+      <DetailTile label="Sold Out" value={product.isSoldOut ? "Yes" : "No"} />
     </div>
 
     <DetailBlock label="Description" value={product.description || "No description"} />
