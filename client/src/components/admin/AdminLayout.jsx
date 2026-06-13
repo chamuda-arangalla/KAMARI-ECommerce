@@ -13,7 +13,7 @@ const AdminLayout = () => {
     <AdminProvider>
       <div
         className={`min-h-screen bg-[#eae0d6] ${isTrackingPage ? 'lg:h-screen lg:overflow-hidden' : ''}`}
-        style={{ fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif' }}
+        style={{ fontFamily: 'var(--kamari-font-body)' }}
       >
         <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         

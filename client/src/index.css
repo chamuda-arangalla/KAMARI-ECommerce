@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --kamari-font-body: "Inter", sans-serif;
-  --kamari-font-heading: "Montserrat", sans-serif;
+  --kamari-font-body: "The Seasons", Georgia, serif;
+  --kamari-font-heading: "The Seasons", Georgia, serif;
   font-family: var(--kamari-font-body);
   color: #2c2b28;
   background-color: #eae0d6;
@@ -25,6 +25,13 @@ body {
   background-color: #eae0d6;
   color: #2c2b28;
   font-family: var(--kamari-font-body);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 a {
