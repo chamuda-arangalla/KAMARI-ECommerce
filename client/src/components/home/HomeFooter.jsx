@@ -74,7 +74,7 @@ export default function HomeFooter() {
               />
               <button
                 type="submit"
-                className="flex-shrink-0 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#1A1A1A] transition hover:text-black/60"
+                className="shrink-0 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#1A1A1A] transition hover:text-black/60"
               >
                 Subscribe
               </button>
@@ -131,7 +131,7 @@ function FooterColumn({ title, links }) {
           className={`transition-transform md:hidden ${open ? "rotate-180" : ""}`}
         />
       </button>
-      <ul className={`space-y-3 md:!mt-0 md:block ${open ? "mt-4 block" : "hidden"}`}>
+      <ul className={`space-y-3 md:mt-0! md:block ${open ? "mt-4 block" : "hidden"}`}>
         {links.map(({ label, to }) => (
           <li key={label}>
             <Link

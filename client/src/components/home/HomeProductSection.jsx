@@ -27,7 +27,7 @@ export default function HomeProductSection({
 
   if (fullBleed) {
     return (
-      <section className={variant === "white" ? "bg-white py-16" : "bg-[#EAE0D6] py-16"}>
+      <section className={variant === "white" ? "bg-white" : "bg-[#EAE0D6]"}>
         <div className={`grid gap-0 ${cols === 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2"}`}>
           {products.map((product) => (
             <HomeProductCard
