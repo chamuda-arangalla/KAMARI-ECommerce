@@ -52,6 +52,17 @@ export const updateOrder = async (orderId, payload, token) => {
   return response.data;
 };
 
+export const downloadOrderInvoice = async (orderId, token) => {
+  const response = await axios.get(`${API_URL}/api/orders/${orderId}/invoice`, {
+    responseType: "blob",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response;
+};
+
 export const uploadPaymentSlip = async (orderId, file, token) => {
   const formData = new FormData();
   formData.append("paymentSlip", file);

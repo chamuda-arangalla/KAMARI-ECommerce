@@ -6,6 +6,10 @@ import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
+import {
+  createInvoicePdf,
+  getInvoiceProfile,
+} from "../services/invoice/invoicePdf.service.js";
 import { sendEmail } from "../services/emailService.js";
 import {
   orderConfirmationTemplate,
@@ -36,6 +40,9 @@ const isOrderOwner = (req, order) =>
 
 const getOrderFilter = (id) =>
   isValidOrderObjectId(id) ? { _id: id } : { orderId: id };
+
+const getSafeInvoiceFileName = (orderId) =>
+  `kamari-invoice-${String(orderId || "order").replace(/[^a-z0-9-]/gi, "-")}.pdf`;
 
 const matchesText = (left = "", right = "") =>
   String(left).trim().toLowerCase() === String(right).trim().toLowerCase();
@@ -410,6 +417,50 @@ export const getAllOrders = async (req, res) => {
       message: "Failed to fetch orders",
       error: error.message,
     });
+  }
+};
+
+export const downloadOrderInvoice = async (req, res) => {
+  try {
+    const order = await Order.findOne(getOrderFilter(req.params.id)).lean();
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (
+      order.orderStatus !== ORDER_STATUS.RECEIVED &&
+      order.paymentStatus !== PAYMENT_STATUS.COMPLETE
+    ) {
+      return res.status(409).json({
+        success: false,
+        message: "Invoice can only be downloaded after payment is complete or the order is received",
+      });
+    }
+
+    const invoiceProfile = await getInvoiceProfile();
+    const invoicePdf = createInvoicePdf(order, invoiceProfile);
+    const fileName = getSafeInvoiceFileName(order.orderId);
+
+    // Stream the PDF directly so invoices are not written to disk on the server.
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+    invoicePdf.pipe(res);
+    invoicePdf.end();
+  } catch (error) {
+    if (!res.headersSent) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to generate invoice",
+        error: error.message,
+      });
+    }
+
+    return res.end();
   }
 };
 
