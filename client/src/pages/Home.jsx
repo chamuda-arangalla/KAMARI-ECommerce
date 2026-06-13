@@ -5,7 +5,7 @@ import HomeCollectionsSection from "../components/home/HomeCollectionsSection";
 import HomeHero from "../components/home/HomeHero";
 import HomeProductQuickView from "../components/home/HomeProductQuickView";
 import HomeProductSection from "../components/home/HomeProductSection";
-import HomeQuoteFeature from "../components/home/HomeQuoteFeature";
+import HomeAboutKamari from "../components/home/HomeAboutKamari";
 import { getCollections } from "../services/collectionApi";
 import { getProducts } from "../services/productApi";
 
@@ -215,32 +215,36 @@ export default function Home() {
             onScroll={scrollCollections}
           />
 
-          <HomeProductSection
-            badge="New"
-            eyebrow="Just In"
-            products={newArrivals}
-            title="New Arrivals"
-            viewAllTo="/collections?sort=newest"
-            variant="white"
-            imageAspect="aspect-[3/4]"
-            fullBleed
-            onOpenProduct={navigateToProduct}
-          />
+          <div className="relative z-2">
+            <HomeProductSection
+              badge="New"
+              eyebrow="Just In"
+              products={newArrivals}
+              title="New Arrivals"
+              viewAllTo="/collections?sort=newest"
+              variant="white"
+              imageAspect="aspect-[3/4]"
+              fullBleed
+              onOpenProduct={navigateToProduct}
+            />
+          </div>
 
-          <HomeQuoteFeature onNavigate={navigate} />
+          <HomeAboutKamari onNavigate={navigate} />
 
-          <HomeProductSection
-            badge="Best Seller"
-            eyebrow="Popular"
-            products={bestSellers}
-            title="Best Sellers"
-            viewAllTo="/shop"
-            variant="white"
-            imageAspect="aspect-[3/4]"
-            fullBleed
-            cols={3}
-            onOpenProduct={setQuickViewProduct}
-          />
+          <div className="relative z-2">
+            <HomeProductSection
+              badge="Best Seller"
+              eyebrow="Popular"
+              products={bestSellers}
+              title="Best Sellers"
+              viewAllTo="/shop"
+              variant="white"
+              imageAspect="aspect-[3/4]"
+              fullBleed
+              cols={3}
+              onOpenProduct={setQuickViewProduct}
+            />
+          </div>
 
         </>
       )}
