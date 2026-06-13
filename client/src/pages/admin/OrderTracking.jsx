@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Check, ChevronRight, Clock, Loader2, Search, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAdmin } from '../../context/useAdmin';
+import AdminPagination from '../../components/admin/AdminPagination';
+
+const PAGE_SIZE = 5;
 
 const stages = [
   { id: 'Created', icon: Clock, label: 'Created' },
@@ -78,6 +81,7 @@ const OrderTracking = () => {
   const { orders, ordersLoading, ordersError } = useAdmin();
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredOrders = orders.filter((order) => {
     const query = searchTerm.trim().toLowerCase();
@@ -90,6 +94,12 @@ const OrderTracking = () => {
       order.status,
     ].some((value) => String(value || '').toLowerCase().includes(query));
   });
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedOrders = filteredOrders.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   const selectedOrder = orders.find((order) => order.id === selectedOrderId);
   const currentStageIndex = Math.max(
@@ -118,7 +128,10 @@ const OrderTracking = () => {
               <input
                 type="search"
                 value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
+                onChange={(event) => {
+                  setSearchTerm(event.target.value);
+                  setCurrentPage(1);
+                }}
                 placeholder="Search orders"
                 className="w-full rounded-xl border border-[#d7c9b8] bg-[#fcfaf7] py-3 pl-10 pr-4 text-sm text-[#2c2b28] outline-none transition-all placeholder:text-[#b8ada5] focus:border-[#c2b2a6] focus:bg-white"
               />
@@ -146,7 +159,7 @@ const OrderTracking = () => {
                 <p className="py-10 text-sm text-[#8f8376]">No matching orders.</p>
               )}
 
-              {!ordersLoading && !ordersError && filteredOrders.map((order) => (
+              {!ordersLoading && !ordersError && paginatedOrders.map((order) => (
                 <button
                   key={order.id}
                   type="button"
@@ -166,6 +179,17 @@ const OrderTracking = () => {
                 </button>
               ))}
             </div>
+
+            {!ordersLoading && !ordersError && (
+              <div className="-mx-6 -mb-6 mt-5 overflow-hidden rounded-b-2xl">
+                <AdminPagination
+                  currentPage={safePage}
+                  totalItems={filteredOrders.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
           </div>
         </div>
 
