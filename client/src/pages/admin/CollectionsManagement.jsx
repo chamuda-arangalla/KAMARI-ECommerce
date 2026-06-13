@@ -7,8 +7,10 @@ import {
   deleteCollection,
 } from "../../services/collectionApi";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import AdminPagination from "../../components/admin/AdminPagination";
 
 const token = () => localStorage.getItem("adminToken");
+const PAGE_SIZE = 10;
 
 const EMPTY_FORM = { name: "", subtitle: "", description: "", displayOrder: "" };
 
@@ -16,6 +18,7 @@ export default function CollectionsManagement() {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -29,6 +32,12 @@ export default function CollectionsManagement() {
   const [deleting, setDeleting] = useState(false);
 
   const fileInputRef = useRef(null);
+  const totalPages = Math.max(1, Math.ceil(collections.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedCollections = collections.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   const load = async () => {
     try {
@@ -134,14 +143,14 @@ export default function CollectionsManagement() {
       {/* ── Page Header ─────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h1 className="text-2xl sm:text-4xl font-bold text-[#3b302a]">Collections</h1>
-          <p className="text-base text-[#a3948b] mt-2">
+          <h1 className="text-2xl sm:text-4xl font-bold text-[#2c2b28]">Collections</h1>
+          <p className="text-base text-[#8f8376] mt-2">
             Manage the collections shown in the header dropdown and shop filters
           </p>
         </div>
         <button
           onClick={openAdd}
-          className="flex w-full items-center justify-center gap-3 bg-[#3b302a] text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-[#2e2622] transition sm:w-auto"
+          className="flex w-full items-center justify-center gap-3 bg-[#2c2b28] text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-[#544c43] transition sm:w-auto"
         >
           <Plus size={20} />
           Add Collection
@@ -152,21 +161,22 @@ export default function CollectionsManagement() {
 
       {/* ── Collection List ──────────────────────────── */}
       {loading ? (
-        <div className="flex justify-center py-24 text-[#a3948b] text-lg">Loading...</div>
+        <div className="flex justify-center py-24 text-[#8f8376] text-lg">Loading...</div>
       ) : collections.length === 0 ? (
-        <div className="text-center py-24 text-[#a3948b]">
+        <div className="text-center py-24 text-[#8f8376]">
           <p className="text-2xl font-medium mb-3">No collections yet</p>
           <p className="text-base">Click "Add Collection" to create your first one.</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:gap-5">
-          {collections.map((col) => (
-            <div
-              key={col._id}
-              className={`grid grid-cols-[72px_1fr] gap-4 bg-white rounded-2xl border p-4 transition sm:flex sm:items-center sm:gap-5 sm:p-5 ${
-                col.isActive ? "border-[#e5ddd5]" : "border-dashed border-[#ddd] opacity-60"
-              }`}
-            >
+        <div className="overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white">
+          <div className="grid gap-4 p-4 sm:gap-5 sm:p-5">
+            {paginatedCollections.map((col) => (
+              <div
+                key={col._id}
+                className={`grid grid-cols-[72px_1fr] gap-4 bg-white rounded-2xl border p-4 transition sm:flex sm:items-center sm:gap-5 sm:p-5 ${
+                  col.isActive ? "border-[#d7c9b8]" : "border-dashed border-[#ddd] opacity-60"
+                }`}
+              >
               {/* Drag handle */}
               <GripVertical size={24} className="hidden text-[#ccc] flex-shrink-0 sm:block" />
 
@@ -184,7 +194,7 @@ export default function CollectionsManagement() {
               {/* Info */}
               <div className="min-w-0 sm:flex-1">
                 <div className="flex items-center gap-3 flex-wrap mb-1">
-                  <p className="max-w-full truncate text-lg font-bold text-[#3b302a] sm:text-xl">{col.name}</p>
+                  <p className="max-w-full truncate text-lg font-bold text-[#2c2b28] sm:text-xl">{col.name}</p>
                   <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
                     col.isActive
                       ? "bg-green-100 text-green-700"
@@ -194,10 +204,10 @@ export default function CollectionsManagement() {
                   </span>
                 </div>
                 {col.subtitle && (
-                  <p className="text-base text-[#7d746c] truncate">{col.subtitle}</p>
+                  <p className="text-base text-[#5f564d] truncate">{col.subtitle}</p>
                 )}
                 {col.description && (
-                  <p className="text-sm text-[#a3948b] mt-1 truncate">{col.description}</p>
+                  <p className="text-sm text-[#8f8376] mt-1 truncate">{col.description}</p>
                 )}
                 <p className="text-sm text-[#bbb] mt-2">Display order: {col.displayOrder}</p>
               </div>
@@ -215,7 +225,7 @@ export default function CollectionsManagement() {
                 </button>
                 <button
                   onClick={() => openEdit(col)}
-                  className="p-2.5 sm:p-3 rounded-xl hover:bg-[#f3ede8] text-[#7d746c] transition"
+                  className="p-2.5 sm:p-3 rounded-xl hover:bg-[#f3ede8] text-[#5f564d] transition"
                 >
                   <Pencil size={22} />
                 </button>
@@ -226,8 +236,15 @@ export default function CollectionsManagement() {
                   <Trash2 size={22} />
                 </button>
               </div>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
+          <AdminPagination
+            currentPage={safePage}
+            totalItems={collections.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
 
@@ -238,12 +255,12 @@ export default function CollectionsManagement() {
 
             {/* Modal Header */}
             <div className="shrink-0 px-5 py-5 sm:px-8 sm:py-6 border-b border-[#f0ebe5] flex items-center justify-between gap-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#3b302a]">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#2c2b28]">
                 {editing ? "Edit Collection" : "Add Collection"}
               </h2>
               <button
                 onClick={() => setModalOpen(false)}
-                className="text-[#a3948b] hover:text-[#3b302a] transition"
+                className="text-[#8f8376] hover:text-[#2c2b28] transition"
               >
                 <X size={24} />
               </button>
@@ -254,11 +271,11 @@ export default function CollectionsManagement() {
 
               {/* Image Upload */}
               <div>
-                <label className="block text-base font-semibold text-[#3b302a] mb-3">
+                <label className="block text-base font-semibold text-[#2c2b28] mb-3">
                   Collection Image
                 </label>
                 {imagePreview ? (
-                  <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden border border-[#e5ddd5]">
+                  <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden border border-[#d7c9b8]">
                     <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -270,7 +287,7 @@ export default function CollectionsManagement() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="absolute bottom-3 right-3 bg-white text-[#3b302a] text-sm font-semibold px-4 py-2 rounded-xl shadow hover:bg-[#f8f5f2] transition flex items-center gap-2"
+                      className="absolute bottom-3 right-3 bg-white text-[#2c2b28] text-sm font-semibold px-4 py-2 rounded-xl shadow hover:bg-[#eae0d6] transition flex items-center gap-2"
                     >
                       <Upload size={15} /> Change Image
                     </button>
@@ -279,7 +296,7 @@ export default function CollectionsManagement() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-44 sm:h-48 border-2 border-dashed border-[#e5ddd5] rounded-2xl flex flex-col items-center justify-center gap-3 text-[#a3948b] hover:border-[#3b302a] hover:text-[#3b302a] transition"
+                    className="w-full h-44 sm:h-48 border-2 border-dashed border-[#d7c9b8] rounded-2xl flex flex-col items-center justify-center gap-3 text-[#8f8376] hover:border-[#2c2b28] hover:text-[#2c2b28] transition"
                   >
                     <Upload size={32} />
                     <span className="text-base font-semibold">Click to upload image</span>
@@ -297,7 +314,7 @@ export default function CollectionsManagement() {
 
               {/* Name */}
               <div>
-                <label className="block text-base font-semibold text-[#3b302a] mb-2">
+                <label className="block text-base font-semibold text-[#2c2b28] mb-2">
                   Collection Name <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -305,49 +322,49 @@ export default function CollectionsManagement() {
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Batik Collection"
-                  className="w-full border border-[#e5ddd5] rounded-xl px-4 py-3 text-base outline-none focus:border-[#3b302a] transition"
+                  className="w-full border border-[#d7c9b8] rounded-xl px-4 py-3 text-base outline-none focus:border-[#2c2b28] transition"
                 />
-                <p className="text-sm text-[#a3948b] mt-1.5">
+                <p className="text-sm text-[#8f8376] mt-1.5">
                   Must match the Set Name used when adding products
                 </p>
               </div>
 
               {/* Subtitle */}
               <div>
-                <label className="block text-base font-semibold text-[#3b302a] mb-2">Subtitle</label>
+                <label className="block text-base font-semibold text-[#2c2b28] mb-2">Subtitle</label>
                 <input
                   type="text"
                   value={form.subtitle}
                   onChange={(e) => setForm((f) => ({ ...f, subtitle: e.target.value }))}
                   placeholder="e.g. Sri Lankan hand-printed batik"
-                  className="w-full border border-[#e5ddd5] rounded-xl px-4 py-3 text-base outline-none focus:border-[#3b302a] transition"
+                  className="w-full border border-[#d7c9b8] rounded-xl px-4 py-3 text-base outline-none focus:border-[#2c2b28] transition"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-base font-semibold text-[#3b302a] mb-2">Description</label>
+                <label className="block text-base font-semibold text-[#2c2b28] mb-2">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="Short description of this collection..."
                   rows={3}
-                  className="w-full border border-[#e5ddd5] rounded-xl px-4 py-3 text-base outline-none focus:border-[#3b302a] transition resize-none"
+                  className="w-full border border-[#d7c9b8] rounded-xl px-4 py-3 text-base outline-none focus:border-[#2c2b28] transition resize-none"
                 />
               </div>
 
               {/* Display Order */}
               <div>
-                <label className="block text-base font-semibold text-[#3b302a] mb-2">Display Order</label>
+                <label className="block text-base font-semibold text-[#2c2b28] mb-2">Display Order</label>
                 <input
                   type="number"
                   value={form.displayOrder}
                   onChange={(e) => setForm((f) => ({ ...f, displayOrder: e.target.value }))}
                   placeholder="1"
                   min={0}
-                  className="w-full sm:w-36 border border-[#e5ddd5] rounded-xl px-4 py-3 text-base outline-none focus:border-[#3b302a] transition"
+                  className="w-full sm:w-36 border border-[#d7c9b8] rounded-xl px-4 py-3 text-base outline-none focus:border-[#2c2b28] transition"
                 />
-                <p className="text-sm text-[#a3948b] mt-1.5">Lower numbers appear first in the header</p>
+                <p className="text-sm text-[#8f8376] mt-1.5">Lower numbers appear first in the header</p>
               </div>
 
               {formError && (
@@ -361,14 +378,14 @@ export default function CollectionsManagement() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 sm:px-6 py-3 rounded-xl border border-[#e5ddd5] text-base font-medium text-[#3b302a] hover:bg-[#f8f5f2] transition"
+                  className="px-4 sm:px-6 py-3 rounded-xl border border-[#d7c9b8] text-base font-medium text-[#2c2b28] hover:bg-[#eae0d6] transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 sm:px-6 py-3 rounded-xl bg-[#3b302a] text-white text-base font-semibold hover:bg-[#2e2622] disabled:opacity-50 transition"
+                  className="px-4 sm:px-6 py-3 rounded-xl bg-[#2c2b28] text-white text-base font-semibold hover:bg-[#544c43] disabled:opacity-50 transition"
                 >
                   {saving ? "Saving..." : editing ? "Save Changes" : "Create Collection"}
                 </button>

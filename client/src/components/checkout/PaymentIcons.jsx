@@ -51,6 +51,7 @@ export function AmexIcon() {
   );
 }
 
+/* Koko payment icon currently disabled.
 export function KokoIcon() {
   return (
     <svg width="52" height="30" viewBox="0 0 52 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -68,7 +69,9 @@ export function KokoIcon() {
     </svg>
   );
 }
+*/
 
+/* Mintpay payment icon currently disabled.
 export function MintpayIcon() {
   return (
     <svg width="62" height="30" viewBox="0 0 62 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -86,14 +89,15 @@ export function MintpayIcon() {
     </svg>
   );
 }
+*/
 
 export function CodIcon() {
   return (
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="30" height="30" rx="4" fill="#F7F7F7" stroke="#E0DADA" strokeWidth="0.8"/>
-      <rect x="7" y="9" width="16" height="12" rx="1.5" stroke="#7D746C" strokeWidth="1.3"/>
-      <path d="M10 14h10M10 17h6" stroke="#7D746C" strokeWidth="1.2" strokeLinecap="round"/>
-      <circle cx="10.5" cy="11.5" r="1.5" fill="#7D746C"/>
+      <rect x="7" y="9" width="16" height="12" rx="1.5" stroke="#5F564D" strokeWidth="1.3"/>
+      <path d="M10 14h10M10 17h6" stroke="#5F564D" strokeWidth="1.2" strokeLinecap="round"/>
+      <circle cx="10.5" cy="11.5" r="1.5" fill="#5F564D"/>
     </svg>
   );
 }

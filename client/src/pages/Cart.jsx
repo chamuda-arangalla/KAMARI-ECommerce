@@ -11,8 +11,8 @@ export default function Cart() {
     totalItems,
     subtotal,
     discount,
-    afterDiscount,
-    freeDelivery,
+    // afterDiscount,
+    // freeDelivery,
     deliveryFee,
     total,
     promoCode,
@@ -28,7 +28,7 @@ export default function Cart() {
   return (
     <div
       className="min-h-screen bg-white"
-      style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+      style={{ fontFamily: "var(--kamari-font-body)" }}
     >
       <CartHeader totalItems={totalItems} />
 
@@ -40,7 +40,7 @@ export default function Cart() {
           className="max-w-6xl mx-auto px-6 py-32 text-center"
         >
           <p className="text-6xl mb-8 text-gray-200">○</p>
-          <h2 className="text-2xl font-light tracking-[0.1em] text-gray-800 mb-3">
+          <h2 className="text-2xl text-gray-800 mb-3">
             YOUR BAG IS EMPTY
           </h2>
           <p className="text-base text-gray-400 mb-10 tracking-wide">
@@ -48,27 +48,27 @@ export default function Cart() {
           </p>
           <Link
             to="/"
-            className="inline-block rounded-full bg-[#E8DED6] px-10 py-3 text-sm uppercase tracking-[0.18em] text-[#3B302A] transition hover:bg-[#d8c9bd]"
+            className="inline-block rounded-full bg-[#E8DED6] px-10 py-3 text-sm uppercase tracking-[0.18em] text-[#2C2B28] transition hover:bg-[#d8c9bd]"
           >
             CONTINUE SHOPPING
           </Link>
         </motion.div>
       ) : (
         <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
+          {/* Free delivery disabled: CartItems previously received afterDiscount. */}
           <CartItems
             items={items}
-            afterDiscount={afterDiscount}
             onUpdateQty={handleUpdateQty}
             onRemove={handleRemove}
           />
 
+          {/* Free delivery disabled: Checkout previously received freeDelivery. */}
           <Checkout
             subtotal={subtotal}
             discount={discount}
             deliveryFee={deliveryFee}
             total={total}
             totalItems={totalItems}
-            freeDelivery={freeDelivery}
             promoApplied={promoApplied}
             promoCode={promoCode}
             promoError={promoError}

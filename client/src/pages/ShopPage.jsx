@@ -1,334 +1,153 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { X } from "lucide-react";
+import FilterSortDrawer from "../components/common/FilterSortDrawer";
+import ProductGridTopbar from "../components/common/ProductGridTopbar";
+import ShopFilters from "../components/shop/ShopFilters";
+import ShopHero from "../components/shop/ShopHero";
+import ShopPagination from "../components/shop/ShopPagination";
+import ShopProductGrid from "../components/shop/ShopProductGrid";
+import { SHOP_PRODUCTS_PER_PAGE } from "../components/shop/shopUtils";
 import { getProducts } from "../services/productApi";
-import { useCart } from "../context/useCart";
+import "../styles/ProductGridMimosa.css";
 import "../styles/ShopPage.css";
-
-const FALLBACK =
-  "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=700&q=80";
-const PER_PAGE = 8;
-
-const getImages = (product) =>
-  product.colors?.flatMap((c) => c.images || []) || [];
-
-const totalStock = (product) =>
-  product.colors?.reduce(
-    (t, c) => t + (c.sizes?.reduce((s, sz) => s + Number(sz.stock || 0), 0) || 0),
-    0,
-  ) || 0;
-
-const inStock = (product) =>
-  !product.isSoldOut && totalStock(product) > 0;
-
-const firstAvailable = (product) => {
-  const color =
-    product.colors?.find((c) => c.sizes?.some((s) => Number(s.stock || 0) > 0)) ||
-    product.colors?.[0];
-  const size =
-    color?.sizes?.find((s) => Number(s.stock || 0) > 0) || color?.sizes?.[0];
-  return { colorName: color?.colorName || "Default", size: size?.size || "S" };
-};
 
 export default function ShopPage() {
   const navigate = useNavigate();
-  const { handleAddItem } = useCart();
 
-  const [products, setProducts]     = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState("");
-  const [tab, setTab]               = useState("all");       // all | new | best
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [tab, setTab] = useState("all");
   const [collection, setCollection] = useState("All");
-  const [sort, setSort]             = useState("featured");
-  const [page, setPage]             = useState(1);
+  const [sort, setSort] = useState("featured");
+  const [page, setPage] = useState(1);
+  const [cols, setCols] = useState(4);
+  const [filterOpen, setFilterOpen] = useState(false);
+
   useEffect(() => {
-    (async () => {
+    const loadProducts = async () => {
       try {
         setLoading(true);
         setError("");
         const res = await getProducts();
         setProducts(res.data || []);
-      } catch (e) {
-        setError(e.response?.data?.message || "Failed to load products");
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load products");
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    loadProducts();
   }, []);
 
   const collections = useMemo(
-    () => ["All", ...new Set(products.map((p) => p.setName || p.collection).filter(Boolean))],
+    () => [
+      "All",
+      ...new Set(
+        products
+          .map((product) => product.setName || product.collection)
+          .filter(Boolean),
+      ),
+    ],
     [products],
   );
 
-  const filtered = useMemo(() => {
+  const filteredProducts = useMemo(() => {
     let list = [...products];
-    if (tab === "new")  list = list.filter((p) => p.isNewArrival);
-    if (tab === "best") list = list.filter((p) => p.isFeatured);
-    if (collection !== "All") list = list.filter((p) => (p.setName || p.collection) === collection);
-    if (sort === "price-asc")  list.sort((a, b) => a.price - b.price);
+
+    if (tab === "new") list = list.filter((product) => product.isNewArrival);
+    if (tab === "best") list = list.filter((product) => product.isFeatured);
+    if (collection !== "All") {
+      list = list.filter(
+        (product) => (product.setName || product.collection) === collection,
+      );
+    }
+
+    if (sort === "price-asc") list.sort((a, b) => a.price - b.price);
     if (sort === "price-desc") list.sort((a, b) => b.price - a.price);
-    if (sort === "name-asc")   list.sort((a, b) => a.name.localeCompare(b.name));
-    if (sort === "newest")     list.sort((a, b) => (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0));
+    if (sort === "name-asc") {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sort === "newest") {
+      list.sort(
+        (a, b) =>
+          (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0),
+      );
+    }
+
     return list;
   }, [products, tab, collection, sort]);
 
-  const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const totalPages = Math.ceil(filteredProducts.length / SHOP_PRODUCTS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (page - 1) * SHOP_PRODUCTS_PER_PAGE,
+    page * SHOP_PRODUCTS_PER_PAGE,
+  );
 
-  const handleTabChange = (t) => { setTab(t); setPage(1); };
-  const handleCollectionChange = (c) => { setCollection(c); setPage(1); };
-  const handleSortChange = (s) => { setSort(s); setPage(1); };
+  const handlePageChange = (nextPage) => {
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  const quickAdd = (product, color) => {
-    if (!inStock(product)) return;
-    const imgs = color?.images?.length ? color.images : getImages(product);
-    const variant = color
-      ? { colorName: color.colorName, size: color.sizes?.find((s) => Number(s.stock || 0) > 0)?.size || color.sizes?.[0]?.size || "S" }
-      : firstAvailable(product);
-    handleAddItem({
-      id: `${product._id}-${variant.colorName}-${variant.size}`,
-      productId: product._id,
-      name: product.name,
-      variant: variant.colorName,
-      size: variant.size,
-      price: Number(product.price || 0),
-      qty: 1,
-      img: imgs[0]?.url || FALLBACK,
-    });
+  const handleTabChange = (nextTab) => {
+    setTab(nextTab);
+    setPage(1);
+  };
+
+  const handleCollectionChange = (nextCollection) => {
+    setCollection(nextCollection);
+    setPage(1);
+  };
+
+  const handleSortChange = (nextSort) => {
+    setSort(nextSort);
+    setPage(1);
+  };
+
+  const clearFilters = () => {
+    setTab("all");
+    handleCollectionChange("All");
   };
 
   return (
     <main className="shop-page">
+      <ShopHero />
 
-      {/* ── Page Header ──────────────────────────────── */}
-      <div className="shop-hero">
-        <h1 className="shop-hero-title">Shop All</h1>
-        <p className="shop-hero-sub">
-          Discover our full range of women's fashion — from everyday casuals to smart formals.
-        </p>
-      </div>
+      <ProductGridTopbar
+        cols={cols}
+        count={filteredProducts.length}
+        loading={loading}
+        onColsChange={setCols}
+        onFilterClick={() => setFilterOpen(true)}
+      />
 
-      {/* ── Tabs + Controls ──────────────────────────── */}
-      <div className="shop-controls">
-        {/* Tabs */}
-        <div className="shop-tabs">
-          {[["all","All"], ["new","New Arrivals"], ["best","Best Sellers"]].map(([key, label]) => (
-            <button
-              key={key}
-              className={`shop-tab ${tab === key ? "active" : ""}`}
-              onClick={() => handleTabChange(key)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <ShopProductGrid
+        cols={cols}
+        error={error}
+        loading={loading}
+        products={paginatedProducts}
+        onClearFilters={clearFilters}
+        onOpenProduct={(product) => navigate(`/products/${product._id}`)}
+      />
 
-        {/* Right controls */}
-        <div className="shop-controls-right">
-          <span className="shop-count">
-            {loading ? "Loading..." : `${filtered.length} ${filtered.length === 1 ? "product" : "products"}`}
-          </span>
+      <ShopPagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
 
-          {/* Collection filter */}
-          <select
-            className="shop-select"
-            value={collection}
-            onChange={(e) => handleCollectionChange(e.target.value)}
-          >
-            {collections.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-
-          {/* Sort */}
-          <select
-            className="shop-select"
-            value={sort}
-            onChange={(e) => handleSortChange(e.target.value)}
-          >
-            <option value="featured">Featured</option>
-            <option value="newest">New Arrivals</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name-asc">Alphabetical</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Active collection pill */}
-      {collection !== "All" && (
-        <div className="shop-active-filter">
-          <span>Collection: <strong>{collection}</strong></span>
-          <button onClick={() => handleCollectionChange("All")}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
-      {/* ── Product Grid ─────────────────────────────── */}
-      {loading ? (
-        <div className="shop-grid">
-          {Array.from({ length: PER_PAGE }).map((_, i) => (
-            <ShopCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : error ? (
-        <div className="shop-state">
-          <p className="shop-error">{error}</p>
-        </div>
-      ) : paginated.length === 0 ? (
-        <div className="shop-state">
-          <p className="shop-empty-title">No products found</p>
-          <p className="shop-empty-sub">Try selecting a different tab or collection.</p>
-          <button className="shop-reset-btn" onClick={() => { setTab("all"); handleCollectionChange("All"); }}>
-            Clear filters
-          </button>
-        </div>
-      ) : (
-        <div className="shop-grid">
-          {paginated.map((product) => (
-            <ShopCard
-              key={product._id}
-              product={product}
-              onOpen={() => navigate(`/products/${product._id}`)}
-              onQuickAdd={(color) => quickAdd(product, color)}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ── Pagination ───────────────────────────────── */}
-      {totalPages > 1 && (
-        <div className="shop-pagination">
-          <button
-            className="shop-page-btn"
-            disabled={page === 1}
-            onClick={() => { setPage((p) => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          >
-            ‹
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              className={`shop-page-btn ${p === page ? "active" : ""}`}
-              onClick={() => { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-            >
-              {p}
-            </button>
-          ))}
-          <button
-            className="shop-page-btn"
-            disabled={page === totalPages}
-            onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          >
-            ›
-          </button>
-        </div>
-      )}
+      <FilterSortDrawer open={filterOpen} onClose={() => setFilterOpen(false)}>
+        <ShopFilters
+          collection={collection}
+          collections={collections}
+          sort={sort}
+          tab={tab}
+          onCollectionChange={handleCollectionChange}
+          onSortChange={handleSortChange}
+          onTabChange={handleTabChange}
+        />
+      </FilterSortDrawer>
     </main>
-  );
-}
-
-function ShopCardSkeleton() {
-  return (
-    <article className="shop-card shop-card-skeleton">
-      <div className="shop-card-img-wrap">
-        <div className="skeleton skeleton-img" />
-      </div>
-      <div className="shop-card-info">
-        <div className="skeleton skeleton-text short" />
-        <div className="skeleton skeleton-text medium" />
-        <div className="skeleton-swatches">
-          <div className="skeleton skeleton-swatch" />
-          <div className="skeleton skeleton-swatch" />
-          <div className="skeleton skeleton-swatch" />
-        </div>
-        <div className="skeleton skeleton-text short" />
-        <div className="skeleton skeleton-text medium" />
-      </div>
-    </article>
-  );
-}
-
-function ShopCard({ product, onOpen, onQuickAdd }) {
-  const colors   = product.colors || [];
-  const inStockP = inStock(product);
-  const images   = getImages(product);
-
-  const [hoveredColor, setHoveredColor] = useState(null);
-
-  const activeColor  = hoveredColor ?? colors[0];
-  const displayImg   = activeColor?.images?.[0]?.url || images[0]?.url || FALLBACK;
-  const displayImg2  = activeColor?.images?.[1]?.url || images[1]?.url || displayImg;
-
-  const badge = product.isFeatured ? "Best Seller"
-              : product.isNewArrival ? "New"
-              : null;
-
-  const colorSoldOut = (color) =>
-    color.sizes?.every((s) => Number(s.stock || 0) === 0);
-
-  return (
-    <article className="shop-card" onClick={onOpen}>
-      {/* Image */}
-      <div className="shop-card-img-wrap">
-        <img src={displayImg}  alt={product.name} className="shop-card-img front" />
-        <img src={displayImg2} alt={product.name} className="shop-card-img back" />
-
-        {badge && inStockP && (
-          <span className={`shop-card-badge ${badge === "Best Seller" ? "best" : "new"}`}>
-            {badge}
-          </span>
-        )}
-
-        {!inStockP && (
-          <div className="shop-card-sold-out">
-            <span>Sold Out</span>
-          </div>
-        )}
-
-        {inStockP && (
-          <button
-            className="shop-card-quick-add"
-            onClick={(e) => { e.stopPropagation(); onQuickAdd(activeColor); }}
-          >
-            Quick Add
-          </button>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="shop-card-info">
-        <p className="shop-card-collection">
-          {product.setName || product.collection}
-        </p>
-        <p className="shop-card-name">{product.name}</p>
-
-        {/* Color swatches */}
-        <div className="shop-card-swatches">
-          {colors.slice(0, 5).map((c) => (
-            <button
-              key={c._id || c.colorName}
-              type="button"
-              className={`shop-card-swatch ${colorSoldOut(c) ? "sold-out" : ""} ${activeColor === c ? "active" : ""}`}
-              style={{ backgroundColor: c.colorCode || "#ccc" }}
-              title={colorSoldOut(c) ? `${c.colorName} — Sold Out` : c.colorName}
-              onClick={(e) => { e.stopPropagation(); setHoveredColor(c); }}
-              onMouseEnter={() => setHoveredColor(c)}
-              onMouseLeave={() => setHoveredColor(null)}
-            />
-          ))}
-          {colors.length > 5 && (
-            <span className="shop-card-more-colors">+{colors.length - 5}</span>
-          )}
-        </div>
-
-        <p className="shop-card-price">LKR {Number(product.price || 0).toLocaleString()}</p>
-        <p className="shop-card-installment">
-          or 3 × LKR {Math.round(Number(product.price || 0) / 3).toLocaleString()} with Koko
-        </p>
-      </div>
-    </article>
   );
 }

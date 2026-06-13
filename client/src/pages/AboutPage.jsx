@@ -13,7 +13,7 @@ const stagger = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#F8F5F2] text-[#342C27]" style={{ paddingTop: "70px" }}>
+    <main className="min-h-screen overflow-hidden bg-[#EAE0D6] text-[#342C27]" style={{ paddingTop: "70px" }}>
       <section className="relative min-h-[78vh] overflow-hidden bg-[#EFE7DF]">
         <motion.img
           src={aboutHeroImg}
@@ -23,7 +23,7 @@ export default function AboutPage() {
           animate={{ scale: 1, opacity: 0.95 }}
           transition={{ duration: 1.4, ease: "easeOut" }}
         />
-        <div className="absolute inset-0 bg-[#3B302A]/34" />
+        <div className="absolute inset-0 bg-[#2C2B28]/34" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(248,245,242,0.9)_0%,rgba(248,245,242,0.72)_42%,rgba(59,48,42,0.24)_100%)]" />
 
         <motion.div
@@ -55,7 +55,7 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      <section className="relative bg-[#F8F5F2] px-6 py-20 sm:py-24">
+      <section className="relative bg-[#EAE0D6] px-6 py-20 sm:py-24">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <motion.div
             variants={fadeUp}
@@ -65,7 +65,7 @@ export default function AboutPage() {
             transition={{ duration: 0.7 }}
           >
             <p className="mb-4 text-xs uppercase tracking-[0.28em] text-[#8B7164]">The Brand Story</p>
-            <h2 className="text-4xl font-light leading-tight text-[#342C27] sm:text-5xl">
+            <h2 className="text-4xl leading-tight text-[#342C27] sm:text-5xl">
               Rest, made intentional.
             </h2>
           </motion.div>

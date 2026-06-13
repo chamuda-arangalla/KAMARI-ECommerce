@@ -152,82 +152,82 @@ const OrdersPage = () => {
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[#3b302a]">Orders</h2>
-          <p className="text-[#a3948b] mt-1">Manage and track customer orders</p>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-[#2c2b28]">Orders</h2>
+          <p className="text-[#8f8376] mt-1">Manage and track customer orders</p>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
           <button
             onClick={refreshOrders}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#e5ddd5] rounded-lg text-[#6b5e55] hover:bg-[#fcfaf7] transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#d7c9b8] rounded-lg text-[#5f564d] hover:bg-[#fcfaf7] transition-all"
           >
             <Download size={18} />
             <span>Refresh</span>
           </button>
-          <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#e5ddd5] rounded-xl text-base font-medium text-[#6b5e55] hover:bg-[#fcfaf7] transition-all">
+          <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#d7c9b8] rounded-xl text-base font-medium text-[#5f564d] hover:bg-[#fcfaf7] transition-all">
             <Download size={20} />
             Export CSV
           </button>
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto border-b border-[#e5ddd5] sm:gap-8">
+      <div className="flex gap-2 overflow-x-auto border-b border-[#d7c9b8] sm:gap-8">
         {tabs.map((tab) => (
           <button
             key={tab.label}
             onClick={() => setFilter(tab.label)}
             className={`relative shrink-0 px-1 pb-4 text-sm sm:text-base font-medium transition-all ${
-              filter === tab.label ? 'text-[#3b302a]' : 'text-[#a3948b] hover:text-[#6b5e55]'
+              filter === tab.label ? 'text-[#2c2b28]' : 'text-[#8f8376] hover:text-[#5f564d]'
             }`}
           >
             {tab.label}
             {filter === tab.label && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3b302a]"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2c2b28]"
               />
             )}
           </button>
         ))}
       </div>
 
-      <div className="rounded-2xl border border-[#e5ddd5] bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-[#d7c9b8] bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-[#a3948b]">Search Orders</p>
-            <p className="mt-1 text-sm text-[#7d746c]">{filteredOrders.length} shown</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-[#8f8376]">Search Orders</p>
+            <p className="mt-1 text-sm text-[#5f564d]">{filteredOrders.length} shown</p>
           </div>
           <div className="relative w-full md:max-w-md">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a3948b]" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8376]" />
             <input
               type="search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Search order, customer, address, or status"
-              className="w-full rounded-xl border border-[#e5ddd5] bg-[#fcfaf7] py-3 pl-10 pr-4 text-sm text-[#3b302a] outline-none transition-all placeholder:text-[#b8ada5] focus:border-[#c2b2a6] focus:bg-white"
+              className="w-full rounded-xl border border-[#d7c9b8] bg-[#fcfaf7] py-3 pl-10 pr-4 text-sm text-[#2c2b28] outline-none transition-all placeholder:text-[#b8ada5] focus:border-[#c2b2a6] focus:bg-white"
             />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e5ddd5] overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl border border-[#d7c9b8] overflow-hidden shadow-sm">
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-[#fcfaf7] border-b border-[#e5ddd5]">
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Order</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Items</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Total</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Payment Status</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Order Status</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#a3948b] uppercase tracking-wider">Need to Verify</th>
+              <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Order</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Items</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Total</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Payment Status</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Order Status</th>
+                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Need to Verify</th>
                 <th className="px-6 py-5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
               {ordersLoading && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-[#6b5e55]">
+                  <td colSpan={8} className="px-6 py-12 text-center text-[#5f564d]">
                     <span className="inline-flex items-center gap-2">
                       <Loader2 size={18} className="animate-spin" />
                       Loading orders...
@@ -248,7 +248,7 @@ const OrdersPage = () => {
 
               {!ordersLoading && !ordersError && filteredOrders.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-[#a3948b]">
+                  <td colSpan={8} className="px-6 py-12 text-center text-[#8f8376]">
                     No orders found.
                   </td>
                 </tr>
@@ -261,14 +261,14 @@ const OrdersPage = () => {
                   onClick={() => handleSelectOrder(order)}
                 >
                   <td className="px-6 py-5 whitespace-nowrap">
-                    <span className="text-base font-semibold text-[#3b302a]">{order.orderNumber}</span>
-                    <div className="text-sm text-[#a3948b] mt-0.5">{order.date}</div>
+                    <span className="text-base font-semibold text-[#2c2b28]">{order.orderNumber}</span>
+                    <div className="text-sm text-[#8f8376] mt-0.5">{order.date}</div>
                   </td>
-                  <td className="px-6 py-5 text-base text-[#6b5e55]">{order.customerName}</td>
-                  <td className="px-6 py-5 text-base text-[#6b5e55]">
+                  <td className="px-6 py-5 text-base text-[#5f564d]">{order.customerName}</td>
+                  <td className="px-6 py-5 text-base text-[#5f564d]">
                     {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                   </td>
-                  <td className="px-6 py-4 font-semibold text-[#3b302a]">{formatCurrency(order.totalAmount)}</td>
+                  <td className="px-6 py-4 font-semibold text-[#2c2b28]">{formatCurrency(order.totalAmount)}</td>
                   <td className="px-6 py-4">
                     <StatusBadge status={order.status} />
                   </td>
@@ -279,7 +279,7 @@ const OrdersPage = () => {
                     <NeedVerifyBadge needsVerify={order.needsPaymentVerification} />
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 text-[#a3948b] group-hover:text-[#3b302a] transition-all">
+                    <button className="p-2 text-[#8f8376] group-hover:text-[#2c2b28] transition-all">
                       <ChevronRight size={22} />
                     </button>
                   </td>
@@ -291,7 +291,7 @@ const OrdersPage = () => {
 
         <div className="divide-y divide-[#f3ede8] md:hidden">
           {ordersLoading && (
-            <div className="px-5 py-10 text-center text-[#6b5e55]">
+            <div className="px-5 py-10 text-center text-[#5f564d]">
               <span className="inline-flex items-center gap-2">
                 <Loader2 size={18} className="animate-spin" />
                 Loading orders...
@@ -308,7 +308,7 @@ const OrdersPage = () => {
           )}
 
           {!ordersLoading && !ordersError && filteredOrders.length === 0 && (
-            <div className="px-5 py-10 text-center text-[#a3948b]">No orders found.</div>
+            <div className="px-5 py-10 text-center text-[#8f8376]">No orders found.</div>
           )}
 
           {!ordersLoading && !ordersError && filteredOrders.map((order) => (
@@ -320,27 +320,27 @@ const OrdersPage = () => {
             >
               <div className="mb-3 flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-base font-semibold text-[#3b302a]">{order.orderNumber}</p>
-                  <p className="mt-0.5 text-sm text-[#a3948b]">{order.date}</p>
+                  <p className="text-base font-semibold text-[#2c2b28]">{order.orderNumber}</p>
+                  <p className="mt-0.5 text-sm text-[#8f8376]">{order.date}</p>
                 </div>
                 <StatusBadge status={order.status} />
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-[#a3948b]">Customer</p>
-                  <p className="mt-1 font-medium text-[#6b5e55]">{order.customerName}</p>
+                  <p className="text-xs uppercase tracking-wider text-[#8f8376]">Customer</p>
+                  <p className="mt-1 font-medium text-[#5f564d]">{order.customerName}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-[#a3948b]">Total</p>
-                  <p className="mt-1 font-semibold text-[#3b302a]">{formatCurrency(order.totalAmount)}</p>
+                  <p className="text-xs uppercase tracking-wider text-[#8f8376]">Total</p>
+                  <p className="mt-1 font-semibold text-[#2c2b28]">{formatCurrency(order.totalAmount)}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-[#a3948b]">Items</p>
-                  <p className="mt-1 text-[#6b5e55]">
+                  <p className="text-xs uppercase tracking-wider text-[#8f8376]">Items</p>
+                  <p className="mt-1 text-[#5f564d]">
                     {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                   </p>
                 </div>
-                <div className="flex items-end justify-end text-[#a3948b]">
+                <div className="flex items-end justify-end text-[#8f8376]">
                   <ChevronRight size={22} />
                 </div>
               </div>
@@ -368,34 +368,34 @@ const OrdersPage = () => {
             >
               <div className="p-5 sm:p-8 space-y-6 sm:space-y-8">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-semibold text-[#3b302a]">Order Details</h3>
+                  <h3 className="text-2xl font-semibold text-[#2c2b28]">Order Details</h3>
                   <button
                     onClick={handleCloseOrder}
-                    className="p-2 hover:bg-[#f8f5f2] rounded-full text-[#6b5e55]"
+                    className="p-2 hover:bg-[#eae0d6] rounded-full text-[#5f564d]"
                   >
                     <ChevronRight size={24} />
                   </button>
                 </div>
 
-                <div className="bg-[#fcfaf7] p-6 rounded-2xl border border-[#e5ddd5] space-y-4">
+                <div className="bg-[#fcfaf7] p-6 rounded-2xl border border-[#d7c9b8] space-y-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-1">Order Number</p>
-                      <p className="text-xl font-bold text-[#3b302a]">{selectedOrder.orderNumber}</p>
+                      <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">Order Number</p>
+                      <p className="text-xl font-bold text-[#2c2b28]">{selectedOrder.orderNumber}</p>
                     </div>
                     <StatusBadge status={selectedOrder.status} />
                   </div>
                   <div>
-                    <p className="text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-1">Placed On</p>
-                    <p className="text-base text-[#6b5e55]">{selectedOrder.date}</p>
+                    <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">Placed On</p>
+                    <p className="text-base text-[#5f564d]">{selectedOrder.date}</p>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-[#e5ddd5] space-y-4 shadow-sm">
+                <div className="bg-white p-6 rounded-2xl border border-[#d7c9b8] space-y-4 shadow-sm">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-sm text-[#a3948b] uppercase tracking-widest font-bold mb-1">Update Order Status</p>
-                      <p className="text-sm text-[#7d746c]">Change the fulfillment stage for this order.</p>
+                      <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">Update Order Status</p>
+                      <p className="text-sm text-[#5f564d]">Change the fulfillment stage for this order.</p>
                     </div>
                     <OrderStatusBadge status={selectedOrder.orderStatus} />
                   </div>
@@ -404,7 +404,7 @@ const OrdersPage = () => {
                       value=""
                       onChange={handleOrderStatusChange}
                       disabled={updatingOrderStatus}
-                      className="w-full rounded-xl border border-[#e5ddd5] bg-white px-4 py-3 text-sm font-medium text-[#3b302a] outline-none transition-all focus:border-[#c2b2a6] disabled:opacity-60"
+                      className="w-full rounded-xl border border-[#d7c9b8] bg-white px-4 py-3 text-sm font-medium text-[#2c2b28] outline-none transition-all focus:border-[#c2b2a6] disabled:opacity-60"
                     >
                       <option value="">Select next status</option>
                       {nextOrderStatusOptions.map((status) => (
@@ -424,31 +424,31 @@ const OrdersPage = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <h4 className="text-base font-bold text-[#3b302a] uppercase tracking-widest">Customer Info</h4>
-                  <p className="text-base font-semibold text-[#3b302a]">{selectedOrder.customerName}</p>
-                  <p className="text-base text-[#6b5e55] leading-relaxed">{selectedOrder.deliveryAddress}</p>
+                  <h4 className="text-base font-bold text-[#2c2b28] uppercase tracking-widest">Customer Info</h4>
+                  <p className="text-base font-semibold text-[#2c2b28]">{selectedOrder.customerName}</p>
+                  <p className="text-base text-[#5f564d] leading-relaxed">{selectedOrder.deliveryAddress}</p>
                 </div>
 
                 <div className="space-y-3">
-                  <h4 className="text-base font-bold text-[#3b302a] uppercase tracking-widest">Order Items</h4>
+                  <h4 className="text-base font-bold text-[#2c2b28] uppercase tracking-widest">Order Items</h4>
                   <div className="divide-y divide-[#f3ede8]">
                     {selectedOrder.items.map((item, idx) => (
                       <div key={`${item.name}-${idx}`} className="py-4 flex justify-between gap-4">
                         <div>
-                          <p className="text-[#3b302a] font-medium">{item.name}</p>
-                          <p className="text-sm text-[#a3948b]">
+                          <p className="text-[#2c2b28] font-medium">{item.name}</p>
+                          <p className="text-sm text-[#8f8376]">
                             {item.colour} · Size {item.size} · Qty: {item.quantity} x {formatCurrency(item.price)}
                           </p>
                         </div>
-                        <p className="font-semibold text-[#3b302a] whitespace-nowrap">
+                        <p className="font-semibold text-[#2c2b28] whitespace-nowrap">
                           {formatCurrency(item.quantity * item.price)}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <div className="pt-4 border-t border-[#e5ddd5] flex justify-between items-center">
-                    <p className="text-lg font-semibold text-[#3b302a]">Total</p>
-                    <p className="text-2xl font-bold text-[#3b302a]">
+                  <div className="pt-4 border-t border-[#d7c9b8] flex justify-between items-center">
+                    <p className="text-lg font-semibold text-[#2c2b28]">Total</p>
+                    <p className="text-2xl font-bold text-[#2c2b28]">
                       {formatCurrency(selectedOrder.totalAmount)}
                     </p>
                   </div>
@@ -456,7 +456,7 @@ const OrdersPage = () => {
 
                 {/* Payment */}
                 <div>
-                  <h4 className="text-base font-bold text-[#3b302a] uppercase tracking-widest mb-3">
+                  <h4 className="text-base font-bold text-[#2c2b28] uppercase tracking-widest mb-3">
                     {isSelectedOrderCod ? 'Payment' : 'Payment Slip'}
                   </h4>
                   {isSelectedOrderCod ? (
@@ -469,19 +469,19 @@ const OrdersPage = () => {
                         href={selectedOrder.paymentSlip.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block overflow-hidden rounded-xl border border-[#e5ddd5]"
+                        className="block overflow-hidden rounded-xl border border-[#d7c9b8]"
                       >
                         <img
                           src={selectedOrder.paymentSlip.url}
                           alt="Payment slip"
-                          className="w-full object-contain max-h-72 bg-[#f8f5f2]"
+                          className="w-full object-contain max-h-72 bg-[#eae0d6]"
                         />
                       </a>
                       <a
                         href={selectedOrder.paymentSlip.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-[#7d746c] underline underline-offset-2 hover:text-[#3b302a] transition-colors"
+                        className="inline-flex items-center gap-2 text-sm text-[#5f564d] underline underline-offset-2 hover:text-[#2c2b28] transition-colors"
                       >
                         View full image ↗
                       </a>
@@ -507,7 +507,7 @@ const OrdersPage = () => {
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-[#a3948b] py-3 px-4 bg-[#f8f5f2] rounded-lg border border-[#e5ddd5]">
+                    <p className="text-sm text-[#8f8376] py-3 px-4 bg-[#eae0d6] rounded-lg border border-[#d7c9b8]">
                       No payment slip uploaded yet.
                     </p>
                   )}
@@ -518,7 +518,7 @@ const OrdersPage = () => {
                   )}
                 </div>
 
-                <button className="w-full py-4 bg-[#3b302a] text-white text-base font-semibold rounded-xl hover:bg-[#2a221d] transition-all shadow-lg shadow-[#3b302a]/10">
+                <button className="w-full py-4 bg-[#2c2b28] text-white text-base font-semibold rounded-xl hover:bg-[#2a221d] transition-all shadow-lg shadow-[#2c2b28]/10">
                   Print Invoice
                 </button>
               </div>

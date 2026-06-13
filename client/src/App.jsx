@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { CartProvider } from "./context/CartContext";
 import Header from "./components/layout/Header";
 import CartDrawer from "./components/cart/CartDrawer";
+import HomeFooter from "./components/home/HomeFooter";
 import Home from "./pages/Home";
 import ShopPage from "./pages/ShopPage";
 import ProductDetails from "./pages/ProductDetails";
@@ -26,6 +27,9 @@ import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
+import { clearLegacyCustomerSession } from "./utils/customerSession";
+
+clearLegacyCustomerSession();
 
 const AdminGuard = ({ children }) => {
   const token = localStorage.getItem("adminToken");
@@ -42,25 +46,41 @@ const ScrollToTop = () => {
   return null;
 };
 
+const CustomerShell = ({ children }) => (
+  <div className="customer-theme flex min-h-screen flex-col">
+    <Header />
+    <CartDrawer />
+    <div className="flex-1">{children}</div>
+    <HomeFooter />
+  </div>
+);
+
+const CustomerAuthShell = ({ children }) => (
+  <div className="customer-theme">
+    {children}
+    <HomeFooter />
+  </div>
+);
+
 function App() {
   return (
     <BrowserRouter>
       <CartProvider>
         <ScrollToTop />
         <Routes>
-          <Route path="/" element={<><Header /><CartDrawer /><Home /></>} />
-          <Route path="/shop" element={<><Header /><CartDrawer /><ShopPage /></>} />
-          <Route path="/products/:id" element={<><Header /><CartDrawer /><ProductDetails /></>} />
-          <Route path="/cart" element={<><Header /><CartDrawer /><Cart /></>} />
-          <Route path="/checkout" element={<><Header /><CartDrawer /><CheckoutPage /></>} />
-          <Route path="/collections" element={<><Header /><CartDrawer /><CollectionsPage /></>} />
-          <Route path="/profile" element={<><Header /><CartDrawer /><CustomerProfilePage /></>} />
-          <Route path="/about"      element={<><Header /><CartDrawer /><AboutPage /></>} />
-          <Route path="/contact"    element={<><Header /><CartDrawer /><ContactPage /></>} />
-          <Route path="/orders"     element={<><Header /><CartDrawer /><CustomerOrdersPage /></>} />
-          <Route path="/orders/:id" element={<><Header /><CartDrawer /><CustomerOrderDetailsPage /></>} />
-          <Route path="/login" element={<CustomerLoginPage />} />
-          <Route path="/register" element={<CustomerRegisterPage />} />
+          <Route path="/" element={<CustomerShell><Home /></CustomerShell>} />
+          <Route path="/shop" element={<CustomerShell><ShopPage /></CustomerShell>} />
+          <Route path="/products/:id" element={<CustomerShell><ProductDetails /></CustomerShell>} />
+          <Route path="/cart" element={<CustomerShell><Cart /></CustomerShell>} />
+          <Route path="/checkout" element={<CustomerShell><CheckoutPage /></CustomerShell>} />
+          <Route path="/collections" element={<CustomerShell><CollectionsPage /></CustomerShell>} />
+          <Route path="/profile" element={<CustomerShell><CustomerProfilePage /></CustomerShell>} />
+          <Route path="/about" element={<CustomerShell><AboutPage /></CustomerShell>} />
+          <Route path="/contact" element={<CustomerShell><ContactPage /></CustomerShell>} />
+          <Route path="/orders" element={<CustomerShell><CustomerOrdersPage /></CustomerShell>} />
+          <Route path="/orders/:id" element={<CustomerShell><CustomerOrderDetailsPage /></CustomerShell>} />
+          <Route path="/login" element={<CustomerAuthShell><CustomerLoginPage /></CustomerAuthShell>} />
+          <Route path="/register" element={<CustomerAuthShell><CustomerRegisterPage /></CustomerAuthShell>} />
           <Route path="/auth/callback" element={<OAuthCallbackPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
