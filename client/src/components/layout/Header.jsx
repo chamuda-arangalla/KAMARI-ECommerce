@@ -221,10 +221,10 @@ const Header = () => {
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className="flex cursor-pointer items-center gap-1.5 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] sm:gap-2"
+            className="flex cursor-pointer items-center gap-1.5 text-[#2C2B28] sm:gap-2"
           >
             <Menu size={24} strokeWidth={1.5} />
-            <span className="hidden text-sm uppercase tracking-[0.18em] min-[430px]:inline">
+            <span className="hidden text-sm font-semibold uppercase tracking-[0.18em] min-[430px]:inline">
               Menu
             </span>
           </button>
@@ -242,7 +242,7 @@ const Header = () => {
             />
           </Link>
 
-          <div className="flex items-center gap-2 text-[#2C2B28] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] min-[430px]:gap-3 sm:gap-5">
+          <div className="flex items-center gap-2 text-[#2C2B28] min-[430px]:gap-3 sm:gap-5">
             <button
               type="button"
               onClick={() => setSearchOpen(true)}

@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { fadeUp, sectionReveal, stagger } from "./homeConstants";
+import { fadeUp, getHomeProductImage, sectionReveal, stagger } from "./homeConstants";
 
 export default function HomeCollectionsSection({
   collections,
+  collectionProducts = {},
   sliderRef,
   onOpenCollection,
   onScroll,
@@ -64,33 +65,56 @@ export default function HomeCollectionsSection({
           viewport={{ once: true, amount: 0.15 }}
           className="flex cursor-grab snap-x snap-mandatory gap-1 overflow-x-auto bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {collections.map((collection) => (
-            <motion.div
-              key={collection._id}
-              variants={fadeUp}
-              whileHover={{ scale: 1.01 }}
-              transition={{ duration: 0.3 }}
-              className="group relative w-full flex-shrink-0 snap-start cursor-pointer overflow-hidden sm:w-[calc((100%_-_0.25rem)/2)] md:w-[calc((100%_-_0.5rem)/3)] lg:w-[calc((100%_-_0.75rem)/4)]"
-              onClick={() => onOpenCollection(collection)}
-            >
-              <div
-                className="relative aspect-[4/5] overflow-hidden bg-[#F7F4F0]"
+          {collections.map((collection, index) => {
+            const product = collectionProducts[collection.name];
+            const imageUrl =
+              index > 0 && product
+                ? getHomeProductImage(product)
+                : collection.image?.url;
+
+            return (
+              <motion.div
+                key={collection._id}
+                variants={fadeUp}
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.3 }}
+                className={`group w-full flex-shrink-0 snap-start cursor-pointer bg-white sm:w-[calc((100%_-_0.25rem)/2)] md:w-[calc((100%_-_0.5rem)/3)] lg:w-[calc((100%_-_0.75rem)/4)] ${
+                  index === 0 ? "sticky left-0 z-[5]" : ""
+                }`}
+                onClick={() => onOpenCollection(collection)}
               >
-                {collection.image?.url ? (
-                  <img
-                    src={collection.image.url}
-                    alt={collection.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-[#E8DED6]" />
+                <div
+                  className="relative aspect-[4/5] overflow-hidden bg-[#F7F4F0]"
+                >
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={product?.name || collection.name}
+                      loading="lazy"
+                      decoding="async"
+                      className={`h-full w-full object-cover transition duration-700 group-hover:scale-105 ${
+                        index > 0 && product ? "object-top" : "object-center"
+                      }`}
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-[#E8DED6]" />
+                  )}
+                  <div className="absolute inset-0 bg-[#2C2B28]/12 transition duration-300 group-hover:bg-[#2C2B28]/6" />
+                </div>
+
+                {index > 0 && (
+                  <div className="pt-3 text-center">
+                    <h3 className="mb-1 text-sm">{collection.name}</h3>
+                    {collection.subtitle && (
+                      <p className="text-xs uppercase tracking-[0.14em] text-[#8f8376]">
+                        {collection.subtitle}
+                      </p>
+                    )}
+                  </div>
                 )}
-                <div className="absolute inset-0 bg-[#2C2B28]/12 transition duration-300 group-hover:bg-[#2C2B28]/6" />
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </motion.section>
