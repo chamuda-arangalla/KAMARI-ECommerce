@@ -12,6 +12,7 @@ import { getProducts } from "../services/productApi";
 export default function Home() {
   const navigate = useNavigate();
   const collectionSliderRef = useRef(null);
+  const collectionScrollTargetRef = useRef(null);
   const heroRevealRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -27,6 +28,7 @@ export default function Home() {
   );
 
   const [collections, setCollections] = useState([]);
+  const [collectionProducts, setCollectionProducts] = useState({});
   const [newArrivals, setNewArrivals] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [heroReady, setHeroReady] = useState(false);
@@ -45,10 +47,19 @@ export default function Home() {
     const slider = collectionSliderRef.current;
     if (!slider) return;
 
-    slider.scrollBy({
-      left: direction * Math.min(slider.clientWidth, 420),
-      behavior: "smooth",
-    });
+    const firstItem = slider.firstElementChild;
+    const gap = parseFloat(getComputedStyle(slider).columnGap || "0");
+    const step = firstItem ? firstItem.getBoundingClientRect().width + gap : slider.clientWidth;
+
+    const maxScroll = slider.scrollWidth - slider.clientWidth;
+    // Base the next target on where we're already heading, not the current
+    // (possibly mid-animation) scrollLeft, so rapid clicks queue smoothly
+    // instead of fighting the in-progress scroll.
+    const base = collectionScrollTargetRef.current ?? slider.scrollLeft;
+    const target = Math.min(Math.max(base + direction * step, 0), maxScroll);
+    collectionScrollTargetRef.current = target;
+
+    slider.scrollTo({ left: target, behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -61,43 +72,46 @@ export default function Home() {
     if (!slider) return undefined;
 
     const handleWheel = (event) => {
-      const delta =
-        Math.abs(event.deltaX) > Math.abs(event.deltaY)
-          ? event.deltaX
-          : event.deltaY;
-
-      if (delta === 0) return;
-
-      const { scrollLeft, scrollWidth, clientWidth } = slider;
-      const atStart = scrollLeft <= 0;
-      const atEnd = scrollLeft + clientWidth >= scrollWidth - 1;
-
-      if ((delta < 0 && atStart) || (delta > 0 && atEnd)) return;
+      // Vertical scroll gestures must scroll the page, not the
+      // horizontal-only slider (browsers otherwise redirect them here).
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
 
       event.preventDefault();
-      slider.scrollLeft += delta;
+      window.scrollBy(0, event.deltaY);
     };
 
     slider.addEventListener("wheel", handleWheel, { passive: false });
 
     let isDragging = false;
+    let moved = false;
     let startX = 0;
     let startScrollLeft = 0;
 
     const handlePointerDown = (event) => {
       isDragging = true;
+      moved = false;
       startX = event.clientX;
       startScrollLeft = slider.scrollLeft;
-      slider.classList.add("cursor-grabbing");
+      collectionScrollTargetRef.current = null;
     };
 
     const handlePointerMove = (event) => {
       if (!isDragging) return;
-      slider.scrollLeft = startScrollLeft - (event.clientX - startX);
+      const deltaX = event.clientX - startX;
+      if (Math.abs(deltaX) > 4) {
+        moved = true;
+        slider.classList.add("cursor-grabbing");
+      }
+      slider.scrollLeft = startScrollLeft - deltaX;
     };
 
-    const handlePointerUp = () => {
+    const handlePointerUp = (event) => {
+      if (moved) {
+        // Prevent the drag from also registering as a click on a card.
+        event.preventDefault?.();
+      }
       isDragging = false;
+      moved = false;
       slider.classList.remove("cursor-grabbing");
     };
 
@@ -152,6 +166,16 @@ export default function Home() {
               : products.filter((product) => !product.isSoldOut)
             ).slice(0, 3),
           );
+
+          const productsByCollection = {};
+          products
+            .filter((product) => !product.isSoldOut)
+            .forEach((product) => {
+              if (!productsByCollection[product.collection]) {
+                productsByCollection[product.collection] = product;
+              }
+            });
+          setCollectionProducts(productsByCollection);
         })
         .catch(() => {});
     };
@@ -185,6 +209,7 @@ export default function Home() {
         <>
           <HomeCollectionsSection
             collections={collections}
+            collectionProducts={collectionProducts}
             sliderRef={collectionSliderRef}
             onOpenCollection={navigateToCollection}
             onScroll={scrollCollections}
