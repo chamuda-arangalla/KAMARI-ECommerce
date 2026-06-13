@@ -1,10 +1,16 @@
 import PDFDocument from "pdfkit";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import SiteContent from "../../models/SiteContent.js";
 
 const DEFAULT_BRAND_NAME = "KAMARI";
 const DEFAULT_CURRENCY = "LKR";
 const PAGE_MARGIN = 48;
 const FOOTER_HEIGHT = 88;
+const INVOICE_LOGO_PATH = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../assets/Kamari-logo.png"
+);
 const INVOICE_THEME = Object.freeze({
   ink: "#2c2b28",
   inkSoft: "#5f564d",
@@ -88,11 +94,12 @@ const drawInvoiceHeader = (doc, order, profile) => {
   const rightX = PAGE_MARGIN + contentWidth - rightWidth;
 
   doc.rect(0, 0, doc.page.width, 170).fill(INVOICE_THEME.ink);
-  doc
-    .fillColor(INVOICE_THEME.cream)
-    .font("Helvetica-Bold")
-    .fontSize(28)
-    .text(profile.brandName, PAGE_MARGIN, 44, { letterSpacing: 2 });
+  doc.roundedRect(PAGE_MARGIN, 35, 190, 62, 6).fill(INVOICE_THEME.cream);
+  doc.image(INVOICE_LOGO_PATH, PAGE_MARGIN + 12, 47, {
+    fit: [166, 38],
+    align: "center",
+    valign: "center",
+  });
 
   doc
     .fillColor(INVOICE_THEME.white)
