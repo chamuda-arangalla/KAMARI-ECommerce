@@ -13,44 +13,34 @@ import orderRoutes from "./routes/order.routes.js";
 
 const app = express();
 
-const getAllowedOrigins = () =>
-  [process.env.CLIENT_URL, process.env.CORS_ORIGINS]
+const allowedOrigins = new Set(
+  [
+    process.env.CLIENT_URL,
+    ...(process.env.CORS_ORIGINS || "").split(","),
+  ]
     .filter(Boolean)
-    .flatMap((origin) => origin.split(","))
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-
-const isLocalhostOrigin = (origin) => {
-  try {
-    const { hostname } = new URL(origin);
-    return ["localhost", "127.0.0.1"].includes(hostname);
-  } catch {
-    return false;
-  }
-};
-
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true;
-  if (getAllowedOrigins().includes(origin)) return true;
-  return process.env.NODE_ENV !== "production" && isLocalhostOrigin(origin);
-};
+    .map((origin) => origin.trim().replace(/\/$/, ""))
+);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (isAllowedOrigin(origin)) return callback(null, true);
-      return callback(new Error(`CORS: origin ${origin} not allowed`));
+      const isAllowed =
+        !origin || allowedOrigins.has(origin.replace(/\/$/, ""));
+      callback(null, isAllowed);
     },
     credentials: true,
   })
 );
 
 app.use(express.json());
-app.use(session({
-  secret: process.env.JWT_SECRET,
-  resave: false,
-  saveUninitialized: false,
-}));
+app.use(
+  session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
