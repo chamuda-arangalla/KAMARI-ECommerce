@@ -4,9 +4,9 @@ import heroBanner3 from "../../assets/images/banner3-eas-set.png";
 import heroBanner4 from "../../assets/images/banner4-bold-set.png";
 import content01Img from "../../assets/images/Content01.png";
 import flowMobileImg from "../../assets/images/flow-mobile.png";
-import playMobileImg from "../../assets/images/play-mobile.png";
-import easeMobileImg from "../../assets/images/ease-mobile.png";
-import boldMobileImg from "../../assets/images/bold-mobile.png";
+import playMobileImg from "../../assets/images/play-mobile2.png";
+import easeMobileImg from "../../assets/images/ease-mobile2.png";
+import boldMobileImg from "../../assets/images/bold-mobile2.png";
 
 export const HOME_FALLBACK_IMG =
   "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
