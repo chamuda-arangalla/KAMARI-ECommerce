@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, ChevronRight, Download, Loader2, Search } from 'lucide-react';
 import { useAdmin } from '../../context/useAdmin';
+import { downloadOrderInvoice } from '../../services/orderApi';
 
 const formatCurrency = (value) => `LKR ${Number(value || 0).toLocaleString()}`;
 
@@ -59,6 +60,8 @@ const OrdersPage = () => {
   const [verifyError, setVerifyError] = useState('');
   const [updatingOrderStatus, setUpdatingOrderStatus] = useState(false);
   const [orderStatusError, setOrderStatusError] = useState('');
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+  const [invoiceError, setInvoiceError] = useState('');
 
   const tabs = [
     { label: 'All', type: 'all' },
@@ -91,18 +94,59 @@ const OrdersPage = () => {
     selectedOrder?.status === 'Pending' &&
     selectedOrder?.paymentSlip?.url &&
     !isSelectedOrderCod;
+  const canDownloadInvoice =
+    selectedOrder?.orderStatus === 'Received' || selectedOrder?.status === 'Complete';
   const nextOrderStatusOptions = getNextOrderStatusOptions(selectedOrder?.orderStatus);
 
   const handleSelectOrder = (order) => {
     setSelectedOrder(order);
     setVerifyError('');
     setOrderStatusError('');
+    setInvoiceError('');
   };
 
   const handleCloseOrder = () => {
     setSelectedOrder(null);
     setVerifyError('');
     setOrderStatusError('');
+    setInvoiceError('');
+  };
+
+  const getInvoiceFileName = (response, orderNumber) => {
+    const disposition = response.headers?.['content-disposition'] || '';
+    const match = disposition.match(/filename="?([^"]+)"?/i);
+
+    return match?.[1] || `kamari-invoice-${orderNumber}.pdf`;
+  };
+
+  const handleDownloadInvoice = async () => {
+    if (!selectedOrder || !canDownloadInvoice) return;
+
+    try {
+      setDownloadingInvoice(true);
+      setInvoiceError('');
+
+      const token = localStorage.getItem('adminToken');
+      const response = await downloadOrderInvoice(selectedOrder.id, token);
+      const invoiceUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+
+      // Use a temporary object URL so the browser downloads the streamed invoice blob.
+      link.href = invoiceUrl;
+      link.download = getInvoiceFileName(response, selectedOrder.orderNumber);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(invoiceUrl);
+    } catch (error) {
+      setInvoiceError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Failed to download invoice',
+      );
+    } finally {
+      setDownloadingInvoice(false);
+    }
   };
 
   const handleVerifyPayment = async () => {
@@ -518,9 +562,34 @@ const OrdersPage = () => {
                   )}
                 </div>
 
-                <button className="w-full py-4 bg-[#2c2b28] text-white text-base font-semibold rounded-xl hover:bg-[#2a221d] transition-all shadow-lg shadow-[#2c2b28]/10">
-                  Print Invoice
-                </button>
+                {canDownloadInvoice && (
+                  <>
+                    {invoiceError && (
+                      <p className="rounded-lg border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                        {invoiceError}
+                      </p>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleDownloadInvoice}
+                      disabled={downloadingInvoice}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#2c2b28] py-4 text-base font-semibold text-white shadow-lg shadow-[#2c2b28]/10 transition-all hover:bg-[#2a221d] disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {downloadingInvoice ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin" />
+                          Downloading...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={18} />
+                          Print Invoice
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           </>
