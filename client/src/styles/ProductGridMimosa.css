@@ -187,11 +187,13 @@
   margin-bottom: 6px;
 }
 
+/* Koko installment styling currently disabled.
 .pg-card-installment {
   font-size: 13px;
   color: #767676;
   margin-bottom: 12px;
 }
+*/
 
 .pg-card-colors {
   display: flex;
@@ -546,9 +548,11 @@
     font-size: 14px;
   }
 
+  /* Koko installment responsive styling currently disabled.
   .pg-card-installment {
     font-size: 12px;
   }
+  */
 
   .pg-drawer {
     width: 100%;

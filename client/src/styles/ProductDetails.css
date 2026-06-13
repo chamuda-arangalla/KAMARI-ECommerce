@@ -267,10 +267,12 @@
   color: #565959;
 }
 
+/* Koko and Mintpay installment styling currently disabled.
 .pd-installment {
   font-size: 13px;
   color: #565959;
 }
+*/
 
 /* Stock badge */
 .pd-stock-badge {

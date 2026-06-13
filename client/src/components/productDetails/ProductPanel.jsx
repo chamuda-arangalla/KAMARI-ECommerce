@@ -33,11 +33,13 @@ export default function ProductPanel({
         <p className="pd-price">
           LKR {Number(product.price || 0).toLocaleString()}
         </p>
+        {/* Koko and Mintpay installment message currently disabled:
         <p className="pd-installment">
           or 3 x LKR{" "}
           {Math.round(Number(product.price || 0) / 3).toLocaleString()} with
           Koko / Mintpay
         </p>
+        */}
       </div>
 
       <p
