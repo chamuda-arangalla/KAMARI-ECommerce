@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, ChevronRight, Download, Loader2, Search } from 'lucide-react';
+import AdminPagination from '../../components/admin/AdminPagination';
 import { useAdmin } from '../../context/useAdmin';
+import { downloadOrderInvoice } from '../../services/orderApi';
+
+const PAGE_SIZE = 10;
 
 const formatCurrency = (value) => `LKR ${Number(value || 0).toLocaleString()}`;
 
@@ -59,6 +63,9 @@ const OrdersPage = () => {
   const [verifyError, setVerifyError] = useState('');
   const [updatingOrderStatus, setUpdatingOrderStatus] = useState(false);
   const [orderStatusError, setOrderStatusError] = useState('');
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+  const [invoiceError, setInvoiceError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const tabs = [
     { label: 'All', type: 'all' },
@@ -86,23 +93,70 @@ const OrdersPage = () => {
       order.paymentType,
     ].some((value) => String(value || '').toLowerCase().includes(query));
   });
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedOrders = filteredOrders.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
   const isSelectedOrderCod = selectedOrder?.paymentType === 'Cash on Delivery';
   const canVerifyPayment =
     selectedOrder?.status === 'Pending' &&
     selectedOrder?.paymentSlip?.url &&
     !isSelectedOrderCod;
+  const canDownloadInvoice =
+    selectedOrder?.orderStatus === 'Received' || selectedOrder?.status === 'Complete';
   const nextOrderStatusOptions = getNextOrderStatusOptions(selectedOrder?.orderStatus);
 
   const handleSelectOrder = (order) => {
     setSelectedOrder(order);
     setVerifyError('');
     setOrderStatusError('');
+    setInvoiceError('');
   };
 
   const handleCloseOrder = () => {
     setSelectedOrder(null);
     setVerifyError('');
     setOrderStatusError('');
+    setInvoiceError('');
+  };
+
+  const getInvoiceFileName = (response, orderNumber) => {
+    const disposition = response.headers?.['content-disposition'] || '';
+    const match = disposition.match(/filename="?([^"]+)"?/i);
+
+    return match?.[1] || `kamari-invoice-${orderNumber}.pdf`;
+  };
+
+  const handleDownloadInvoice = async () => {
+    if (!selectedOrder || !canDownloadInvoice) return;
+
+    try {
+      setDownloadingInvoice(true);
+      setInvoiceError('');
+
+      const token = localStorage.getItem('adminToken');
+      const response = await downloadOrderInvoice(selectedOrder.id, token);
+      const invoiceUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+
+      // Use a temporary object URL so the browser downloads the streamed invoice blob.
+      link.href = invoiceUrl;
+      link.download = getInvoiceFileName(response, selectedOrder.orderNumber);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(invoiceUrl);
+    } catch (error) {
+      setInvoiceError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Failed to download invoice',
+      );
+    } finally {
+      setDownloadingInvoice(false);
+    }
   };
 
   const handleVerifyPayment = async () => {
@@ -174,7 +228,10 @@ const OrdersPage = () => {
         {tabs.map((tab) => (
           <button
             key={tab.label}
-            onClick={() => setFilter(tab.label)}
+            onClick={() => {
+              setFilter(tab.label);
+              setCurrentPage(1);
+            }}
             className={`relative shrink-0 px-1 pb-4 text-sm sm:text-base font-medium transition-all ${
               filter === tab.label ? 'text-[#2c2b28]' : 'text-[#8f8376] hover:text-[#5f564d]'
             }`}
@@ -201,7 +258,10 @@ const OrdersPage = () => {
             <input
               type="search"
               value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+                setCurrentPage(1);
+              }}
               placeholder="Search order, customer, address, or status"
               className="w-full rounded-xl border border-[#d7c9b8] bg-[#fcfaf7] py-3 pl-10 pr-4 text-sm text-[#2c2b28] outline-none transition-all placeholder:text-[#b8ada5] focus:border-[#c2b2a6] focus:bg-white"
             />
@@ -254,7 +314,7 @@ const OrdersPage = () => {
                 </tr>
               )}
 
-              {!ordersLoading && !ordersError && filteredOrders.map((order) => (
+              {!ordersLoading && !ordersError && paginatedOrders.map((order) => (
                 <tr
                   key={order.id}
                   className="hover:bg-[#fcfaf7] transition-colors cursor-pointer group"
@@ -311,11 +371,11 @@ const OrdersPage = () => {
             <div className="px-5 py-10 text-center text-[#8f8376]">No orders found.</div>
           )}
 
-          {!ordersLoading && !ordersError && filteredOrders.map((order) => (
+          {!ordersLoading && !ordersError && paginatedOrders.map((order) => (
             <button
               key={order.id}
               type="button"
-              onClick={() => setSelectedOrder(order)}
+              onClick={() => handleSelectOrder(order)}
               className="block w-full p-4 text-left transition hover:bg-[#fcfaf7]"
             >
               <div className="mb-3 flex items-start justify-between gap-3">
@@ -347,6 +407,14 @@ const OrdersPage = () => {
             </button>
           ))}
         </div>
+        {!ordersLoading && !ordersError && (
+          <AdminPagination
+            currentPage={safePage}
+            totalItems={filteredOrders.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       <AnimatePresence>
@@ -518,9 +586,34 @@ const OrdersPage = () => {
                   )}
                 </div>
 
-                <button className="w-full py-4 bg-[#2c2b28] text-white text-base font-semibold rounded-xl hover:bg-[#2a221d] transition-all shadow-lg shadow-[#2c2b28]/10">
-                  Print Invoice
-                </button>
+                {canDownloadInvoice && (
+                  <>
+                    {invoiceError && (
+                      <p className="rounded-lg border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                        {invoiceError}
+                      </p>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleDownloadInvoice}
+                      disabled={downloadingInvoice}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#2c2b28] py-4 text-base font-semibold text-white shadow-lg shadow-[#2c2b28]/10 transition-all hover:bg-[#2a221d] disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {downloadingInvoice ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin" />
+                          Downloading...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={18} />
+                          Print Invoice
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           </>

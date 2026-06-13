@@ -2,6 +2,7 @@ import express from "express";
 import {
   createOrder,
   deleteOrder,
+  downloadOrderInvoice,
   getAllOrders,
   getOrder,
   getOrderByOrderId,
@@ -18,6 +19,7 @@ router.post("/", protect, createOrder);
 router.get("/", protect, adminOnly, getAllOrders);
 router.get("/user/:userId", protect, getOrdersByUserId);
 router.get("/order-id/:orderId", protect, getOrderByOrderId);
+router.get("/:id/invoice", protect, adminOnly, downloadOrderInvoice);
 router.get("/:id", protect, getOrder);
 router.put("/:id", protect, adminOnly, updateOrder);
 router.delete("/:id", protect, adminOnly, deleteOrder);

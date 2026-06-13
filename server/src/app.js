@@ -30,6 +30,7 @@ app.use(
       callback(null, isAllowed);
     },
     credentials: true,
+    exposedHeaders: ["Content-Disposition"],
   })
 );
 
