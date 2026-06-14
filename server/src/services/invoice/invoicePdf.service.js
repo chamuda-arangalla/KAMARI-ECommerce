@@ -5,8 +5,9 @@ import SiteContent from "../../models/SiteContent.js";
 
 const DEFAULT_BRAND_NAME = "KAMARI";
 const DEFAULT_CURRENCY = "LKR";
-const PAGE_MARGIN = 48;
-const FOOTER_HEIGHT = 88;
+const PAGE_MARGIN = 36;
+const FOOTER_HEIGHT = 54;
+const AMOUNT_RIGHT_INSET = 12;
 const INVOICE_LOGO_PATH = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../assets/Kamari-logo.png"
@@ -48,7 +49,12 @@ const asArray = (value) => {
 
 const getContentWidth = (doc) => doc.page.width - PAGE_MARGIN * 2;
 
-const getFooterTop = (doc) => doc.page.height - FOOTER_HEIGHT;
+const getFooterTop = (doc) => doc.page.height - PAGE_MARGIN - FOOTER_HEIGHT;
+
+const getAmountTextBox = (column, inset = AMOUNT_RIGHT_INSET) => ({
+  x: column.x,
+  width: column.width - inset,
+});
 
 const ensureWritableSpace = (doc, y, requiredHeight, profile) => {
   if (y + requiredHeight <= getFooterTop(doc)) return y;
@@ -93,10 +99,10 @@ const drawInvoiceHeader = (doc, order, profile) => {
   const rightWidth = 185;
   const rightX = PAGE_MARGIN + contentWidth - rightWidth;
 
-  doc.rect(0, 0, doc.page.width, 170).fill(INVOICE_THEME.ink);
-  doc.roundedRect(PAGE_MARGIN, 35, 190, 62, 6).fill(INVOICE_THEME.cream);
-  doc.image(INVOICE_LOGO_PATH, PAGE_MARGIN + 12, 47, {
-    fit: [166, 38],
+  doc.rect(0, 0, doc.page.width, 112).fill(INVOICE_THEME.ink);
+  doc.roundedRect(PAGE_MARGIN, 27, 160, 48, 5).fill(INVOICE_THEME.cream);
+  doc.image(INVOICE_LOGO_PATH, PAGE_MARGIN + 10, 37, {
+    fit: [140, 28],
     align: "center",
     valign: "center",
   });
@@ -104,19 +110,21 @@ const drawInvoiceHeader = (doc, order, profile) => {
   doc
     .fillColor(INVOICE_THEME.white)
     .font("Helvetica-Bold")
-    .fontSize(24)
-    .text("INVOICE", rightX, 42, { width: 185, align: "right" });
+    .fontSize(21)
+    .text("INVOICE", rightX, 31, { width: 185, align: "right" });
   doc
     .fillColor(INVOICE_THEME.border)
     .font("Helvetica")
-    .fontSize(10)
-    .text(`# ${order.orderId}`, rightX, 78, { width: 185, align: "right" })
-    .text(formatDate(order.createdAt), rightX, 96, { width: 185, align: "right" });
+    .fontSize(9)
+    .text(`# ${order.orderId}`, rightX, 61, { width: 185, align: "right" })
+    .text(formatDate(order.createdAt), rightX, 77, { width: 185, align: "right" });
+
+  return 130;
 };
 
-const drawProfileAndCustomer = (doc, order, profile) => {
+const drawProfileAndCustomer = (doc, order, profile, y) => {
   const contentWidth = getContentWidth(doc);
-  const columnGap = 48;
+  const columnGap = 30;
   const columnWidth = (contentWidth - columnGap) / 2;
   const billToX = PAGE_MARGIN + columnWidth + columnGap;
   const receiver = order.receiverDetails || {};
@@ -132,18 +140,21 @@ const drawProfileAndCustomer = (doc, order, profile) => {
     .filter(Boolean)
     .join(", ");
 
-  doc.fillColor(INVOICE_THEME.ink).font("Helvetica-Bold").fontSize(10);
-  doc.text("FROM", PAGE_MARGIN, 205);
-  doc.text("BILL TO", billToX, 205);
+  doc.fillColor(INVOICE_THEME.ink).font("Helvetica-Bold").fontSize(8);
+  doc.text("FROM", PAGE_MARGIN, y, { width: columnWidth });
+  doc.text("BILL TO", billToX, y, { width: columnWidth });
 
-  doc.fillColor(INVOICE_THEME.inkSoft).font("Helvetica").fontSize(10);
+  doc.fillColor(INVOICE_THEME.inkSoft).font("Helvetica").fontSize(9);
   const fromLines = [
     profile.brandName,
     ...profile.address,
     profile.phone,
     profile.email,
   ];
-  drawTextBlock(doc, fromLines, PAGE_MARGIN, 228, { width: columnWidth, lineGap: 5 });
+  const fromBottom = drawTextBlock(doc, fromLines, PAGE_MARGIN, y + 16, {
+    width: columnWidth,
+    lineGap: 2,
+  });
 
   const billToLines = [
     customerName || "Customer",
@@ -151,11 +162,15 @@ const drawProfileAndCustomer = (doc, order, profile) => {
     receiver.phoneNumber,
     receiver.secondaryPhoneNumber,
   ];
-  drawTextBlock(doc, billToLines, billToX, 228, { width: columnWidth, lineGap: 5 });
+  const billToBottom = drawTextBlock(doc, billToLines, billToX, y + 16, {
+    width: columnWidth,
+    lineGap: 2,
+  });
+
+  return Math.max(fromBottom, billToBottom) + 16;
 };
 
-const drawMetaStrip = (doc, order) => {
-  const top = 330;
+const drawMetaStrip = (doc, order, top) => {
   const contentWidth = getContentWidth(doc);
   const columnWidth = contentWidth / 3;
   const columns = [
@@ -165,7 +180,7 @@ const drawMetaStrip = (doc, order) => {
   ];
 
   doc
-    .roundedRect(PAGE_MARGIN, top, contentWidth, 66, 8)
+    .roundedRect(PAGE_MARGIN, top, contentWidth, 48, 6)
     .fill(INVOICE_THEME.ivory)
     .stroke(INVOICE_THEME.border);
 
@@ -174,34 +189,56 @@ const drawMetaStrip = (doc, order) => {
     doc
       .fillColor(INVOICE_THEME.muted)
       .font("Helvetica-Bold")
-      .fontSize(8)
-      .text(label.toUpperCase(), x + 18, top + 16, { width: columnWidth - 36 });
+      .fontSize(7)
+      .text(label.toUpperCase(), x + 14, top + 10, { width: columnWidth - 28 });
     doc
       .fillColor(INVOICE_THEME.ink)
       .font("Helvetica-Bold")
-      .fontSize(11)
-      .text(safeText(value).toUpperCase(), x + 18, top + 34, { width: columnWidth - 36 });
+      .fontSize(9)
+      .text(safeText(value).toUpperCase(), x + 14, top + 25, { width: columnWidth - 28 });
   });
+
+  return top + 62;
 };
 
 const drawTableHeader = (doc, y) => {
   const contentWidth = getContentWidth(doc);
   const columns = getTableColumns(doc);
 
-  doc.roundedRect(PAGE_MARGIN, y, contentWidth, 32, 6).fill(INVOICE_THEME.ink);
-  doc.fillColor(INVOICE_THEME.white).font("Helvetica-Bold").fontSize(8);
-  doc.text("ITEM", columns.item.x, y + 11, { width: columns.item.width });
-  doc.text("QTY", columns.qty.x, y + 11, { width: columns.qty.width, align: "right" });
-  doc.text("UNIT", columns.unit.x, y + 11, { width: columns.unit.width, align: "right" });
-  doc.text("TOTAL", columns.total.x, y + 11, { width: columns.total.width, align: "right" });
+  doc.roundedRect(PAGE_MARGIN, y, contentWidth, 26, 5).fill(INVOICE_THEME.ink);
+  doc.fillColor(INVOICE_THEME.white).font("Helvetica-Bold").fontSize(7.5);
+  doc.text("PRODUCT", columns.item.x, y + 9, { width: columns.item.width });
+  doc.text("QTY", columns.qty.x, y + 9, { width: columns.qty.width, align: "right" });
+  doc.text("UNIT PRICE", columns.unit.x, y + 9, {
+    width: columns.unit.width,
+    align: "right",
+  });
+  const totalHeaderBox = getAmountTextBox(columns.total);
+  doc.text("LINE TOTAL", totalHeaderBox.x, y + 9, {
+    width: totalHeaderBox.width,
+    align: "right",
+  });
+};
+
+const drawContinuationLabel = (doc, order, y) => {
+  doc
+    .fillColor(INVOICE_THEME.muted)
+    .font("Helvetica-Bold")
+    .fontSize(7.5)
+    .text(`INVOICE #${order.orderId} CONTINUED`, PAGE_MARGIN, y, {
+      width: getContentWidth(doc),
+      align: "right",
+    });
+
+  return y + 16;
 };
 
 const getTableColumns = (doc) => {
   const contentWidth = getContentWidth(doc);
-  const totalWidth = 88;
-  const unitWidth = 82;
-  const quantityWidth = 42;
-  const gap = 14;
+  const totalWidth = 112;
+  const unitWidth = 100;
+  const quantityWidth = 32;
+  const gap = 10;
   const itemWidth = contentWidth - totalWidth - unitWidth - quantityWidth - gap * 4;
   const itemX = PAGE_MARGIN + gap;
 
@@ -219,12 +256,16 @@ const getTableColumns = (doc) => {
 const drawItemsTable = (doc, order, profile) => {
   const columns = getTableColumns(doc);
   const contentRight = PAGE_MARGIN + getContentWidth(doc);
-  let y = 425;
+  let y = drawMetaStrip(
+    doc,
+    order,
+    drawProfileAndCustomer(doc, order, profile, drawInvoiceHeader(doc, order, profile)),
+  );
 
   drawTableHeader(doc, y);
-  y += 44;
+  y += 34;
 
-  order.productDetails.forEach((item) => {
+  order.productDetails.forEach((item, index) => {
     const discountAmount = (Number(item.unitPrice || 0) * Number(item.discount || 0)) / 100;
     const invoiceUnitPrice = Number(item.unitPrice || 0) - discountAmount;
     const itemTotal = invoiceUnitPrice * Number(item.quantity || 0);
@@ -236,52 +277,74 @@ const drawItemsTable = (doc, order, profile) => {
       .join(" / ");
     const productNameHeight = doc
       .font("Helvetica-Bold")
-      .fontSize(10)
+      .fontSize(9.5)
       .heightOfString(item.productName, { width: columns.item.width });
     const metaHeight = doc
       .font("Helvetica")
-      .fontSize(8)
+      .fontSize(7.5)
       .heightOfString(metaText, { width: columns.item.width });
-    const rowHeight = Math.max(48, productNameHeight + metaHeight + 22);
+    const unitHeight = doc
+      .font("Helvetica")
+      .fontSize(8)
+      .heightOfString(formatCurrency(invoiceUnitPrice, profile.currency), {
+        width: columns.unit.width,
+        align: "right",
+      });
+    const totalHeight = doc
+      .font("Helvetica-Bold")
+      .fontSize(8)
+      .heightOfString(formatCurrency(itemTotal, profile.currency), {
+        width: columns.total.width,
+        align: "right",
+      });
+    const textHeight = productNameHeight + (metaText ? metaHeight + 3 : 0);
+    const rowHeight = Math.max(34, textHeight + 16, unitHeight + 16, totalHeight + 16);
 
-    y = ensureWritableSpace(doc, y, rowHeight + 14, profile);
+    y = ensureWritableSpace(doc, y, rowHeight + 10, profile);
 
     if (y === PAGE_MARGIN) {
+      y = drawContinuationLabel(doc, order, y);
       drawTableHeader(doc, y);
-      y += 44;
+      y += 34;
     }
 
-    doc.fillColor(INVOICE_THEME.ink).font("Helvetica-Bold").fontSize(10);
+    if (index % 2 === 1) {
+      doc.rect(PAGE_MARGIN, y - 6, getContentWidth(doc), rowHeight).fill(INVOICE_THEME.ivory);
+    }
+
+    doc.fillColor(INVOICE_THEME.ink).font("Helvetica-Bold").fontSize(9.5);
     doc.text(item.productName, columns.item.x, y, { width: columns.item.width });
     doc
       .fillColor(INVOICE_THEME.muted)
       .font("Helvetica")
-      .fontSize(8)
+      .fontSize(7.5)
       .text(metaText, columns.item.x, y + productNameHeight + 4, {
         width: columns.item.width,
       });
 
-    doc.fillColor(INVOICE_THEME.inkSoft).font("Helvetica").fontSize(9);
-    doc.text(String(item.quantity), columns.qty.x, y + 4, {
+    doc.fillColor(INVOICE_THEME.inkSoft).font("Helvetica").fontSize(8);
+    doc.text(String(item.quantity), columns.qty.x, y + 1, {
       width: columns.qty.width,
       align: "right",
     });
-    doc.text(formatCurrency(invoiceUnitPrice, profile.currency), columns.unit.x, y + 4, {
+    doc.text(formatCurrency(invoiceUnitPrice, profile.currency), columns.unit.x, y + 1, {
       width: columns.unit.width,
       align: "right",
     });
+    const totalValueBox = getAmountTextBox(columns.total);
     doc
       .font("Helvetica-Bold")
       .fillColor(INVOICE_THEME.ink)
-      .text(formatCurrency(itemTotal, profile.currency), columns.total.x, y + 4, {
-        width: columns.total.width,
+      .fontSize(8)
+      .text(formatCurrency(itemTotal, profile.currency), totalValueBox.x, y + 1, {
+        width: totalValueBox.width,
         align: "right",
       });
 
     y += rowHeight;
     doc
-      .moveTo(PAGE_MARGIN, y - 10)
-      .lineTo(contentRight, y - 10)
+      .moveTo(PAGE_MARGIN, y - 6)
+      .lineTo(contentRight, y - 6)
       .strokeColor(INVOICE_THEME.rule)
       .stroke();
   });
@@ -291,7 +354,7 @@ const drawItemsTable = (doc, order, profile) => {
 
 const drawTotals = (doc, order, profile, y) => {
   const pricing = order.pricing || {};
-  const width = Math.min(220, getContentWidth(doc));
+  const width = Math.min(240, getContentWidth(doc));
   const x = PAGE_MARGIN + getContentWidth(doc) - width;
   const rows = [
     ["Subtotal", pricing.subTotal],
@@ -301,19 +364,23 @@ const drawTotals = (doc, order, profile, y) => {
 
   rows.forEach(([label, value], index) => {
     const isGrandTotal = index === rows.length - 1;
-    const rowY = y + index * 28;
+    const rowY = y + index * 24;
+    const labelWidth = 88;
+    const valueX = x + 92;
+    const valueWidth = width - 92 - AMOUNT_RIGHT_INSET;
 
     if (isGrandTotal) {
-      doc.roundedRect(x - 12, rowY - 7, width + 12, 34, 6).fill(INVOICE_THEME.sand);
+      doc.roundedRect(x - 10, rowY - 6, width + 10, 30, 5).fill(INVOICE_THEME.sand);
     }
 
     doc
       .fillColor(isGrandTotal ? INVOICE_THEME.ink : INVOICE_THEME.inkSoft)
       .font(isGrandTotal ? "Helvetica-Bold" : "Helvetica")
-      .fontSize(isGrandTotal ? 12 : 10)
-      .text(label, x, rowY, { width: 88 });
-    doc.text(formatCurrency(value, profile.currency), x + 92, rowY, {
-      width: width - 92,
+      .fontSize(isGrandTotal ? 11 : 9)
+      .text(label, x, isGrandTotal ? rowY + 3 : rowY, { width: labelWidth });
+
+    doc.text(formatCurrency(value, profile.currency), valueX, isGrandTotal ? rowY + 3 : rowY, {
+      width: valueWidth,
       align: "right",
     });
   });
@@ -331,9 +398,9 @@ const drawFooter = (doc, profile) => {
   doc
     .fillColor(INVOICE_THEME.muted)
     .font("Helvetica")
-    .fontSize(8)
-    .text("Thank you for shopping with us.", PAGE_MARGIN, y + 18, { width: contentWidth / 2 });
-  doc.text(profile.brandName, PAGE_MARGIN + contentWidth / 2, y + 18, {
+    .fontSize(7.5)
+    .text("Thank you for shopping with us.", PAGE_MARGIN, y + 12, { width: contentWidth / 2 });
+  doc.text(profile.brandName, PAGE_MARGIN + contentWidth / 2, y + 12, {
     width: contentWidth / 2,
     align: "right",
   });
@@ -350,11 +417,8 @@ export const createInvoicePdf = (order, profile) => {
     },
   });
 
-  drawInvoiceHeader(doc, order, profile);
-  drawProfileAndCustomer(doc, order, profile);
-  drawMetaStrip(doc, order);
   const totalsY = drawItemsTable(doc, order, profile);
-  const totalsStartY = ensureWritableSpace(doc, Math.max(totalsY, 610), 96, profile);
+  const totalsStartY = ensureWritableSpace(doc, totalsY, 82, profile);
   drawTotals(doc, order, profile, totalsStartY);
   drawFooter(doc, profile);
 
