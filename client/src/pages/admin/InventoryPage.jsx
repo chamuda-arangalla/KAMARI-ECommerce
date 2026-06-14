@@ -7,7 +7,7 @@ import { deleteProduct } from "../../services/productApi";
 import { AlertCircle, Search, Edit2, Plus, Trash2 } from "lucide-react";
 import AdminPagination from "../../components/admin/AdminPagination";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const InventoryPage = () => {
   const navigate = useNavigate();
@@ -56,8 +56,8 @@ const InventoryPage = () => {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 sm:space-y-8 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:gap-4 lg:space-y-0">
+      <div className="flex shrink-0 flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-2xl sm:text-4xl font-bold text-[#2c2b28]">Inventory</h2>
           <p className="text-base text-[#8f8376] mt-2">Manage stock levels across all collections</p>
@@ -88,7 +88,7 @@ const InventoryPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#d7c9b8] overflow-hidden shadow-sm">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white shadow-sm">
         {productsError && (
           <div className="px-6 py-4 bg-rose-50 text-rose-700 text-base border-b border-rose-100">
             {productsError}
@@ -104,15 +104,22 @@ const InventoryPage = () => {
             Loading products...
           </div>
         )}
-        <div className="hidden overflow-x-auto md:block">
-          <table className="w-full text-left">
+        <div className="hidden min-h-0 flex-1 md:block">
+          <table className="w-full table-fixed text-left">
+            <colgroup>
+              <col className="w-[28%]" />
+              <col className="w-[18%]" />
+              <col className="w-[30%]" />
+              <col className="w-[16%]" />
+              <col className="w-[8%]" />
+            </colgroup>
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Product</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Collection</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Sizes & Stock</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Status</th>
-                <th className="px-6 py-5" />
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Product</th>
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Collection</th>
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Sizes & Stock</th>
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Status</th>
+                <th className="px-2 py-4" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
@@ -125,26 +132,26 @@ const InventoryPage = () => {
                     onClick={() => openProductView(product)}
                     className="hover:bg-[#fcfaf7] transition-colors cursor-pointer"
                   >
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="flex items-center gap-4">
+                    <td className="px-4 py-3">
+                      <div className="flex min-w-0 items-center gap-3">
                         <img
                           src={product.image}
                           alt={product.name}
                           className="w-14 h-14 rounded-xl object-cover border border-[#d7c9b8]"
                         />
-                        <div>
-                          <p className="text-base font-semibold text-[#2c2b28]">{product.name}</p>
+                        <div className="min-w-0">
+                          <p className="break-words text-base font-semibold text-[#2c2b28]">{product.name}</p>
                           <p className="text-sm text-[#8f8376] mt-0.5">LKR {product.price?.toLocaleString()}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <span className="text-base text-[#5f564d] px-3 py-1.5 bg-[#eae0d6] rounded-full">
+                    <td className="px-4 py-3">
+                      <span className="inline-flex max-w-full break-words rounded-full bg-[#eae0d6] px-3 py-1.5 text-sm text-[#5f564d]">
                         {product.collection}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex gap-4 flex-wrap">
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-3">
                         {Object.entries(product.stock).map(([size, count]) => (
                           <div key={size} className="flex flex-col items-center">
                             <span className="text-xs text-[#8f8376] font-bold mb-1 uppercase">{size}</span>
@@ -155,7 +162,7 @@ const InventoryPage = () => {
                         ))}
                       </div>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-4 py-3">
                       {product.isSoldOut || totalStock === 0 ? (
                         <span className="flex items-center gap-1.5 text-rose-600 text-sm font-semibold uppercase">
                           <AlertCircle size={16} /> Sold Out
@@ -168,7 +175,7 @@ const InventoryPage = () => {
                         <span className="text-emerald-600 text-sm font-semibold uppercase">In Stock</span>
                       )}
                     </td>
-                    <td className="px-6 py-5 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-2 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-end gap-2">
                         <button
                           type="button"

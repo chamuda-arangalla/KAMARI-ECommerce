@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Check, ChevronLeft, ChevronRight, Clock, Loader2, MapPin, Phone, Search, X } from 'lucide-react';
+import { Check, ChevronRight, Clock, Loader2, MapPin, Phone, Search, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAdmin } from '../../context/useAdmin';
+import AdminPagination from '../../components/admin/AdminPagination';
 
 const PAGE_SIZE = 6;
 
@@ -130,8 +131,6 @@ const OrderTracking = () => {
     (safePage - 1) * PAGE_SIZE,
     safePage * PAGE_SIZE,
   );
-  const firstVisibleOrder = filteredOrders.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
-  const lastVisibleOrder = Math.min(safePage * PAGE_SIZE, filteredOrders.length);
 
   const selectedOrder = orders.find((order) => order.id === selectedOrderId);
   const currentStageIndex = Math.max(
@@ -229,37 +228,14 @@ const OrderTracking = () => {
               ))}
             </div>
 
-            {!ordersLoading && !ordersError && totalPages > 1 && (
-              <div className="-mx-6 -mb-6 mt-5 flex shrink-0 items-center justify-between border-t border-[#eee6de] bg-[#fcfaf7] px-6 py-4 lg:-mx-5 lg:-mb-5 lg:mt-3 lg:px-5 lg:py-3">
-                <p className="text-xs font-medium text-[#8f8376]">
-                  {firstVisibleOrder}-{lastVisibleOrder} of {filteredOrders.length}
-                </p>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(safePage - 1)}
-                    disabled={safePage === 1}
-                    aria-label="Previous page"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d7c9b8] bg-white text-[#5f564d] transition hover:border-[#c2b2a6] hover:bg-[#f4ece4] disabled:cursor-not-allowed disabled:opacity-35"
-                  >
-                    <ChevronLeft size={15} />
-                  </button>
-
-                  <span className="min-w-14 text-center text-xs font-semibold text-[#5f564d]">
-                    {safePage} / {totalPages}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(safePage + 1)}
-                    disabled={safePage === totalPages}
-                    aria-label="Next page"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d7c9b8] bg-white text-[#5f564d] transition hover:border-[#c2b2a6] hover:bg-[#f4ece4] disabled:cursor-not-allowed disabled:opacity-35"
-                  >
-                    <ChevronRight size={15} />
-                  </button>
-                </div>
+            {!ordersLoading && !ordersError && (
+              <div className="-mx-6 -mb-6 mt-5 shrink-0 overflow-hidden rounded-b-2xl lg:-mx-5 lg:-mb-5 lg:mt-3">
+                <AdminPagination
+                  currentPage={safePage}
+                  totalItems={filteredOrders.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setCurrentPage}
+                />
               </div>
             )}
           </div>

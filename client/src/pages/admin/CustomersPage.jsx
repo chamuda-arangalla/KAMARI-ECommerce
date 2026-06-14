@@ -5,7 +5,7 @@ import ConfirmDialog from "../../components/common/ConfirmDialog";
 import AdminPagination from "../../components/admin/AdminPagination";
 import { useAdmin } from "../../context/useAdmin";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const createCustomerDraft = (customer) => ({
   firstName:    customer?.firstName || "",
@@ -143,8 +143,8 @@ const CustomersPage = () => {
   const drawerOpen = selectedCustomer || creatingCustomer;
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 sm:space-y-8 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:gap-4 lg:space-y-0">
+      <div className="flex shrink-0 flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-2xl sm:text-4xl font-bold text-[#2c2b28]">Customers</h2>
           <p className="text-base text-[#8f8376] mt-2">Create, edit, or remove customer accounts</p>
@@ -174,8 +174,8 @@ const CustomersPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#d7c9b8] overflow-hidden shadow-sm">
-        <div className="hidden md:block">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white shadow-sm sm:rounded-3xl">
+        <div className="hidden min-h-0 flex-1 md:block">
           <table className="w-full table-fixed text-left">
             <colgroup>
               <col className="w-[24%]" />
@@ -186,11 +186,11 @@ const CustomersPage = () => {
             </colgroup>
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
-                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
-                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Contact</th>
-                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Default Address</th>
-                <th className="px-4 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Joined</th>
-                <th className="px-4 py-5" />
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Contact</th>
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Default Address</th>
+                <th className="px-4 py-4 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Joined</th>
+                <th className="px-2 py-4" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
@@ -220,7 +220,7 @@ const CustomersPage = () => {
               )}
               {!customersLoading && !customersError && paginatedCustomers.map((customer) => (
                 <tr key={customer.id} className="hover:bg-[#fcfaf7] transition-colors">
-                  <td className="px-4 py-5 align-top">
+                  <td className="px-4 py-3 align-top">
                     <div className="flex min-w-0 items-start gap-3">
                       <div className="w-12 h-12 shrink-0 rounded-full bg-[#f3ede8] flex items-center justify-center text-[#2c2b28] text-lg font-bold">
                         {customer.name.charAt(0).toUpperCase()}
@@ -231,7 +231,7 @@ const CustomersPage = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-5 align-top">
+                  <td className="px-4 py-3 align-top">
                     <div className="flex flex-col gap-1.5">
                       <span className="flex min-w-0 items-start gap-2 text-base text-[#5f564d]">
                         <Mail size={16} className="mt-1 shrink-0 text-[#8f8376]" />
@@ -243,13 +243,13 @@ const CustomersPage = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-5 align-top">
+                  <td className="px-4 py-3 align-top">
                     <p className="break-words text-base leading-relaxed text-[#5f564d]">
                       {formatCustomerAddress(customer.defaultAddress)}
                     </p>
                   </td>
-                  <td className="px-4 py-5 align-top text-base text-[#5f564d]">{customer.joinedDate}</td>
-                  <td className="px-2 py-5 align-top">
+                  <td className="px-4 py-3 align-top text-base text-[#5f564d]">{customer.joinedDate}</td>
+                  <td className="px-2 py-3 align-top">
                     <div className="flex flex-col items-center gap-1">
                       <button type="button" onClick={() => openEditCustomer(customer)}
                         className="p-2.5 text-[#8c7d73] hover:text-[#2c2b28] hover:bg-[#f3ede8] rounded-xl transition-all">
