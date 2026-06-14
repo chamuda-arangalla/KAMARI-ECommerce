@@ -1,31 +1,68 @@
-import { motion } from "framer-motion";
+import { motion, useMotionValueEvent, useReducedMotion } from "framer-motion";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { fadeUp, getHomeProductImage, sectionReveal, stagger } from "./homeConstants";
+import { getHomeProductImage } from "./homeConstants";
+
+const premiumStagger = {
+  hidden: {},
+  visible: {
+    transition: { delayChildren: 0.08, staggerChildren: 0.12 },
+  },
+};
+
+const premiumCard = {
+  hidden: { opacity: 0, y: 24, scale: 0.985 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const premiumImage = {
+  hidden: { opacity: 0, scale: 1.06 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] },
+  },
+};
 
 export default function HomeCollectionsSection({
   collections,
   collectionProducts = {},
+  revealProgress,
   sliderRef,
   onOpenCollection,
   onScroll,
 }) {
+  const prefersReducedMotion = useReducedMotion();
+  const hasRevealedRef = useRef(false);
+  const [isRevealed, setIsRevealed] = useState(false);
+
+  useMotionValueEvent(revealProgress, "change", (progress) => {
+    if (!hasRevealedRef.current && progress >= 0.16) {
+      hasRevealedRef.current = true;
+      setIsRevealed(true);
+    }
+  });
+
   if (!collections.length) return null;
 
   return (
     <motion.section
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.16 }}
-      className="flex min-h-full w-full items-center bg-white px-4 py-0 sm:px-8 sm:py-8 md:px-12 lg:px-16"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isRevealed ? 1 : 0 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.55 }}
+      className="flex min-h-full w-full items-end bg-white px-4 py-2 sm:items-center sm:p-8 md:px-12 lg:px-16"
     >
       <motion.div
-        variants={stagger}
+        variants={premiumStagger}
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        className="flex w-full touch-pan-x snap-x snap-mandatory gap-1 overflow-x-auto overscroll-x-contain bg-white md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        animate={isRevealed ? "visible" : "hidden"}
+        className="flex w-full touch-pan-x snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-smooth bg-white pr-[6%] md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {collections.map((collection, index) => (
           <CollectionCard
@@ -33,17 +70,16 @@ export default function HomeCollectionsSection({
             collection={collection}
             product={collectionProducts[collection.name]}
             index={index}
-            className="w-full sm:w-[calc((100%_-_0.25rem)/2)]"
+            className="w-[94%]"
             onOpenCollection={onOpenCollection}
           />
         ))}
       </motion.div>
 
       <motion.div
-        variants={stagger}
+        variants={premiumStagger}
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
+        animate={isRevealed ? "visible" : "hidden"}
         className="hidden w-full grid-cols-3 gap-1 md:grid lg:grid-cols-4"
       >
         <CollectionCard
@@ -74,10 +110,9 @@ export default function HomeCollectionsSection({
 
           <motion.div
             ref={sliderRef}
-            variants={stagger}
+            variants={premiumStagger}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
+            animate={isRevealed ? "visible" : "hidden"}
             className="flex cursor-grab snap-x snap-mandatory gap-1 overflow-x-auto bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {collections.slice(1).map((collection, offset) => (
@@ -109,15 +144,16 @@ function CollectionCard({
 
   return (
     <motion.div
-      variants={fadeUp}
+      variants={premiumCard}
       whileHover={{ scale: 1.01 }}
       transition={{ duration: 0.3 }}
-      className={`group flex-shrink-0 self-start snap-start cursor-pointer bg-white ${className}`}
+      className={`group relative min-w-0 flex-shrink-0 self-start snap-start cursor-pointer bg-white ${className}`}
       onClick={() => onOpenCollection(collection)}
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#F7F4F0]">
+      <div className="relative h-[68svh] min-h-[440px] max-h-[590px] overflow-hidden bg-[#F7F4F0] md:h-auto md:min-h-0 md:max-h-none md:aspect-[4/5]">
         {imageUrl ? (
-          <img
+          <motion.img
+            variants={premiumImage}
             src={imageUrl}
             alt={product?.name || collection.name}
             loading="lazy"
@@ -134,13 +170,13 @@ function CollectionCard({
         {index === 0 && (
           <div className="absolute inset-0 z-10 flex items-center justify-center px-4 text-center text-white">
             <div>
-              <p className="mb-8 text-3xl font-light uppercase leading-none tracking-[0.03em] drop-shadow-sm">
+              <p className="mb-6 text-3xl font-light uppercase leading-none tracking-[0.03em] drop-shadow-sm">
                 Shop by Collection
               </p>
               <Link
                 to="/collections"
                 onClick={(event) => event.stopPropagation()}
-                className="inline-flex min-h-12 items-center justify-center bg-white px-12 shadow-sm transition hover:bg-[#F4F1EE]"
+                className="inline-flex min-h-11 items-center justify-center bg-white px-10 shadow-sm transition hover:bg-[#F4F1EE]"
               >
                 <span
                   className="text-sm font-bold uppercase leading-none tracking-[0.04em]"
@@ -155,8 +191,10 @@ function CollectionCard({
       </div>
 
       {index > 0 && (
-        <div className="pt-3 text-center">
-          <h3 className="mb-1 text-sm">{collection.name}</h3>
+        <div className="min-h-20 bg-white px-4 py-3 text-center md:min-h-0 md:px-0 md:pt-3 md:pb-0">
+          <h3 className="mb-1 text-sm font-medium uppercase tracking-[0.08em]">
+            {collection.name}
+          </h3>
           {collection.subtitle && (
             <p className="text-xs uppercase tracking-[0.14em] text-[#8f8376]">
               {collection.subtitle}

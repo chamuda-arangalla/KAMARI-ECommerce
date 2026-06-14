@@ -221,6 +221,7 @@ export default function Home() {
               <HomeCollectionsSection
                 collections={collections}
                 collectionProducts={collectionProducts}
+                revealProgress={scrollYProgress}
                 sliderRef={collectionSliderRef}
                 onOpenCollection={navigateToCollection}
                 onScroll={scrollCollections}
@@ -273,7 +274,7 @@ export default function Home() {
               title="Best Sellers"
               viewAllTo="/shop"
               variant="white"
-              imageAspect="aspect-[3/4]"
+              imageAspect="h-[100svh] sm:h-auto sm:aspect-[3/4]"
               fullBleed
               cols={3}
               mobileFirstOnly

@@ -43,7 +43,7 @@ export default function HomeFooter() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="w-full min-w-0 px-4 pb-5 pt-10 sm:px-10 sm:pb-7 sm:pt-20 lg:px-14"
+        className="w-full min-w-0 px-4 pb-5 pt-5 sm:px-10 sm:pb-7 sm:pt-20 lg:px-14"
       >
         <motion.div
           variants={fadeUp}
@@ -51,13 +51,13 @@ export default function HomeFooter() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.6 }}
-          className="grid min-w-0 gap-6 sm:gap-10 md:grid-cols-3 md:gap-16"
+          className="grid min-w-0 gap-0 sm:gap-10 md:grid-cols-3 md:gap-16"
         >
           <FooterColumn title="Shop" links={FOOTER_COLUMNS[0].links} />
           <FooterColumn title="Explore" links={FOOTER_COLUMNS[1].links} />
 
           {/* Newsletter — always visible, full width on mobile */}
-          <div className="min-w-0 py-4 md:py-0">
+          <div className="min-w-0 pb-2 pt-3 md:py-0">
             <p className="mb-3 text-xs uppercase tracking-[0.22em] text-black/60">
               Newsletter Sign Up
             </p>
@@ -120,7 +120,7 @@ function FooterColumn({ title, links }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="py-4 md:py-0">
+    <div className="py-3 md:py-0">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
