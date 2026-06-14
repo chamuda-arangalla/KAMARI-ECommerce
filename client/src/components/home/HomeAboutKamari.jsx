@@ -1,6 +1,12 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import aboutHeroImg from "../../assets/images/about-image.png";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import aboutHeroImg from "../../assets/images/Home-about.png";
+import aboutHeroMobileImg from "../../assets/images/Home-about-mobile.png";
 
 const ABOUT_COPY =
   "We design modern women's clothing for the Sri Lankan lifestyle - comfortable, versatile and beautifully made for every occasion.";
@@ -56,6 +62,7 @@ function AnimatedColorText({ progress, text }) {
 
 export default function HomeAboutKamari({ onNavigate }) {
   const wrapperRef = useRef(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
@@ -91,21 +98,34 @@ export default function HomeAboutKamari({ onNavigate }) {
     ],
   );
 
+  const imageScale = useTransform(
+    scrollYProgress,
+    [0, 0.18, 0.82, 1],
+    prefersReducedMotion
+      ? [1, 1, 1, 1]
+      : [1.08, 1, 1, 1.08],
+  );
+
   return (
     <div
       ref={wrapperRef}
       aria-label="About KAMARI"
-      className="relative"
-      style={{ height: "250vh", zIndex: 1 }}
+      className="relative z-1 -mt-[100vh] -mb-[100vh] h-[400vh]"
     >
       <div className="sticky top-0 h-screen overflow-hidden">
-        <img
-          src={aboutHeroImg}
-          alt="KAMARI everyday style, effortlessly Sri Lankan"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          loading="lazy"
-          decoding="async"
-        />
+        <motion.picture
+          className="absolute inset-0 block h-full w-full"
+          style={{ scale: imageScale }}
+        >
+          <source media="(max-width: 767px)" srcSet={aboutHeroMobileImg} />
+          <img
+            src={aboutHeroImg}
+            alt="KAMARI everyday style, effortlessly Sri Lankan"
+            className="h-full w-full object-cover object-center"
+            loading="lazy"
+            decoding="async"
+          />
+        </motion.picture>
 
         <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-[#2C2B28]/10 via-transparent to-[#2C2B28]/10" />
 

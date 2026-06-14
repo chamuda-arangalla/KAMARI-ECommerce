@@ -49,7 +49,9 @@ export default function Home() {
 
     const firstItem = slider.firstElementChild;
     const gap = parseFloat(getComputedStyle(slider).columnGap || "0");
-    const step = firstItem ? firstItem.getBoundingClientRect().width + gap : slider.clientWidth;
+    const step = firstItem
+      ? firstItem.getBoundingClientRect().width + gap
+      : slider.clientWidth;
 
     const maxScroll = slider.scrollWidth - slider.clientWidth;
     // Base the next target on where we're already heading, not the current
@@ -215,7 +217,7 @@ export default function Home() {
             onScroll={scrollCollections}
           />
 
-          <div className="relative z-2">
+          <div className="relative z-2 bg-white md:min-h-screen">
             <HomeProductSection
               badge="New"
               eyebrow="Just In"
@@ -229,9 +231,11 @@ export default function Home() {
             />
           </div>
 
-          <HomeAboutKamari onNavigate={navigate} />
+          <div>
+            <HomeAboutKamari onNavigate={navigate} />
+          </div>
 
-          <div className="relative z-2">
+          <div className="relative z-2 bg-white md:min-h-screen">
             <HomeProductSection
               badge="Best Seller"
               eyebrow="Popular"
@@ -245,7 +249,6 @@ export default function Home() {
               onOpenProduct={setQuickViewProduct}
             />
           </div>
-
         </>
       )}
 

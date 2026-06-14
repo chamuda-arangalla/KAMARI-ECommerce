@@ -78,7 +78,7 @@ export default function HomeCollectionsSection({
                 variants={fadeUp}
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.3 }}
-                className={`group w-full flex-shrink-0 snap-start cursor-pointer bg-white sm:w-[calc((100%_-_0.25rem)/2)] md:w-[calc((100%_-_0.5rem)/3)] lg:w-[calc((100%_-_0.75rem)/4)] ${
+                className={`group w-full flex-shrink-0 self-start snap-start cursor-pointer bg-white sm:w-[calc((100%_-_0.25rem)/2)] md:w-[calc((100%_-_0.5rem)/3)] lg:w-[calc((100%_-_0.75rem)/4)] ${
                   index === 0 ? "sticky left-0 z-[5]" : ""
                 }`}
                 onClick={() => onOpenCollection(collection)}

@@ -37,7 +37,7 @@ const SOCIAL_LINKS = [
 
 export default function HomeFooter() {
   return (
-    <footer className="bg-white text-[#1A1A1A]">
+    <footer className="relative z-2 bg-white text-[#1A1A1A]">
       <motion.div
         variants={sectionReveal}
         initial="hidden"
