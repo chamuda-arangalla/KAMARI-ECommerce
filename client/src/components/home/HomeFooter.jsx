@@ -30,9 +30,24 @@ const FOOTER_COLUMNS = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: "Instagram", href: "#", icon: InstagramIcon },
-  { label: "Facebook", href: "#", icon: FacebookIcon },
-  { label: "TikTok", href: "#", icon: TikTokIcon },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/kamari.lk/",
+    icon: InstagramIcon,
+    hoverClass: "hover:border-[#C13584] hover:bg-[#FCE7F3] hover:text-[#C13584]",
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61577494230895#",
+    icon: FacebookIcon,
+    hoverClass: "hover:border-[#1877F2] hover:bg-[#E7F0FF] hover:text-[#1877F2]",
+  },
+  {
+    label: "TikTok",
+    href: "#",
+    icon: TikTokIcon,
+    hoverClass: "hover:border-[#FE2C55] hover:bg-[#FFE8ED] hover:text-[#D91E45]",
+  },
 ];
 
 export default function HomeFooter() {
@@ -43,7 +58,7 @@ export default function HomeFooter() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="w-full min-w-0 px-4 pb-5 pt-10 sm:px-10 sm:pb-7 sm:pt-20 lg:px-14"
+        className="w-full min-w-0 px-4 pb-5 pt-5 sm:px-10 sm:pb-7 sm:pt-20 lg:px-14"
       >
         <motion.div
           variants={fadeUp}
@@ -51,13 +66,13 @@ export default function HomeFooter() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.6 }}
-          className="grid min-w-0 gap-6 sm:gap-10 md:grid-cols-3 md:gap-16"
+          className="grid min-w-0 gap-0 sm:gap-10 md:grid-cols-3 md:gap-16"
         >
           <FooterColumn title="Shop" links={FOOTER_COLUMNS[0].links} />
           <FooterColumn title="Explore" links={FOOTER_COLUMNS[1].links} />
 
           {/* Newsletter — always visible, full width on mobile */}
-          <div className="min-w-0 py-4 md:py-0">
+          <div className="min-w-0 pb-2 pt-3 md:py-0">
             <p className="mb-3 text-xs uppercase tracking-[0.22em] text-black/60">
               Newsletter Sign Up
             </p>
@@ -96,17 +111,21 @@ export default function HomeFooter() {
             © 2026 KAMARI. All rights reserved.
           </p>
 
+          <p className="text-center text-[11px] leading-relaxed text-black/50 sm:text-xs">
+            Solution by Cybernest
+          </p>
+
           <div className="flex items-center gap-3">
-            {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
+            {SOCIAL_LINKS.map(({ label, href, icon: Icon, hoverClass }) => (
               <a
                 key={label}
                 href={href}
                 aria-label={label}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-[#1A1A1A] transition hover:border-black hover:bg-black hover:text-white"
+                className={`flex h-11 w-11 items-center justify-center rounded-full border border-black/30 text-[#1A1A1A] transition-all duration-300 hover:scale-110 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A] ${hoverClass}`}
               >
-                <Icon size={15} />
+                <Icon size={19} />
               </a>
             ))}
           </div>
@@ -120,7 +139,7 @@ function FooterColumn({ title, links }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="py-4 md:py-0">
+    <div className="py-3 md:py-0">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
