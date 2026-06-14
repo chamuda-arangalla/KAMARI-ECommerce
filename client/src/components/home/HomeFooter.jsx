@@ -30,9 +30,24 @@ const FOOTER_COLUMNS = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: "Instagram", href: "#", icon: InstagramIcon },
-  { label: "Facebook", href: "#", icon: FacebookIcon },
-  { label: "TikTok", href: "#", icon: TikTokIcon },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/kamari.lk/",
+    icon: InstagramIcon,
+    hoverClass: "hover:border-[#C13584] hover:bg-[#FCE7F3] hover:text-[#C13584]",
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61577494230895#",
+    icon: FacebookIcon,
+    hoverClass: "hover:border-[#1877F2] hover:bg-[#E7F0FF] hover:text-[#1877F2]",
+  },
+  {
+    label: "TikTok",
+    href: "#",
+    icon: TikTokIcon,
+    hoverClass: "hover:border-[#FE2C55] hover:bg-[#FFE8ED] hover:text-[#D91E45]",
+  },
 ];
 
 export default function HomeFooter() {
@@ -96,17 +111,21 @@ export default function HomeFooter() {
             © 2026 KAMARI. All rights reserved.
           </p>
 
+          <p className="text-center text-[11px] leading-relaxed text-black/50 sm:text-xs">
+            Solution by Cybernest
+          </p>
+
           <div className="flex items-center gap-3">
-            {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
+            {SOCIAL_LINKS.map(({ label, href, icon: Icon, hoverClass }) => (
               <a
                 key={label}
                 href={href}
                 aria-label={label}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-[#1A1A1A] transition hover:border-black hover:bg-black hover:text-white"
+                className={`flex h-11 w-11 items-center justify-center rounded-full border border-black/30 text-[#1A1A1A] transition-all duration-300 hover:scale-110 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A] ${hoverClass}`}
               >
-                <Icon size={15} />
+                <Icon size={19} />
               </a>
             ))}
           </div>
