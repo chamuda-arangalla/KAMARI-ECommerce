@@ -13,15 +13,13 @@ export default function AdminPagination({ currentPage, totalItems, pageSize, onP
   const firstItem = totalItems === 0 ? 0 : (safePage - 1) * pageSize + 1;
   const lastItem = Math.min(safePage * pageSize, totalItems);
 
-  if (totalPages <= 1) return null;
-
   return (
-    <div className="flex flex-col gap-3 border-t border-[#d7c9b8] bg-[#fcfaf7] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <div className="flex flex-col gap-3 border-t border-[#d7c9b8] bg-[#fcfaf7] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:py-3">
       <p className="text-center text-sm text-[#8f8376] sm:text-left">
         Showing {firstItem}-{lastItem} of {totalItems}
       </p>
 
-      <div className="flex items-center justify-center gap-1.5">
+      {totalPages > 1 && <div className="flex items-center justify-center gap-1.5">
         <button
           type="button"
           onClick={() => onPageChange(safePage - 1)}
@@ -63,7 +61,7 @@ export default function AdminPagination({ currentPage, totalItems, pageSize, onP
         >
           <ChevronRight size={18} />
         </button>
-      </div>
+      </div>}
     </div>
   );
 }

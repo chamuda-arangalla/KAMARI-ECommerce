@@ -5,7 +5,7 @@ import AdminPagination from '../../components/admin/AdminPagination';
 import { useAdmin } from '../../context/useAdmin';
 import { downloadOrderInvoice } from '../../services/orderApi';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const formatCurrency = (value) => `LKR ${Number(value || 0).toLocaleString()}`;
 
@@ -203,8 +203,8 @@ const OrdersPage = () => {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 sm:space-y-8 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:gap-3 lg:space-y-0">
+      <div className="flex shrink-0 flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-2xl sm:text-3xl font-semibold text-[#2c2b28]">Orders</h2>
           <p className="text-[#8f8376] mt-1">Manage and track customer orders</p>
@@ -224,7 +224,7 @@ const OrdersPage = () => {
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto border-b border-[#d7c9b8] sm:gap-8">
+      <div className="flex shrink-0 flex-wrap gap-x-5 gap-y-3 border-b border-[#d7c9b8] sm:gap-x-8">
         {tabs.map((tab) => (
           <button
             key={tab.label}
@@ -232,7 +232,7 @@ const OrdersPage = () => {
               setFilter(tab.label);
               setCurrentPage(1);
             }}
-            className={`relative shrink-0 px-1 pb-4 text-sm sm:text-base font-medium transition-all ${
+            className={`relative px-1 pb-3 text-sm sm:pb-4 sm:text-base font-medium transition-all ${
               filter === tab.label ? 'text-[#2c2b28]' : 'text-[#8f8376] hover:text-[#5f564d]'
             }`}
           >
@@ -247,7 +247,7 @@ const OrdersPage = () => {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-[#d7c9b8] bg-white p-4 shadow-sm">
+      <div className="shrink-0 rounded-2xl border border-[#d7c9b8] bg-white p-4 shadow-sm lg:py-3">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-[#8f8376]">Search Orders</p>
@@ -269,19 +269,29 @@ const OrdersPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#d7c9b8] overflow-hidden shadow-sm">
-        <div className="hidden overflow-x-auto md:block">
-          <table className="w-full text-left">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white shadow-sm">
+        <div className="hidden min-h-0 flex-1 xl:block">
+          <table className="w-full table-fixed text-left">
+            <colgroup>
+              <col className="w-[14%]" />
+              <col className="w-[15%]" />
+              <col className="w-[8%]" />
+              <col className="w-[12%]" />
+              <col className="w-[15%]" />
+              <col className="w-[14%]" />
+              <col className="w-[16%]" />
+              <col className="w-[6%]" />
+            </colgroup>
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Order</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Items</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Total</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Payment Status</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Order Status</th>
-                <th className="px-6 py-5 text-sm font-semibold text-[#8f8376] uppercase tracking-wider">Need to Verify</th>
-                <th className="px-6 py-5" />
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Order</th>
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Items</th>
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Total</th>
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Payment</th>
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Order Status</th>
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Verification</th>
+                <th className="px-2 py-4" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f3ede8]">
@@ -320,25 +330,25 @@ const OrdersPage = () => {
                   className="hover:bg-[#fcfaf7] transition-colors cursor-pointer group"
                   onClick={() => handleSelectOrder(order)}
                 >
-                  <td className="px-6 py-5 whitespace-nowrap">
+                  <td className="px-3 py-3">
                     <span className="text-base font-semibold text-[#2c2b28]">{order.orderNumber}</span>
                     <div className="text-sm text-[#8f8376] mt-0.5">{order.date}</div>
                   </td>
-                  <td className="px-6 py-5 text-base text-[#5f564d]">{order.customerName}</td>
-                  <td className="px-6 py-5 text-base text-[#5f564d]">
+                  <td className="break-words px-3 py-3 text-sm text-[#5f564d]">{order.customerName}</td>
+                  <td className="px-3 py-3 text-sm text-[#5f564d]">
                     {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                   </td>
-                  <td className="px-6 py-4 font-semibold text-[#2c2b28]">{formatCurrency(order.totalAmount)}</td>
-                  <td className="px-6 py-4">
+                  <td className="break-words px-3 py-3 text-sm font-semibold text-[#2c2b28]">{formatCurrency(order.totalAmount)}</td>
+                  <td className="px-3 py-3">
                     <StatusBadge status={order.status} />
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-3">
                     <OrderStatusBadge status={order.orderStatus} />
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-3">
                     <NeedVerifyBadge needsVerify={order.needsPaymentVerification} />
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-2 py-3 text-right">
                     <button className="p-2 text-[#8f8376] group-hover:text-[#2c2b28] transition-all">
                       <ChevronRight size={22} />
                     </button>
@@ -349,7 +359,7 @@ const OrdersPage = () => {
           </table>
         </div>
 
-        <div className="divide-y divide-[#f3ede8] md:hidden">
+        <div className="divide-y divide-[#f3ede8] xl:hidden">
           {ordersLoading && (
             <div className="px-5 py-10 text-center text-[#5f564d]">
               <span className="inline-flex items-center gap-2">
