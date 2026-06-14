@@ -13,9 +13,9 @@ const ABOUT_COPY =
 
 function AnimatedLetter({ children, index, progress, total }) {
   const delay = total > 1 ? index / (total - 1) : 0;
-  const enterStart = 0.16 + delay * 0.34;
-  const enterEnd = enterStart + 0.08;
-  const exitStart = 0.64 + delay * 0.22;
+  const enterStart = 0.36 + delay * 0.28;
+  const enterEnd = enterStart + 0.09;
+  const exitStart = 0.74 + delay * 0.16;
   const exitEnd = exitStart + 0.08;
   const color = useTransform(
     progress,
@@ -69,27 +69,21 @@ export default function HomeAboutKamari({ onNavigate }) {
     offset: ["start start", "end end"],
   });
 
-  const textY = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    ["22vh", "0vh", "-22vh"],
-  );
-
   const textOpacity = useTransform(
     scrollYProgress,
-    [0, 0.1, 0.9, 1],
-    [0, 1, 1, 0],
+    [0, 0.32, 0.42, 0.9, 1],
+    [0, 0, 1, 1, 0],
   );
 
   const textColor = useTransform(
     scrollYProgress,
-    [0, 0.35, 0.65, 1],
+    [0, 0.36, 0.68, 1],
     ["#2C2B28", "#FFFFFF", "#FFFFFF", "#2C2B28"],
   );
 
   const btnBorderColor = useTransform(
     scrollYProgress,
-    [0, 0.35, 0.65, 1],
+    [0, 0.36, 0.68, 1],
     [
       "rgba(44,43,40,0.45)",
       "rgba(255,255,255,0.55)",
@@ -131,7 +125,7 @@ export default function HomeAboutKamari({ onNavigate }) {
 
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
-            style={{ y: textY, opacity: textOpacity, color: textColor }}
+            style={{ opacity: textOpacity, color: textColor }}
             className="flex flex-col items-center px-6 text-center"
           >
             <motion.p
