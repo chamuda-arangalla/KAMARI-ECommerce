@@ -254,8 +254,9 @@ export default function Home() {
               title="New Arrivals"
               viewAllTo="/collections?sort=newest"
               variant="white"
-              imageAspect="h-[50svh] md:h-auto md:aspect-[3/4]"
+              imageAspect="h-[100svh] md:h-auto md:aspect-[3/4]"
               fullBleed
+              mobileSingle
               onOpenProduct={navigateToProduct}
             />
           </div>
@@ -275,6 +276,7 @@ export default function Home() {
               imageAspect="aspect-[3/4]"
               fullBleed
               cols={3}
+              mobileFirstOnly
               onOpenProduct={setQuickViewProduct}
             />
           </div>

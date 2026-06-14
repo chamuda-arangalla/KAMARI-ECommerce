@@ -14,6 +14,8 @@ export default function HomeProductSection({
   imageAspect,
   fullBleed = false,
   cols = 2,
+  mobileSingle = false,
+  mobileFirstOnly = false,
   onOpenProduct,
 }) {
   if (!products.length) return null;
@@ -28,17 +30,29 @@ export default function HomeProductSection({
   if (fullBleed) {
     return (
       <section className={variant === "white" ? "bg-white" : "bg-[#EAE0D6]"}>
-        <div className={`grid gap-0 ${cols === 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2"}`}>
-          {products.map((product) => (
-            <HomeProductCard
+        <div
+          className={`grid gap-0 ${
+            mobileSingle
+              ? "grid-cols-1 md:grid-cols-2"
+              : cols === 3
+                ? "grid-cols-1 sm:grid-cols-3"
+                : "grid-cols-2"
+          }`}
+        >
+          {products.map((product, index) => (
+            <div
               key={product._id}
-              product={product}
-              badge={badge}
-              imageAspect={imageAspect}
-              rounded={false}
-              fullBleed
-              onClick={() => onOpenProduct(product)}
-            />
+              className={mobileFirstOnly && index > 0 ? "hidden sm:block" : "block"}
+            >
+              <HomeProductCard
+                product={product}
+                badge={badge}
+                imageAspect={imageAspect}
+                rounded={false}
+                fullBleed
+                onClick={() => onOpenProduct(product)}
+              />
+            </div>
           ))}
         </div>
       </section>
