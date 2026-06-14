@@ -18,9 +18,9 @@ export default function HomeCollectionsSection({
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.16 }}
-      className="w-full bg-white px-4 py-12 sm:px-8 md:px-12 lg:px-16"
+      className="flex min-h-full w-full items-center bg-white px-4 py-0 sm:px-8 sm:py-8 md:px-12 lg:px-16"
     >
-      <div className="relative">
+      <div className="relative w-full">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-full items-center justify-center px-4 text-center text-white sm:w-[calc((100%_-_0.25rem)/2)] md:w-[calc((100%_-_0.5rem)/3)] lg:w-[calc((100%_-_0.75rem)/4)]">
           <div className="pointer-events-auto">
             <p className="mb-8 text-3xl font-light uppercase leading-none tracking-[0.03em] drop-shadow-sm">
@@ -63,7 +63,7 @@ export default function HomeCollectionsSection({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="flex cursor-grab snap-x snap-mandatory gap-1 overflow-x-auto bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex touch-pan-x cursor-grab snap-x snap-mandatory gap-1 overflow-x-auto overscroll-x-contain bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {collections.map((collection, index) => {
             const product = collectionProducts[collection.name];
@@ -79,7 +79,7 @@ export default function HomeCollectionsSection({
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.3 }}
                 className={`group w-full flex-shrink-0 self-start snap-start cursor-pointer bg-white sm:w-[calc((100%_-_0.25rem)/2)] md:w-[calc((100%_-_0.5rem)/3)] lg:w-[calc((100%_-_0.75rem)/4)] ${
-                  index === 0 ? "sticky left-0 z-[5]" : ""
+                  index === 0 ? "sm:sticky sm:left-0 sm:z-[5]" : ""
                 }`}
                 onClick={() => onOpenCollection(collection)}
               >

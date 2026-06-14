@@ -7,7 +7,6 @@ const SLIDE_INTERVAL = 5000;
 export default function HomeHero({
   heroImageScale,
   heroImageY,
-  heroRevealRef,
   heroTextOpacity,
   prefersReducedMotion,
   onHeroReady,
@@ -45,7 +44,6 @@ export default function HomeHero({
 
   return (
     <section
-      ref={heroRevealRef}
       className="relative h-[100svh] min-h-[520px] overflow-hidden bg-[#2C2B28] md:min-h-[640px]"
     >
       <motion.div

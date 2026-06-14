@@ -1,4 +1,9 @@
-import { useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeCollectionsSection from "../components/home/HomeCollectionsSection";
@@ -17,10 +22,15 @@ export default function Home() {
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: heroRevealRef,
-    offset: ["start start", "end start"],
+    offset: ["start start", "end end"],
   });
   const heroImageY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
   const heroImageScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+  const heroPanelY = useTransform(
+    scrollYProgress,
+    [0.12, 0.88],
+    prefersReducedMotion ? ["0%", "-100%"] : ["0%", "-100%"],
+  );
   const heroTextOpacity = useTransform(
     scrollYProgress,
     [0, 0.72, 1],
@@ -197,26 +207,45 @@ export default function Home() {
 
   return (
     <main className="bg-[#EAE0D6] text-[#2C2B28]">
-      <HomeHero
-        heroImageScale={heroImageScale}
-        heroImageY={heroImageY}
-        heroRevealRef={heroRevealRef}
-        heroTextOpacity={heroTextOpacity}
-        prefersReducedMotion={prefersReducedMotion}
-        onHeroReady={() => setHeroReady(true)}
-        onNavigate={navigate}
-      />
+      <div
+        ref={heroRevealRef}
+        className={
+          showBelowContent
+            ? "relative h-[240svh] md:h-[360svh]"
+            : "relative h-[100svh]"
+        }
+      >
+        <div className="sticky top-0 h-[100svh] overflow-hidden bg-white">
+          {showBelowContent && (
+            <div className="absolute inset-0 z-1 overflow-hidden bg-white">
+              <HomeCollectionsSection
+                collections={collections}
+                collectionProducts={collectionProducts}
+                sliderRef={collectionSliderRef}
+                onOpenCollection={navigateToCollection}
+                onScroll={scrollCollections}
+              />
+            </div>
+          )}
+
+          <motion.div
+            className="absolute inset-0 z-2"
+            style={{ y: showBelowContent ? heroPanelY : 0 }}
+          >
+            <HomeHero
+              heroImageScale={heroImageScale}
+              heroImageY={heroImageY}
+              heroTextOpacity={heroTextOpacity}
+              prefersReducedMotion={prefersReducedMotion}
+              onHeroReady={() => setHeroReady(true)}
+              onNavigate={navigate}
+            />
+          </motion.div>
+        </div>
+      </div>
 
       {showBelowContent && (
         <>
-          <HomeCollectionsSection
-            collections={collections}
-            collectionProducts={collectionProducts}
-            sliderRef={collectionSliderRef}
-            onOpenCollection={navigateToCollection}
-            onScroll={scrollCollections}
-          />
-
           <div className="relative z-2 bg-white md:min-h-screen">
             <HomeProductSection
               badge="New"
@@ -225,7 +254,7 @@ export default function Home() {
               title="New Arrivals"
               viewAllTo="/collections?sort=newest"
               variant="white"
-              imageAspect="aspect-[3/4]"
+              imageAspect="h-[50svh] md:h-auto md:aspect-[3/4]"
               fullBleed
               onOpenProduct={navigateToProduct}
             />

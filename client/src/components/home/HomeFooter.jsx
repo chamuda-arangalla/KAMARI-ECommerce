@@ -37,13 +37,13 @@ const SOCIAL_LINKS = [
 
 export default function HomeFooter() {
   return (
-    <footer className="relative z-2 bg-white text-[#1A1A1A]">
+    <footer className="relative z-2 w-full max-w-full overflow-x-hidden bg-white text-[#1A1A1A]">
       <motion.div
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="w-full px-5 pb-5 pt-14 sm:px-10 sm:pb-7 sm:pt-20 lg:px-14"
+        className="w-full min-w-0 px-4 pb-5 pt-10 sm:px-10 sm:pb-7 sm:pt-20 lg:px-14"
       >
         <motion.div
           variants={fadeUp}
@@ -51,22 +51,24 @@ export default function HomeFooter() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.6 }}
-          className="grid gap-10 md:grid-cols-3 md:gap-16"
+          className="grid min-w-0 gap-6 sm:gap-10 md:grid-cols-3 md:gap-16"
         >
           <FooterColumn title="Shop" links={FOOTER_COLUMNS[0].links} />
           <FooterColumn title="Explore" links={FOOTER_COLUMNS[1].links} />
 
           {/* Newsletter — always visible, full width on mobile */}
-          <div className="py-4 md:py-0">
+          <div className="min-w-0 py-4 md:py-0">
             <p className="mb-3 text-xs uppercase tracking-[0.22em] text-black/60">
               Newsletter Sign Up
             </p>
-            <h3 className="mb-3 text-2xl">Join the Soft Night Club</h3>
+            <h3 className="mb-3 text-xl leading-tight sm:text-2xl">
+              Join the Soft Night Club
+            </h3>
             <p className="mb-6 text-sm leading-relaxed text-black/60">
               Sign up to get first dibs on new arrivals, sales, exclusive
               content, events and more!
             </p>
-            <form className="flex items-stretch gap-0 border-b border-black/30">
+            <form className="flex min-w-0 flex-col border-b border-black/30 min-[360px]:flex-row min-[360px]:items-stretch">
               <input
                 type="email"
                 placeholder="Email address"
@@ -74,7 +76,7 @@ export default function HomeFooter() {
               />
               <button
                 type="submit"
-                className="shrink-0 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#1A1A1A] transition hover:text-black/60"
+                className="self-start whitespace-nowrap py-3 text-xs font-medium uppercase tracking-[0.14em] text-[#1A1A1A] transition hover:text-black/60 min-[360px]:self-auto min-[360px]:tracking-[0.18em]"
               >
                 Subscribe
               </button>
@@ -84,13 +86,13 @@ export default function HomeFooter() {
       </motion.div>
 
       {/* Bottom bar */}
-      <div className="w-full pb-8 sm:pb-10">
+      <div className="w-full min-w-0 pb-8 sm:pb-10">
         <div className="relative mx-4 aspect-[5.7/1] overflow-hidden sm:mx-10 lg:mx-14">
           <BrandLogo className="absolute left-1/2 top-1/2 block h-auto w-full -translate-x-1/2 -translate-y-1/2 object-contain" />
         </div>
 
-        <div className="mx-4 flex flex-col items-center gap-6 border-t border-black/15 pt-6 sm:mx-10 sm:flex-row sm:justify-between lg:mx-14">
-          <p className="text-xs text-black/50">
+        <div className="mx-4 flex min-w-0 flex-col items-center gap-6 border-t border-black/15 pt-6 sm:mx-10 sm:flex-row sm:justify-between lg:mx-14">
+          <p className="max-w-full text-center text-[11px] leading-relaxed text-black/50 sm:text-left sm:text-xs">
             © 2026 KAMARI. All rights reserved.
           </p>
 

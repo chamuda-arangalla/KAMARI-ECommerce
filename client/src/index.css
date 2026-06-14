@@ -72,6 +72,7 @@ h6 {
 
 .customer-theme {
   min-height: 100vh;
+  overflow-x: clip;
   background-color: #eae0d6;
   color: #2c2b28;
   font-family: var(--kamari-font-body);
