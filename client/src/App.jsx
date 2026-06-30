@@ -17,6 +17,10 @@ import CustomerProfilePage from "./pages/CustomerProfilePage";
 import CustomerRegisterPage from "./pages/CustomerRegisterPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import ShippingPolicyPage from "./pages/ShippingPolicyPage";
+import ReturnPolicyPage from "./pages/ReturnPolicyPage";
+import TermsConditionsPage from "./pages/TermsConditionsPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import AdminLayout from "./components/admin/AdminLayout";
 import OrdersPage from "./pages/admin/OrdersPage";
 import OrderTracking from "./pages/admin/OrderTracking";
@@ -77,6 +81,10 @@ function App() {
           <Route path="/profile" element={<CustomerShell><CustomerProfilePage /></CustomerShell>} />
           <Route path="/about" element={<CustomerShell><AboutPage /></CustomerShell>} />
           <Route path="/contact" element={<CustomerShell><ContactPage /></CustomerShell>} />
+          <Route path="/shipping-policy" element={<CustomerShell><ShippingPolicyPage /></CustomerShell>} />
+          <Route path="/return-policy" element={<CustomerShell><ReturnPolicyPage /></CustomerShell>} />
+          <Route path="/terms-conditions" element={<CustomerShell><TermsConditionsPage /></CustomerShell>} />
+          <Route path="/privacy-policy" element={<CustomerShell><PrivacyPolicyPage /></CustomerShell>} />
           <Route path="/orders" element={<CustomerShell><CustomerOrdersPage /></CustomerShell>} />
           <Route path="/orders/:id" element={<CustomerShell><CustomerOrderDetailsPage /></CustomerShell>} />
           <Route path="/login" element={<CustomerAuthShell><CustomerLoginPage /></CustomerAuthShell>} />
