@@ -33,16 +33,13 @@ const syncAdmin = async () => {
     return;
   }
 
-  // No admin yet — promote existing user with that email or create fresh
-  const userWithEmail = await User.findOne({ email });
-  if (userWithEmail) {
-    await User.updateOne({ _id: userWithEmail._id }, { $set: { role: "admin", password: hashedPassword } });
-    console.log(`User promoted to admin: ${email}`);
-    return;
-  }
-
-  await User.create({ email, password: hashedPassword, role: "admin", firstName: "Admin", lastName: "" });
-  console.log(`Admin account created: ${email}`);
+  // Upsert: promote existing user with that email or create fresh
+  await User.findOneAndUpdate(
+    { email },
+    { $set: { role: "admin", password: hashedPassword, firstName: "Admin", lastName: "" } },
+    { upsert: true, new: true }
+  );
+  console.log(`Admin account created/promoted: ${email}`);
 };
 
 const dropStaleIndexes = async () => {
@@ -52,12 +49,26 @@ const dropStaleIndexes = async () => {
       await col.dropIndex(idx);
     } catch (_) {}
   }
-  await User.syncIndexes();
+
+  // Remove duplicate emails, keeping the admin or most recent document
+  const dupes = await col.aggregate([
+    { $match: { email: { $ne: null } } },
+    { $group: { _id: "$email", count: { $sum: 1 }, ids: { $push: "$_id" } } },
+    { $match: { count: { $gt: 1 } } },
+  ]).toArray();
+  for (const { ids } of dupes) {
+    ids.shift(); // keep the first, delete the rest
+    await col.deleteMany({ _id: { $in: ids } });
+  }
+
+  try {
+    await User.syncIndexes();
+  } catch (_) {}
 };
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const conn = await mongoose.connect(process.env.MONGO_URI, { autoIndex: false });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     await dropStaleIndexes();
     await syncAdmin();
