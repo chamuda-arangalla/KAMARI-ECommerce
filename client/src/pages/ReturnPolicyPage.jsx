@@ -14,9 +14,6 @@ export default function ReturnPolicyPage() {
     >
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
-        <p className="mb-3 text-xs uppercase tracking-[0.34em] text-[#8B7164]">
-          KAMARI
-        </p>
         <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
           Return &amp; Exchange Policy
         </h1>
