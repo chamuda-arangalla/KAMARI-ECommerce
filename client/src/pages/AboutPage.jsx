@@ -58,9 +58,10 @@ export default function AboutPage() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.35 }}
             transition={{ duration: 0.7 }}
+            className="flex flex-col items-start justify-center text-left lg:self-center"
           >
-            <p className="mb-4 text-xs uppercase tracking-[0.28em] text-[#8B7164]">The Brand Story</p>
-            <h2 className="text-xl leading-tight text-[#342C27] lg:text-2xl mt-5">
+            <p className="mb-3 text-xs justify-start items-start uppercase tracking-[0.28em] text-[#8B7164]">The Brand Story</p>
+            <h2 className="text-xl leading-tight text-[#342C27] lg:text-2xl">
               Glow Even in the Dark
             </h2>
           </motion.div>
