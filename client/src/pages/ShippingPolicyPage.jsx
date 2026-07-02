@@ -48,7 +48,7 @@ export default function ShippingPolicyPage() {
             </BulletItem>
             <BulletItem>
               A standard islandwide delivery fee of{" "}
-              <strong className="font-medium text-[#342C27]">LKR 450</strong>{" "}
+              <strong className="font-medium text-[#342C27]">Rs 450</strong>{" "}
               applies to all orders.
             </BulletItem>
             <BulletItem>
@@ -75,10 +75,10 @@ export default function ShippingPolicyPage() {
             If you have any questions regarding shipping or delivery, please
             contact us at:{" "}
             <a
-              href="mailto:info@kamari.lk"
+              href="mailto:hello@kamari.lk"
               className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
             >
-              info@kamari.lk
+              hello@kamari.lk
             </a>
           </p>
         </Section>

@@ -77,9 +77,9 @@ export default function CollectionsFilters({
             onChange={(event) => onMaxPriceChange(Number(event.target.value))}
           />
           <div className="price-range-values">
-            <span>LKR 0</span>
+            <span>Rs 0</span>
             <span>
-              Up to LKR {Math.min(maxPrice, maxProductPrice).toLocaleString()}
+              Up to Rs {Math.min(maxPrice, maxProductPrice).toLocaleString()}
             </span>
           </div>
         </div>

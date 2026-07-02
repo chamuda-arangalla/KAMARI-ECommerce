@@ -1,6 +1,6 @@
 // Free delivery banner is currently disabled.
 // const FREE_DELIVERY_THRESHOLD = 10000;
-// Banner: FREE DELIVERY ON ORDERS OVER LKR {FREE_DELIVERY_THRESHOLD.toLocaleString()}
+// Banner: FREE DELIVERY ON ORDERS OVER Rs {FREE_DELIVERY_THRESHOLD.toLocaleString()}
 
 export default function CartHeader({ totalItems }) {
   return (
@@ -8,7 +8,7 @@ export default function CartHeader({ totalItems }) {
         <div className="max-w-6xl mx-auto px-6 py-8 flex items-baseline justify-between">
 
           <h1 className="text-3xl text-[#2C2B28]">
-            Shopping Bag
+            Shopping Cart 
           </h1>
 
           <span className="text-base text-[#5F564D] tracking-[0.18em]">

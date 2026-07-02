@@ -241,10 +241,10 @@ export default function PrivacyPolicyPage() {
             For any questions, requests, or concerns regarding this Privacy
             Policy, please contact us:{" "}
             <a
-              href="mailto:info@kamari.lk"
+              href="mailto:hello@kamari.lk"
               className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
             >
-              info@kamari.lk
+              hello@kamari.lk
             </a>
             <br />
             Website:{" "}

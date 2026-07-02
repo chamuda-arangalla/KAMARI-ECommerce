@@ -7,7 +7,7 @@ import { downloadOrderInvoice } from '../../services/orderApi';
 
 const PAGE_SIZE = 5;
 
-const formatCurrency = (value) => `LKR ${Number(value || 0).toLocaleString()}`;
+const formatCurrency = (value) => `Rs ${Number(value || 0).toLocaleString()}`;
 
 const StatusBadge = ({ status }) => {
   const styles = {

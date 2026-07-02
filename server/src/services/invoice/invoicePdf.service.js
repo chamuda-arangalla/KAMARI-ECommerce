@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import SiteContent from "../../models/SiteContent.js";
 
 const DEFAULT_BRAND_NAME = "KAMARI";
-const DEFAULT_CURRENCY = "LKR";
+const DEFAULT_CURRENCY = "Rs";
 const PAGE_MARGIN = 36;
 const FOOTER_HEIGHT = 54;
 const AMOUNT_RIGHT_INSET = 12;

@@ -102,7 +102,7 @@ export default function HomeProductQuickView({ product, onClose }) {
               {product.name}
             </h3>
             <p className="mb-6 text-lg text-[#2C2B28]">
-              LKR {Number(product.price || 0).toLocaleString()}
+              Rs {Number(product.price || 0).toLocaleString()}
             </p>
 
             {colors.length > 0 && (

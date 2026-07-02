@@ -9,7 +9,7 @@ export default function ContactInfoGrid({ items }) {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
       >
         {items.map(({ icon: Icon, title, lines }) => (
           <motion.div

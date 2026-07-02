@@ -18,10 +18,12 @@ export default function ContactForm({
       transition={{ duration: 0.7 }}
       className="rounded-2xl border border-[#e8e2dc] bg-white p-10 shadow-sm"
     >
-      <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#5F564D]">
+      <p className="mb-2 text-xs lowercase tracking-[0.24em] text-[#5F564D]">
         Send a Message
       </p>
-      <h2 className="mb-8 text-3xl">We'll get back to you soon</h2>
+      <h4 className="mb-4 text-lg" uppercase >
+        We'll get back to you soon
+      </h4>
 
       {submitted ? (
         <motion.div
@@ -46,7 +48,7 @@ export default function ContactForm({
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <ContactField label="Phone" name="phone" value={form.phone} onChange={onChange} placeholder="+94 77 123 4567" />
             <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#5F564D]">
+              <label className="mb-2 block text-xs font-semibold tracking-[0.14em] text-[#5F564D]">
                 Subject
               </label>
               <select
@@ -65,7 +67,7 @@ export default function ContactForm({
             </div>
           </div>
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#5F564D]">
+            <label className="mb-2 block text-xs font-semibold tracking-[0.14em] text-[#5F564D]">
               Message *
             </label>
             <textarea

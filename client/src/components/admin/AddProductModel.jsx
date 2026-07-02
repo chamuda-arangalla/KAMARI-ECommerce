@@ -330,7 +330,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
                     </select>
                   </div>
 
-                  <Input label="Price (LKR)" name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} />
+                  <Input label="Price (Rs)" name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} />
                 </div>
 
                 <Textarea label="Description" name="description" value={form.description} onChange={handleChange} required={false} />

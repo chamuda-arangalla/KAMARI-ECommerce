@@ -34,9 +34,9 @@ export default function CheckoutForm({
             Creating Order
           </span>
         ) : isPaymentStep ? (
-          `Create Order - LKR ${total.toLocaleString()}`
+          `Create Order - Rs ${total.toLocaleString()}`
         ) : (
-          "Next to Payment"
+          "Proceed to Payment"
         )}
       </button>
 

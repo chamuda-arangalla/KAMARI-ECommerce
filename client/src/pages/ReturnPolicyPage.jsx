@@ -180,10 +180,10 @@ export default function ReturnPolicyPage() {
           <p className="text-[15px] leading-8 text-[#5F514B]">
             For exchange or refund requests, please contact us at:{" "}
             <a
-              href="mailto:info@kamari.lk"
+              href="mailto:hello@kamari.lk"
               className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
             >
-              info@kamari.lk
+              hello@kamari.lk
             </a>
           </p>
         </Section>

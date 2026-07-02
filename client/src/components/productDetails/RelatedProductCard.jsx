@@ -23,7 +23,7 @@ export default function RelatedProductCard({ product, onClick }) {
         </p>
         <p className="pd-related-name">{product.name}</p>
         <p className="pd-related-price">
-          LKR {Number(product.price || 0).toLocaleString()}
+          Rs {Number(product.price || 0).toLocaleString()}
         </p>
       </div>
     </button>
