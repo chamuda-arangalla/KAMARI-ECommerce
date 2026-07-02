@@ -211,11 +211,11 @@ export default function Home() {
         ref={heroRevealRef}
         className={
           showBelowContent
-            ? "relative h-[240svh] md:h-[360svh]"
-            : "relative h-[100svh]"
+            ? "relative h-[210svh] md:h-[300svh]"
+            : "relative h-svh"
         }
       >
-        <div className="sticky top-0 h-[100svh] overflow-hidden bg-white">
+        <div className="sticky top-0 h-svh overflow-hidden bg-white">
           {showBelowContent && (
             <div className="absolute inset-0 z-1 overflow-hidden bg-white">
               <HomeCollectionsSection
@@ -249,15 +249,15 @@ export default function Home() {
         <>
           <div className="relative z-2 bg-white md:min-h-screen">
             <HomeProductSection
-              badge="New"
               eyebrow="Just In"
               products={newArrivals}
-              title="New Arrivals"
+              title="NEW SELLER"
               viewAllTo="/collections?sort=newest"
               variant="white"
               imageAspect="h-[100svh] md:h-auto md:aspect-[3/4]"
               fullBleed
               mobileSingle
+              headerPadding="pt-0 pb-4 md:pt-0 md:pb-6"
               onOpenProduct={navigateToProduct}
             />
           </div>
@@ -268,16 +268,16 @@ export default function Home() {
 
           <div className="relative z-2 bg-white md:min-h-screen">
             <HomeProductSection
-              badge="Best Seller"
               eyebrow="Popular"
               products={bestSellers}
-              title="Best Sellers"
+              title="BEST SELLER"
               viewAllTo="/shop"
               variant="white"
               imageAspect="h-[100svh] sm:h-auto sm:aspect-[3/4]"
               fullBleed
               cols={3}
               mobileFirstOnly
+              headerPadding="pt-12 pb-5 md:pt-20 md:pb-10"
               onOpenProduct={setQuickViewProduct}
             />
           </div>

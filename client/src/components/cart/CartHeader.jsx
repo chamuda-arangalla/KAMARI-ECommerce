@@ -7,7 +7,7 @@ export default function CartHeader({ totalItems }) {
       <div className="mt-16 border-b border-[#2C2B28]/10 bg-[#EAE0D6]">
         <div className="max-w-6xl mx-auto px-6 py-8 flex items-baseline justify-between">
 
-          <h1 className="text-3xl text-[#2C2B28]">
+          <h1 className="lg:text-3xl text:2xl text-[#2C2B28]">
             Shopping Cart 
           </h1>
 
