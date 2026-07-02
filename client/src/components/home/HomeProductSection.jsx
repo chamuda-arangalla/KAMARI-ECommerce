@@ -5,7 +5,6 @@ import HomeProductCard from "./HomeProductCard";
 import { fadeUp, sectionReveal, stagger } from "./homeConstants";
 
 export default function HomeProductSection({
-  badge,
   eyebrow,
   products,
   title,
@@ -16,6 +15,7 @@ export default function HomeProductSection({
   cols = 2,
   mobileSingle = false,
   mobileFirstOnly = false,
+  headerPadding = "py-5 md:py-8",
   onOpenProduct,
 }) {
   if (!products.length) return null;
@@ -30,6 +30,13 @@ export default function HomeProductSection({
   if (fullBleed) {
     return (
       <section className={variant === "white" ? "bg-white" : "bg-[#EAE0D6]"}>
+        <div
+          className={`flex items-center justify-between gap-4 px-4 sm:px-8 md:px-10 lg:px-10 ${headerPadding}`}
+        >
+          <h2 className="text-md font-light uppercase tracking-[0.08em] text-[#2C2B28] md:text-xl lg:text-xl">
+            {title}
+          </h2>
+        </div>
         <div
           className={`grid gap-0 ${
             mobileSingle
@@ -46,7 +53,6 @@ export default function HomeProductSection({
             >
               <HomeProductCard
                 product={product}
-                badge={badge}
                 imageAspect={imageAspect}
                 rounded={false}
                 fullBleed
@@ -101,7 +107,6 @@ export default function HomeProductSection({
             <HomeProductCard
               key={product._id}
               product={product}
-              badge={badge}
               imageAspect={imageAspect}
               onClick={() => onOpenProduct(product)}
             />
