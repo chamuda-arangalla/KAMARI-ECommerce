@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
         <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
-          Privacy Policy
+          Shipping Policy
         </h1>
         <p className="mt-4 text-sm text-[#8B7164]">Last Updated: June 2026</p>
       </div>
@@ -275,7 +275,7 @@ function Section({ number, title, children }) {
 function BulletItem({ children }) {
   return (
     <li className="flex gap-3">
-      <span className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
+      <span className="mt-2.75 h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
       <span>{children}</span>
     </li>
   );
