@@ -2,6 +2,7 @@ import { motion, useMotionValueEvent, useReducedMotion } from "framer-motion";
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import collectionCoverImage from "../../assets/images/collection-static.JPG.jpeg";
 import { getHomeProductImage } from "./homeConstants";
 
 const premiumStagger = {
@@ -41,6 +42,7 @@ export default function HomeCollectionsSection({
   const prefersReducedMotion = useReducedMotion();
   const hasRevealedRef = useRef(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [mobileIndex, setMobileIndex] = useState(0);
 
   useMotionValueEvent(revealProgress, "change", (progress) => {
     if (!hasRevealedRef.current && progress >= 0.16) {
@@ -51,30 +53,65 @@ export default function HomeCollectionsSection({
 
   if (!collections.length) return null;
 
+  const activeMobileIndex = Math.min(mobileIndex, collections.length - 1);
+  const activeMobileCollection = collections[activeMobileIndex];
+
   return (
     <motion.section
       initial={{ opacity: 0 }}
       animate={{ opacity: isRevealed ? 1 : 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.55 }}
-      className="flex min-h-full w-full items-end bg-white px-4 py-2 sm:items-center sm:p-8 md:px-12 lg:px-16"
+      className="flex min-h-full w-full items-center bg-white px-4 py-2 sm:p-8 md:px-12 lg:px-16"
     >
-      <motion.div
-        variants={premiumStagger}
-        initial="hidden"
-        animate={isRevealed ? "visible" : "hidden"}
-        className="flex w-full touch-pan-x snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-smooth bg-white pr-[6%] md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {collections.map((collection, index) => (
+      <div className="relative w-full overflow-hidden bg-white md:hidden">
+        <motion.div
+          variants={premiumStagger}
+          initial="hidden"
+          animate={isRevealed ? "visible" : "hidden"}
+          className="w-full overflow-hidden bg-white"
+        >
           <CollectionCard
-            key={collection._id}
-            collection={collection}
-            product={collectionProducts[collection.name]}
-            index={index}
-            className="w-[94%]"
+            key={activeMobileCollection._id}
+            collection={activeMobileCollection}
+            product={collectionProducts[activeMobileCollection.name]}
+            index={activeMobileIndex}
+            className="w-full"
             onOpenCollection={onOpenCollection}
           />
-        ))}
-      </motion.div>
+        </motion.div>
+
+        {activeMobileIndex > 0 && (
+          <button
+            type="button"
+            aria-label="Previous collection"
+            onClick={() =>
+              setMobileIndex((currentIndex) => Math.max(currentIndex - 1, 0))
+            }
+            className="absolute left-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#2C2B28] shadow-sm backdrop-blur transition hover:bg-white"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
+
+        {activeMobileIndex < collections.length - 1 && (
+          <button
+            type="button"
+            aria-label="Next collection"
+            onClick={() =>
+              setMobileIndex((currentIndex) =>
+                Math.min(currentIndex + 1, collections.length - 1),
+              )
+            }
+            className={`absolute right-3 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-[#2C2B28] shadow-sm backdrop-blur transition hover:bg-white ${
+              activeMobileIndex === 0
+                ? "top-[calc(50%+1.625rem)] -translate-y-1/2"
+                : "top-1/2 -translate-y-1/2"
+            }`}
+          >
+            <ChevronRight size={18} />
+          </button>
+        )}
+      </div>
 
       <motion.div
         variants={premiumStagger}
@@ -121,7 +158,7 @@ export default function HomeCollectionsSection({
                 collection={collection}
                 product={collectionProducts[collection.name]}
                 index={offset + 1}
-                className="w-[calc((100%_-_0.25rem)/2)] lg:w-[calc((100%_-_0.5rem)/3)]"
+                className="w-[calc((100%-0.25rem)/2)] lg:w-[calc((100%-0.5rem)/3)]"
                 onOpenCollection={onOpenCollection}
               />
             ))}
@@ -140,17 +177,21 @@ function CollectionCard({
   onOpenCollection,
 }) {
   const imageUrl =
-    index > 0 && product ? getHomeProductImage(product) : collection.image?.url;
+    index === 0
+      ? collectionCoverImage
+      : product
+        ? getHomeProductImage(product)
+        : collection.image?.url;
 
   return (
     <motion.div
       variants={premiumCard}
       whileHover={{ scale: 1.01 }}
       transition={{ duration: 0.3 }}
-      className={`group relative min-w-0 flex-shrink-0 self-start snap-start cursor-pointer bg-white ${className}`}
+      className={`group relative min-w-0 shrink-0 self-start snap-start cursor-pointer bg-white ${className}`}
       onClick={() => onOpenCollection(collection)}
     >
-      <div className="relative h-[68svh] min-h-[440px] max-h-[590px] overflow-hidden bg-[#F7F4F0] md:h-auto md:min-h-0 md:max-h-none md:aspect-[4/5]">
+      <div className="relative h-[78svh] min-h-130 max-h-170 overflow-hidden bg-[#F7F4F0] md:h-auto md:min-h-0 md:max-h-none md:aspect-4/5">
         {imageUrl ? (
           <motion.img
             variants={premiumImage}

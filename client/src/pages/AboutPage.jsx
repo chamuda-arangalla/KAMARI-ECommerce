@@ -30,20 +30,15 @@ export default function AboutPage() {
           variants={stagger}
           initial="hidden"
           animate="visible"
-          className="relative z-10 mx-auto flex min-h-[78vh] max-w-6xl flex-col justify-center px-6 py-20 text-left text-[#342C27]"
+          className="relative z-10 mx-auto flex lg:min-h-[68vh] min-h-[78vh] max-w-6xl flex-col justify-center px-6 py-20 text-left text-[#342C27]"
         >
           <motion.p
             variants={fadeUp}
-            className="mb-5 text-xs uppercase tracking-[0.34em] text-[#8B7164]"
+            className="mb-5 text-sm uppercase tracking-[0.34em] text-[#8B7164]"
           >
             About KAMARI
           </motion.p>
-          <motion.h1
-            variants={fadeUp}
-            className="max-w-3xl text-5xl font-light leading-tight tracking-[0.08em] sm:text-6xl lg:text-7xl"
-          >
-            Glow Even in the Dark
-          </motion.h1>
+          
           <motion.p
             variants={fadeUp}
             className="mt-8 max-w-2xl text-base leading-8 text-[#5F514B] sm:text-lg"
@@ -63,10 +58,11 @@ export default function AboutPage() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.35 }}
             transition={{ duration: 0.7 }}
+            className="flex flex-col items-start justify-center text-left lg:self-center"
           >
-            <p className="mb-4 text-xs uppercase tracking-[0.28em] text-[#8B7164]">The Brand Story</p>
-            <h2 className="text-4xl leading-tight text-[#342C27] sm:text-5xl">
-              Rest, made intentional.
+            <p className="mb-3 text-xs justify-start items-start uppercase tracking-[0.28em] text-[#8B7164]">The Brand Story</p>
+            <h2 className="text-xl leading-tight text-[#342C27] lg:text-2xl">
+              Glow Even in the Dark
             </h2>
           </motion.div>
 

@@ -12,7 +12,7 @@ export default function ContactMapSocial({ data }) {
       transition={{ duration: 0.7, delay: 0.15 }}
       className="flex flex-col gap-6"
     >
-      <div className="min-h-[300px] flex-1 overflow-hidden rounded-2xl border border-[#e8e2dc] shadow-sm">
+      <div className="min-h-75 flex-1 overflow-hidden rounded-2xl border border-[#e8e2dc] shadow-sm">
         <iframe
           title="KAMARI Location"
           src={data.mapEmbedUrl}
@@ -37,7 +37,7 @@ export default function ContactMapSocial({ data }) {
             className="flex items-center gap-4 rounded-xl border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-medium text-[#2C2B28] transition hover:border-[#D7C9B8] hover:bg-[#FAF7F3]"
           >
             <MessageCircle size={20} className="text-[#5F564D]" />
-            Chat on WhatsApp - +{data.whatsappNumber}
+            Chat on WhatsApp {data.whatsappNumber}
           </a>
           <a
             href={`https://instagram.com/${data.instagramHandle}`}
