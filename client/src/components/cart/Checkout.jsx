@@ -102,8 +102,8 @@ export default function Checkout({
                 onClick={() => setPromoOpen(!promoOpen)}
                 className="flex items-center justify-between w-full text-[11px] tracking-[0.06em] text-[#5F564D] hover:text-[#2C2B28] transition mb-3"
               >
-                <span className="flex items-center gap-2">
-                  <Tag size={5} />
+                <span className="flex items-center gap-2 text-sm">
+                  <Tag size={11} />
                   PROMO CODE
                 </span>
                 <span>{promoOpen ? "−" : "+"}</span>
@@ -167,7 +167,7 @@ export default function Checkout({
             {["Secure Checkout", "Free Returns", "Authentic"].map((t) => (
               <span
                 key={t}
-                className="text-[10px] text-[#5F564D] font-normal lowercase text-center"
+                className="text-[12px] text-[#5F564D] font-normal lowercase text-center"
               >
                 {t}
               </span>
