@@ -40,7 +40,7 @@ export default function Checkout({
                 Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})
               </span>
               <span className="text-[#2C2B28]">
-                LKR {subtotal.toLocaleString()}
+                Rs {subtotal.toLocaleString()}
               </span>
             </div>
 
@@ -63,7 +63,7 @@ export default function Checkout({
                       <X size={11} />
                     </button>
                   </span>
-                  <span>– LKR {discount.toLocaleString()}</span>
+                  <span>– Rs {discount.toLocaleString()}</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -73,7 +73,7 @@ export default function Checkout({
               <span>Delivery</span>
               <span className="text-[#2C2B28]">
                 {/* Free delivery disabled: freeDelivery ? "Free" : fee */}
-                LKR {deliveryFee.toLocaleString()}
+                Rs {deliveryFee.toLocaleString()}
               </span>
             </div>
           </div>
@@ -82,12 +82,12 @@ export default function Checkout({
 
           {/* Total */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="text-base tracking-[0.15em] uppercase text-[#2C2B28] font-semibold">
+            <span className="text-base tracking-[0.12em] text-[#2C2B28] font-semibold">
               Total
             </span>
             <div className="text-right">
-              <p className="text-2xl font-light text-[#2C2B28]">
-                LKR {total.toLocaleString()}
+              <p className="text-xl font-light text-[#2C2B28]">
+                Rs {total.toLocaleString()}
               </p>
               <p className="text-sm text-[#5F564D] mt-0.5">
                 Incl. taxes
@@ -97,14 +97,14 @@ export default function Checkout({
 
           {/* Promo Input */}
           {!promoApplied && (
-            <div className="mb-6">
+            <div className="mb-8">
               <button
                 onClick={() => setPromoOpen(!promoOpen)}
-                className="flex items-center justify-between w-full text-sm tracking-[0.15em] text-[#5F564D] hover:text-[#2C2B28] transition uppercase mb-3"
+                className="flex items-center justify-between w-full text-[11px] tracking-[0.06em] text-[#5F564D] hover:text-[#2C2B28] transition mb-3"
               >
                 <span className="flex items-center gap-2">
-                  <Tag size={12} />
-                  Promo Code
+                  <Tag size={5} />
+                  PROMO CODE
                 </span>
                 <span>{promoOpen ? "−" : "+"}</span>
               </button>
@@ -128,9 +128,9 @@ export default function Checkout({
                       />
                       <button
                         onClick={onApplyPromo}
-                        className="px-5 bg-[#E8DED6] text-[#2C2B28] text-sm tracking-[0.15em] hover:bg-[#d8c9bd] transition"
+                        className="px-4 bg-[#E8DED6] text-[#2C2B28] text-[11px] tracking-[0.08em] hover:bg-[#d8c9bd] transition"
                       >
-                        APPLY
+                        Apply
                       </button>
                     </div>
 
@@ -167,7 +167,7 @@ export default function Checkout({
             {["Secure Checkout", "Free Returns", "Authentic"].map((t) => (
               <span
                 key={t}
-                className="text-xs text-[#5F564D] uppercase text-center"
+                className="text-[10px] text-[#5F564D] font-normal lowercase text-center"
               >
                 {t}
               </span>

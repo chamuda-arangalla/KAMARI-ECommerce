@@ -59,7 +59,7 @@ const productTable = (productDetails) => `
         <td style="padding:10px 12px;font-size:13px;color:#555;text-align:center;">${item.colour}</td>
         <td style="padding:10px 12px;font-size:13px;color:#555;text-align:center;">${item.size}</td>
         <td style="padding:10px 12px;font-size:13px;color:#555;text-align:center;">${item.quantity}</td>
-        <td style="padding:10px 12px;font-size:13px;color:#333;text-align:right;">LKR ${(item.unitPrice * item.quantity).toLocaleString()}</td>
+        <td style="padding:10px 12px;font-size:13px;color:#333;text-align:right;">Rs ${(item.unitPrice * item.quantity).toLocaleString()}</td>
       </tr>`
       )
       .join("")}
@@ -70,15 +70,15 @@ const pricingBlock = (pricing) => `
   <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:4px;">
     <tr>
       <td style="padding:6px 0;color:#666;font-size:13px;">Subtotal</td>
-      <td style="padding:6px 0;color:#333;font-size:13px;text-align:right;">LKR ${pricing.subTotal.toLocaleString()}</td>
+      <td style="padding:6px 0;color:#333;font-size:13px;text-align:right;">Rs ${pricing.subTotal.toLocaleString()}</td>
     </tr>
     <tr>
       <td style="padding:6px 0;color:#666;font-size:13px;">Shipping Fee</td>
-      <td style="padding:6px 0;color:#333;font-size:13px;text-align:right;">LKR ${pricing.shippingFee.toLocaleString()}</td>
+      <td style="padding:6px 0;color:#333;font-size:13px;text-align:right;">Rs ${pricing.shippingFee.toLocaleString()}</td>
     </tr>
     <tr style="border-top:2px solid ${brandColor};">
       <td style="padding:10px 0 4px;color:${brandColor};font-size:15px;font-weight:bold;">Total</td>
-      <td style="padding:10px 0 4px;color:${brandColor};font-size:15px;font-weight:bold;text-align:right;">LKR ${pricing.grandTotal.toLocaleString()}</td>
+      <td style="padding:10px 0 4px;color:${brandColor};font-size:15px;font-weight:bold;text-align:right;">Rs ${pricing.grandTotal.toLocaleString()}</td>
     </tr>
   </table>
 `;

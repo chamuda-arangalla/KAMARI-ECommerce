@@ -14,9 +14,6 @@ export default function TermsConditionsPage() {
     >
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
-        <p className="mb-3 text-xs uppercase tracking-[0.34em] text-[#8B7164]">
-          KAMARI
-        </p>
         <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
           Terms &amp; Conditions
         </h1>
@@ -84,7 +81,7 @@ export default function TermsConditionsPage() {
             <BulletItem>
               All prices displayed on the website are in{" "}
               <strong className="font-medium text-[#342C27]">
-                Sri Lankan Rupees (LKR)
+                Sri Lankan Rupees (Rs)
               </strong>
               .
             </BulletItem>
@@ -248,10 +245,10 @@ export default function TermsConditionsPage() {
             If you have any questions regarding these Terms &amp; Conditions,
             please contact us at:{" "}
             <a
-              href="mailto:info@kamari.lk"
+              href="mailto:hello@kamari.lk"
               className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
             >
-              info@kamari.lk
+              hello@kamari.lk
             </a>
           </p>
         </Section>

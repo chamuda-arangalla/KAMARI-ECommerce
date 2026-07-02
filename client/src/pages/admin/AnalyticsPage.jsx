@@ -30,10 +30,10 @@ const AnalyticsPage = () => (
     </div>
 
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
-      <StatCard icon={DollarSign}  label="Total Revenue"    value="LKR 42,850" trend="+12.5%" />
+      <StatCard icon={DollarSign}  label="Total Revenue"    value="Rs 42,850" trend="+12.5%" />
       <StatCard icon={ShoppingCart}label="Total Orders"     value="384"         trend="+8.2%"  />
       <StatCard icon={Users}       label="New Customers"    value="52"          trend="+15.1%" />
-      <StatCard icon={TrendingUp}  label="Avg. Order Value" value="LKR 112"    trend="-2.4%"  />
+      <StatCard icon={TrendingUp}  label="Avg. Order Value" value="Rs 112"    trend="-2.4%"  />
     </div>
 
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">

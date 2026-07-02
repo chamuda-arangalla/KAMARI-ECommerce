@@ -773,7 +773,7 @@ const ProductSummary = ({ product, totalStock }) => (
       </p>
       <h2 className="text-3xl font-semibold text-[#2c2b28] mt-1">{product.name}</h2>
       <p className="text-2xl font-bold text-[#2c2b28] mt-2">
-        LKR {Number(product.price || 0).toLocaleString()}
+        Rs {Number(product.price || 0).toLocaleString()}
       </p>
     </div>
 

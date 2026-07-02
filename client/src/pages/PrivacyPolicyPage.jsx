@@ -14,9 +14,6 @@ export default function PrivacyPolicyPage() {
     >
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
-        <p className="mb-3 text-xs uppercase tracking-[0.34em] text-[#8B7164]">
-          KAMARI
-        </p>
         <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
           Privacy Policy
         </h1>
@@ -244,10 +241,10 @@ export default function PrivacyPolicyPage() {
             For any questions, requests, or concerns regarding this Privacy
             Policy, please contact us:{" "}
             <a
-              href="mailto:info@kamari.lk"
+              href="mailto:hello@kamari.lk"
               className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
             >
-              info@kamari.lk
+              hello@kamari.lk
             </a>
             <br />
             Website:{" "}

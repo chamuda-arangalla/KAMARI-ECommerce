@@ -24,12 +24,17 @@ export default function ContactPage() {
 
   useEffect(() => {
     getSiteContent("contact")
-      .then((res) => setData({ ...DEFAULT_CONTACT_CONTENT, ...res.data }))
+      .then((res) =>
+        setData({
+          ...DEFAULT_CONTACT_CONTENT,
+          ...res.data,
+          emails: DEFAULT_CONTACT_CONTENT.emails,
+        })
+      )
       .catch(() => setData(DEFAULT_CONTACT_CONTENT));
   }, []);
 
   const contactInfo = [
-    { icon: MapPin, title: "Visit Us", lines: data.address },
     { icon: Phone, title: "Call Us", lines: data.phones },
     { icon: Mail, title: "Email Us", lines: data.emails },
     { icon: Clock, title: "Working Hours", lines: data.workingHours },
@@ -60,6 +65,7 @@ export default function ContactPage() {
       <section className="mx-auto max-w-7xl px-6 pb-16">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <ContactForm
+          
             form={form}
             submitted={submitted}
             onChange={handleChange}

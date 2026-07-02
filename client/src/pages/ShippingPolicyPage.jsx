@@ -14,9 +14,6 @@ export default function ShippingPolicyPage() {
     >
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
-        <p className="mb-3 text-xs uppercase tracking-[0.34em] text-[#8B7164]">
-          KAMARI
-        </p>
         <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
           Shipping Policy
         </h1>
@@ -51,7 +48,7 @@ export default function ShippingPolicyPage() {
             </BulletItem>
             <BulletItem>
               A standard islandwide delivery fee of{" "}
-              <strong className="font-medium text-[#342C27]">LKR 450</strong>{" "}
+              <strong className="font-medium text-[#342C27]">Rs 450</strong>{" "}
               applies to all orders.
             </BulletItem>
             <BulletItem>
@@ -78,10 +75,10 @@ export default function ShippingPolicyPage() {
             If you have any questions regarding shipping or delivery, please
             contact us at:{" "}
             <a
-              href="mailto:info@kamari.lk"
+              href="mailto:hello@kamari.lk"
               className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
             >
-              info@kamari.lk
+              hello@kamari.lk
             </a>
           </p>
         </Section>

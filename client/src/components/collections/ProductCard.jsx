@@ -44,10 +44,10 @@ export default function ProductCard({ product, onOpen }) {
 
       <div className="pg-card-info">
         <p className="pg-card-name">{product.name}</p>
-        <p className="pg-card-price">LKR {product.price.toLocaleString()}</p>
+        <p className="pg-card-price">Rs {product.price.toLocaleString()}</p>
         {/* Koko installment message currently disabled:
         <p className="pg-card-installment">
-          or 3 x LKR {installment} with Koko
+          or 3 x Rs {installment} with Koko
         </p>
         */}
 

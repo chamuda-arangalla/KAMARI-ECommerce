@@ -9,7 +9,7 @@ export default function ContactField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#5F564D]">
+      <label className="mb-2 block text-xs font-semibold normal-case tracking-[0.14em] text-[#5F564D]" style={{ textTransform: "none" }}>
         {label}
       </label>
       <input

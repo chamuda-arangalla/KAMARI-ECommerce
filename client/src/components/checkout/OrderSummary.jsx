@@ -30,7 +30,7 @@ export default function OrderSummary({
               <p className="order-item-name">{item.name}</p>
               <p className="order-item-meta">{item.variant} - Size {item.size}</p>
             </div>
-            <span className="order-item-price">LKR {(item.price * item.qty).toLocaleString()}</span>
+            <span className="order-item-price">Rs {(item.price * item.qty).toLocaleString()}</span>
           </div>
         ))
       )}
@@ -42,20 +42,20 @@ export default function OrderSummary({
 
       <div className="order-divider" />
 
-      <OrderTotalRow label="Subtotal" value={`LKR ${subtotal.toLocaleString()}`} />
+      <OrderTotalRow label="Subtotal" value={`Rs ${subtotal.toLocaleString()}`} />
 
       {promoApplied && (
-        <OrderTotalRow label="Discount (KAMARI10)" value={`- LKR ${discount.toLocaleString()}`} valueClassName="order-discount-value" />
+        <OrderTotalRow label="Discount (KAMARI10)" value={`- Rs ${discount.toLocaleString()}`} valueClassName="order-discount-value" />
       )}
 
       {/* Free delivery disabled: value was freeDelivery ? "Free" : deliveryFee. */}
-      <OrderTotalRow label="Delivery" value={`LKR ${deliveryFee.toLocaleString()}`} valueClassName="order-total-value" />
+      <OrderTotalRow label="Delivery" value={`Rs ${deliveryFee.toLocaleString()}`} valueClassName="order-total-value" />
 
       <div className="order-divider" />
 
       <div className="order-total-row total">
         <span>Total</span>
-        <span>LKR {(createdOrder ? orderTotal : total).toLocaleString()}</span>
+        <span>Rs {(createdOrder ? orderTotal : total).toLocaleString()}</span>
       </div>
     </div>
   );

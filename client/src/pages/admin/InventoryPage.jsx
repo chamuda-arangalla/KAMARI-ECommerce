@@ -141,7 +141,7 @@ const InventoryPage = () => {
                         />
                         <div className="min-w-0">
                           <p className="break-words text-base font-semibold text-[#2c2b28]">{product.name}</p>
-                          <p className="text-sm text-[#8f8376] mt-0.5">LKR {product.price?.toLocaleString()}</p>
+                          <p className="text-sm text-[#8f8376] mt-0.5">Rs {product.price?.toLocaleString()}</p>
                         </div>
                       </div>
                     </td>
@@ -228,7 +228,7 @@ const InventoryPage = () => {
                   />
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-base font-semibold text-[#2c2b28]">{product.name}</p>
-                    <p className="mt-1 text-sm text-[#8f8376]">LKR {product.price?.toLocaleString()}</p>
+                    <p className="mt-1 text-sm text-[#8f8376]">Rs {product.price?.toLocaleString()}</p>
                     <span className="mt-2 inline-flex rounded-full bg-[#eae0d6] px-3 py-1 text-sm text-[#5f564d]">
                       {product.collection}
                     </span>

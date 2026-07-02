@@ -44,7 +44,7 @@ export default function CartDrawer() {
             <div className="flex items-center justify-between border-b border-[#2C2B28]/10 px-6 py-5">
               <div className="flex items-center gap-3">
                 <ShoppingBag size={18} strokeWidth={1.5} className="text-[#2C2B28]" />
-                <span className="cart-drawer-header-title">Shopping Bag</span>
+                <span className="cart-drawer-header-title">Shopping Cart</span>
                 {totalItems > 0 && (
                   <span className="cart-drawer-badge">{totalItems}</span>
                 )}
@@ -101,11 +101,11 @@ export default function CartDrawer() {
                               {item.variant} · Size {item.size}
                             </p>
                             <p className="cart-item-price">
-                              LKR {(item.price * item.qty).toLocaleString()}
+                              Rs {(item.price * item.qty).toLocaleString()}
                             </p>
                             {item.qty > 1 && (
                               <p className="cart-item-price-each">
-                                Qty {item.qty} · LKR {item.price.toLocaleString()} each
+                                Qty {item.qty} · Rs {item.price.toLocaleString()} each
                               </p>
                             )}
                           </div>
@@ -132,12 +132,12 @@ export default function CartDrawer() {
                     Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})
                   </span>
                   <span className="cart-footer-subtotal-value">
-                    LKR {total.toLocaleString()}
+                    Rs {total.toLocaleString()}
                   </span>
                 </div>
                 <p className="cart-footer-delivery-note">
                   {/* Free delivery disabled: previously displayed "Free delivery included". */}
-                  Includes LKR {deliveryFee.toLocaleString()} delivery
+                  Includes Rs {deliveryFee.toLocaleString()} delivery
                 </p>
 
                 <div className="cart-footer-actions">

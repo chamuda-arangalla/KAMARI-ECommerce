@@ -15,7 +15,7 @@ const progressPct = Math.min(
 
 Messages:
 - "YOU'VE UNLOCKED FREE DELIVERY"
-- `ADD LKR ${remaining.toLocaleString()} MORE FOR FREE DELIVERY`
+- `ADD Rs ${remaining.toLocaleString()} MORE FOR FREE DELIVERY`
 */
 
 export default function CartItems({ items, onUpdateQty, onRemove }) {
@@ -45,10 +45,10 @@ export default function CartItems({ items, onUpdateQty, onRemove }) {
             <div className="flex flex-col justify-between flex-1 py-0.5">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-xl font-medium tracking-[0.06em] text-[#2C2B28] uppercase mb-1">
+                  <h3 className="text-xl font-medium tracking-[0.06em] text-[#2C2B28] capitalize mb-1">
                     {item.name}
                   </h3>
-                  <div className="flex gap-3 text-base tracking-[0.12em] text-[#5F564D] uppercase">
+                  <div className="flex gap-3 text-base tracking-[0.12em] text-[#5F564D] capitalize">
                     <span>{item.variant}</span>
                     <span>·</span>
                     <span>Size {item.size}</span>
@@ -86,11 +86,11 @@ export default function CartItems({ items, onUpdateQty, onRemove }) {
                 {/* Price */}
                 <div className="text-right">
                   <p className="text-xl font-medium text-[#2C2B28] tracking-wide">
-                    LKR {(item.price * item.qty).toLocaleString()}
+                    Rs {(item.price * item.qty).toLocaleString()}
                   </p>
                   {item.qty > 1 && (
                     <p className="text-base text-[#5F564D]">
-                      LKR {item.price.toLocaleString()} each
+                      Rs {item.price.toLocaleString()} each
                     </p>
                   )}
                 </div>
@@ -104,7 +104,7 @@ export default function CartItems({ items, onUpdateQty, onRemove }) {
       <div className="mt-8">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-base tracking-[0.15em] text-[#5F564D] hover:text-[#2C2B28] transition uppercase"
+          className="inline-flex items-center gap-2 text-base tracking-[0.15em] text-[#5F564D] hover:text-[#2C2B28] transition"
         >
           ← Continue Shopping
         </Link>

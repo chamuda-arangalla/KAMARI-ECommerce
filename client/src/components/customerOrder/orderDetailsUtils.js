@@ -1,5 +1,5 @@
 export const formatCurrency = (value) =>
-  `LKR ${Number(value || 0).toLocaleString()}`;
+  `Rs ${Number(value || 0).toLocaleString()}`;
 
 export const formatDate = (value) =>
   value

@@ -108,7 +108,7 @@ export default function HomeProductCard({
         </div>
 
         <p className="text-sm text-[#2C2B28]">
-          LKR {Number(product.price || 0).toLocaleString()}
+          Rs {Number(product.price || 0).toLocaleString()}
         </p>
       </div>
     </motion.div>

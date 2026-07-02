@@ -515,7 +515,7 @@ const Header = () => {
                               {product.setName || product.collection}
                             </span>
                             <span className="mt-1 block text-sm font-medium text-[#5f564d]">
-                              LKR {Number(product.price || 0).toLocaleString()}
+                              Rs {Number(product.price || 0).toLocaleString()}
                             </span>
                           </span>
                         </button>

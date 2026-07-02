@@ -44,11 +44,11 @@ export default function ShopCard({ product, onOpen }) {
       <div className="pg-card-info">
         <p className="pg-card-name">{product.name}</p>
         <p className="pg-card-price">
-          LKR {Number(product.price || 0).toLocaleString()}
+          Rs {Number(product.price || 0).toLocaleString()}
         </p>
         {/* Koko installment message currently disabled:
         <p className="pg-card-installment">
-          or 3 x LKR{" "}
+          or 3 x Rs{" "}
           {Math.round(Number(product.price || 0) / 3).toLocaleString()} with
           Koko
         </p>

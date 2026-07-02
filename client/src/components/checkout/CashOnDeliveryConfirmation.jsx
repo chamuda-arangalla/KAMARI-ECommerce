@@ -5,7 +5,7 @@ export default function CashOnDeliveryConfirmation({ orderTotal }) {
       <h3 className="bank-transfer-title">Pay When Your Order Arrives</h3>
       <p className="bank-transfer-note">
         Your order has been placed with Cash on Delivery. Please keep
-        <strong> LKR {orderTotal.toLocaleString()} </strong>
+        <strong> Rs {orderTotal.toLocaleString()} </strong>
         ready and our team will contact you before delivery.
       </p>
     </div>
