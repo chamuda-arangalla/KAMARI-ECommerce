@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { DEFAULT_CONTACT_CONTENT } from "../components/contact/contactConstants";
+import { getSiteContent } from "../services/siteContentApi";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
@@ -8,7 +10,15 @@ const fadeUp = {
 };
 
 export default function FaqPage() {
-  const faqs = DEFAULT_CONTACT_CONTENT.faqs || [];
+  const [faqs, setFaqs] = useState(DEFAULT_CONTACT_CONTENT.faqs || []);
+
+  useEffect(() => {
+    getSiteContent("contact")
+      .then((res) => {
+        setFaqs(res.data?.faqs || DEFAULT_CONTACT_CONTENT.faqs || []);
+      })
+      .catch(() => setFaqs(DEFAULT_CONTACT_CONTENT.faqs || []));
+  }, []);
 
   return (
     <main
