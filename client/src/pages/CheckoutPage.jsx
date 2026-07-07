@@ -38,6 +38,7 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [createdOrder, setCreatedOrder] = useState(null);
+  const [createdOrderSummary, setCreatedOrderSummary] = useState(null);
   const [orderTotal, setOrderTotal] = useState(0);
   const [slipFile, setSlipFile] = useState(null);
   const [slipPreview, setSlipPreview] = useState(null);
@@ -113,8 +114,18 @@ export default function CheckoutPage() {
       );
       const order = response?.data || response;
       const updatedCustomer = buildUpdatedCustomer(receiverDetails, response?.user);
+      const pricing = order?.pricing || {};
+      const summarySnapshot = {
+        items,
+        subtotal: pricing.subTotal ?? subtotal,
+        discount,
+        deliveryFee: pricing.shippingFee ?? deliveryFee,
+        total: pricing.grandTotal ?? total,
+        promoApplied,
+      };
 
-      setOrderTotal(total);
+      setOrderTotal(summarySnapshot.total);
+      setCreatedOrderSummary(summarySnapshot);
       setCreatedOrder(order);
       updateCustomerSessionUser(updatedCustomer);
       window.dispatchEvent(new Event("kamari:user-updated"));
@@ -215,6 +226,7 @@ export default function CheckoutPage() {
         {/* Free delivery disabled: OrderSummary previously received freeDelivery. */}
         <OrderSummary
           createdOrder={createdOrder}
+          createdOrderSummary={createdOrderSummary}
           deliveryFee={deliveryFee}
           discount={discount}
           discountCode={discountCode}
