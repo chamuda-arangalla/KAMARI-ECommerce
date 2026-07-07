@@ -84,15 +84,12 @@ export default function Home() {
     if (!slider) return undefined;
 
     const handleWheel = (event) => {
-      // Vertical scroll gestures must scroll the page, not the
-      // horizontal-only slider (browsers otherwise redirect them here).
-      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-
-      event.preventDefault();
-      window.scrollBy(0, event.deltaY);
+      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+        collectionScrollTargetRef.current = null;
+      }
     };
 
-    slider.addEventListener("wheel", handleWheel, { passive: false });
+    slider.addEventListener("wheel", handleWheel, { passive: true });
 
     let isDragging = false;
     let moved = false;
@@ -247,7 +244,7 @@ export default function Home() {
 
       {showBelowContent && (
         <>
-          <div className="relative z-2 bg-white md:min-h-screen">
+          <div className="relative z-2 bg-white md:mt-0 md:min-h-screen">
             <HomeProductSection
               eyebrow="Just In"
               products={newArrivals}
