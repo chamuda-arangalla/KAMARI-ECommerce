@@ -14,7 +14,7 @@ export default function ReturnPolicyPage() {
     >
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
-        <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
+        <h1 className="lg:text-4xl font-light tracking-[0.06em] text-2xl">
           Return &amp; Exchange Policy
         </h1>
       </div>
@@ -33,7 +33,7 @@ export default function ReturnPolicyPage() {
         </p>
 
         {/* Exchanges */}
-        <Section title="Exchanges">
+        <Section number="1" title="Exchanges">
           <ul className="space-y-5 text-[15px] leading-8 text-[#5F514B]">
             <BulletItem>
               Exchange requests must be made{" "}
@@ -66,7 +66,7 @@ export default function ReturnPolicyPage() {
         <Divider />
 
         {/* How to request exchange */}
-        <Section title="How to Request an Exchange">
+        <Section number="2" title="How to Request an Exchange">
           <ol className="space-y-5 text-[15px] leading-8 text-[#5F514B]">
             <NumberedItem n={1}>
               Contact us within 7 days of receiving your order via email,
@@ -97,7 +97,7 @@ export default function ReturnPolicyPage() {
         <Divider />
 
         {/* Exchange fees */}
-        <Section title="Exchange Fees">
+        <Section number="3" title="Exchange Fees">
           <ul className="space-y-5 text-[15px] leading-8 text-[#5F514B]">
             <BulletItem>
               If the exchange is required due to an error on KAMARI's part
@@ -122,16 +122,18 @@ export default function ReturnPolicyPage() {
         <Divider />
 
         {/* Refunds */}
-        <Section title="Refunds">
-          <p className="mb-5 text-[15px] leading-8 text-[#5F514B]">
+        <Section number="4" title="Refunds">
+          <p className="mb-5 text-[15px] leading-8 text-[#5F514B] pl-6">
             Refunds are only available under the following circumstances:
           </p>
           <ul className="mb-0 space-y-5 text-[15px] leading-8 text-[#5F514B]">
-            <BulletItem>The item received is damaged or defective.</BulletItem>
-            <BulletItem>
+            <BulletItem indent="pl-9">
+              The item received is damaged or defective.
+            </BulletItem>
+            <BulletItem indent="pl-9">
               The item received is different from the item ordered.
             </BulletItem>
-            <BulletItem>
+            <BulletItem indent="pl-9">
               The requested replacement item is unavailable and an exchange
               cannot be completed.
             </BulletItem>
@@ -141,7 +143,7 @@ export default function ReturnPolicyPage() {
         <Divider />
 
         {/* How to request refund */}
-        <Section title="How to Request a Refund">
+        <Section number="5" title="How to Request a Refund">
           <ol className="space-y-5 text-[15px] leading-8 text-[#5F514B]">
             <NumberedItem n={1}>
               Contact us within{" "}
@@ -168,7 +170,7 @@ export default function ReturnPolicyPage() {
               the purchase where applicable.
             </NumberedItem>
           </ol>
-          <p className="mt-6 text-[13px] leading-7 text-[#8B7164]">
+          <p className="mt-6 text-[13px] leading-7 text-[#8B7164] pl-6">
             Please note that shipping charges are non-refundable unless the
             refund is due to an error on KAMARI's part.
           </p>
@@ -176,8 +178,8 @@ export default function ReturnPolicyPage() {
 
         <Divider />
 
-        <Section title="Contact Us">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
+        <Section number="6" title="Contact Us">
+          <p className="text-[15px] leading-8 text-[#5F514B] pl-6">
             For exchange or refund requests, please contact us at:{" "}
             <a
               href="mailto:hello@kamari.lk"
@@ -194,12 +196,19 @@ export default function ReturnPolicyPage() {
   );
 }
 
-function Section({ title, children }) {
+function Section({ number, title, children }) {
   return (
     <section className="mb-10">
       {title && (
-        <h2 className="mb-5 text-lg font-medium uppercase tracking-[0.18em] text-[#342C27]">
-          {title}
+        <h2 className="mb-5 flex items-baseline gap-3 text-md lg:text-lg font-medium tracking-[0.04em] text-[#342C27]">
+          {number && (
+            <span className="text-sm lg:text-md font-normal text-[#8B7164]">
+              {number}.
+            </span>
+          )}
+          <span className="lg:text-lg text-md uppercase tracking-[0.18em]">
+            {title}
+          </span>
         </h2>
       )}
       {children}
@@ -207,10 +216,10 @@ function Section({ title, children }) {
   );
 }
 
-function BulletItem({ children }) {
+function BulletItem({ children, indent = "pl-6" }) {
   return (
-    <li className="flex gap-3">
-      <span className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
+    <li className={`flex gap-3 ${indent}`}>
+      <span className="mt-2.75 h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
       <span>{children}</span>
     </li>
   );
@@ -218,7 +227,7 @@ function BulletItem({ children }) {
 
 function NumberedItem({ n, children }) {
   return (
-    <li className="flex gap-4">
+    <li className="flex gap-4 pl-6">
       <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EFE7DF] text-xs font-medium text-[#8B7164]">
         {n}
       </span>

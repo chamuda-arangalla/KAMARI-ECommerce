@@ -16,7 +16,7 @@ export default function ContactFaq({ faqs, openFaq, onToggle }) {
           <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[#5F564D]">
             Quick Answers
           </p>
-          <h3 className="text-2xl">Frequently Asked Questions</h3>
+          <h3 className="lg:text-2xl text-lg">Frequently Asked Questions</h3>
         </motion.div>
 
         <motion.div
@@ -37,7 +37,7 @@ export default function ContactFaq({ faqs, openFaq, onToggle }) {
                 onClick={() => onToggle(index)}
               >
                 <span>{question}</span>
-                <span className="ml-4 flex-shrink-0 text-xl font-light text-[#8f8376]">
+                <span className="ml-4 shrink-0 text-xl font-light text-[#8f8376]">
                   {openFaq === index ? "-" : "+"}
                 </span>
               </button>

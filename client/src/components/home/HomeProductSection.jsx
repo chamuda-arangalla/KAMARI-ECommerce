@@ -33,7 +33,10 @@ export default function HomeProductSection({
         <div
           className={`flex items-center justify-between gap-4 px-4 sm:px-8 md:px-10 lg:px-10 ${headerPadding}`}
         >
-          <h2 className="text-md font-light uppercase tracking-[0.08em] text-[#2C2B28] md:text-xl lg:text-xl">
+          <h2
+            className="text-lg font-light normal-case tracking-[0.08em] text-[#2C2B28] md:text-xl lg:text-2xl"
+            style={{ textTransform: "none" }}
+          >
             {title}
           </h2>
         </div>
@@ -63,7 +66,7 @@ export default function HomeProductSection({
         </div>
       </section>
     );
-  }
+  } 
 
   return (
     <motion.section
@@ -86,7 +89,9 @@ export default function HomeProductSection({
             <p className="mb-2 text-xs uppercase tracking-[0.24em] text-[#5F564D]">
               {eyebrow}
             </p>
-            <h2 className="text-3xl">{title}</h2>
+            <h2 className="text-3xl normal-case" style={{ textTransform: "none" }}>
+              {title}
+            </h2>
           </div>
           <Link
             to={viewAllTo}

@@ -186,8 +186,6 @@ function CollectionCard({
   return (
     <motion.div
       variants={premiumCard}
-      whileHover={{ scale: 1.01 }}
-      transition={{ duration: 0.3 }}
       className={`group relative min-w-0 shrink-0 self-start snap-start cursor-pointer bg-white ${className}`}
       onClick={() => onOpenCollection(collection)}
     >

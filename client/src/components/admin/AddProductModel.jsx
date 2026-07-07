@@ -280,8 +280,8 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/35 backdrop-blur-sm flex items-stretch justify-center p-0 sm:items-center sm:px-4 sm:py-6">
-      <div className="flex h-[100dvh] w-full max-w-6xl flex-col bg-white border border-[#d7c9b8] shadow-2xl sm:h-auto sm:max-h-[92vh]">
+    <div className="fixed inset-0 z-100 bg-black/35 backdrop-blur-sm flex items-stretch justify-center p-0 sm:items-center sm:px-4 sm:py-6">
+      <div className="flex h-dvh w-full max-w-6xl flex-col bg-white border border-[#d7c9b8] shadow-2xl sm:h-auto sm:max-h-[92vh]">
         <div className="shrink-0 flex items-start justify-between gap-4 px-5 py-5 sm:items-center sm:px-8 sm:py-6 border-b border-[#d7c9b8] bg-[#fcfaf7]">
           <div className="min-w-0">
             <h3 className="text-xl sm:text-2xl font-bold text-[#2c2b28]">Add Product</h3>

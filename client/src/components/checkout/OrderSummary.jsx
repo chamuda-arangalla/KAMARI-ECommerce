@@ -2,6 +2,7 @@ import OrderTotalRow from "./OrderTotalRow";
 
 export default function OrderSummary({
   createdOrder,
+  createdOrderSummary,
   deliveryFee,
   // freeDelivery,
   discount,
@@ -13,14 +14,21 @@ export default function OrderSummary({
   total,
   onDiscountCodeChange,
 }) {
+  const displayItems = createdOrderSummary?.items || items;
+  const displaySubtotal = createdOrderSummary?.subtotal ?? subtotal;
+  const displayDiscount = createdOrderSummary?.discount ?? discount;
+  const displayDeliveryFee = createdOrderSummary?.deliveryFee ?? deliveryFee;
+  const displayPromoApplied = createdOrderSummary?.promoApplied ?? promoApplied;
+  const displayTotal = createdOrderSummary?.total ?? (createdOrder ? orderTotal : total);
+
   return (
     <div className="checkout-right">
       <p className="order-summary-title">Order Summary</p>
 
-      {items.length === 0 && !createdOrder ? (
+      {displayItems.length === 0 && !createdOrder ? (
         <p className="checkout-empty-summary">Your cart is empty.</p>
       ) : (
-        items.map((item) => (
+        displayItems.map((item) => (
           <div key={item.id} className="order-item">
             <div className="order-item-img-wrap">
               <img src={item.img} alt={item.name} className="order-item-img" />
@@ -42,20 +50,20 @@ export default function OrderSummary({
 
       <div className="order-divider" />
 
-      <OrderTotalRow label="Subtotal" value={`Rs ${subtotal.toLocaleString()}`} />
+      <OrderTotalRow label="Subtotal" value={`Rs ${displaySubtotal.toLocaleString()}`} />
 
-      {promoApplied && (
-        <OrderTotalRow label="Discount (KAMARI10)" value={`- Rs ${discount.toLocaleString()}`} valueClassName="order-discount-value" />
+      {displayPromoApplied && (
+        <OrderTotalRow label="Discount (KAMARI10)" value={`- Rs ${displayDiscount.toLocaleString()}`} valueClassName="order-discount-value" />
       )}
 
       {/* Free delivery disabled: value was freeDelivery ? "Free" : deliveryFee. */}
-      <OrderTotalRow label="Delivery" value={`Rs ${deliveryFee.toLocaleString()}`} valueClassName="order-total-value" />
+      <OrderTotalRow label="Delivery" value={displayDeliveryFee === 0 ? "Free" : `Rs ${displayDeliveryFee.toLocaleString()}`} valueClassName="order-total-value" />
 
       <div className="order-divider" />
 
       <div className="order-total-row total">
         <span>Total</span>
-        <span>Rs {(createdOrder ? orderTotal : total).toLocaleString()}</span>
+        <span>Rs {displayTotal.toLocaleString()}</span>
       </div>
     </div>
   );

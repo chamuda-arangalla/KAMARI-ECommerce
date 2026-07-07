@@ -45,7 +45,7 @@ export default function CartItems({ items, onUpdateQty, onRemove }) {
             <div className="flex flex-col justify-between flex-1 py-0.5">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-md font-medium tracking-[0.06em] text-[#2C2B28] capitalize mb-1">
+                  <h3 className="lg:text-md text-sm font-medium tracking-[0.06em] text-[#2C2B28] capitalize mb-1">
                     {item.name}
                   </h3>
                   <div className="flex gap-3 text-sm tracking-[0.12em] text-[#5F564D] capitalize">
