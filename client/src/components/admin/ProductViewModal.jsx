@@ -378,9 +378,9 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
 
   return (
     <>
-      <div className="fixed inset-0 z-[120] flex items-stretch justify-center p-0 sm:items-center sm:p-4">
+      <div className="fixed inset-0 z-120 flex items-stretch justify-center p-0 sm:items-center sm:p-4">
         <div className="absolute inset-0 bg-[#2c2b28]/25 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden border border-[#d7c9b8] bg-white shadow-xl sm:h-auto sm:max-h-[92vh] sm:rounded-3xl">
+        <div className="relative flex h-dvh w-full max-w-6xl flex-col overflow-hidden border border-[#d7c9b8] bg-white shadow-xl sm:h-auto sm:max-h-[92vh] sm:rounded-3xl">
         <div className="shrink-0 bg-[#fcfaf7] border-b border-[#d7c9b8] px-4 py-4 sm:px-8 sm:py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:rounded-t-3xl">
           <div className="min-w-0">
             <h3 className="truncate text-xl font-bold text-[#2c2b28] sm:text-2xl">
@@ -443,7 +443,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                 <img
                   src={mainImage}
                   alt={product.name}
-                  className="w-full max-h-[420px] aspect-square object-cover bg-[#eae0d6] border border-[#d7c9b8]"
+                  className="w-full max-h-105 aspect-square object-cover bg-[#eae0d6] border border-[#d7c9b8]"
                 />
                 <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-4">
                   {uniqueImages.map((image) => (
@@ -645,7 +645,7 @@ const ProductViewModal = ({ productId, startInEdit = false, onClose, onChanged }
                       <button
                         type="button"
                         onClick={() => addSize(colorIndex)}
-                        className="min-h-[84px] rounded-xl border border-dashed border-[#c2b2a6] text-[#5f564d] text-xs uppercase tracking-wider hover:bg-[#fcfaf7]"
+                        className="min-h-21 rounded-xl border border-dashed border-[#c2b2a6] text-[#5f564d] text-xs uppercase tracking-wider hover:bg-[#fcfaf7]"
                       >
                         + Add Size
                       </button>

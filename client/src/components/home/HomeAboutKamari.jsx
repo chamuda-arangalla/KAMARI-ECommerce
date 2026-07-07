@@ -104,9 +104,9 @@ export default function HomeAboutKamari({ onNavigate }) {
     <div
       ref={wrapperRef}
       aria-label="About KAMARI"
-      className="relative z-1 -mt-[100svh] -mb-[100svh] h-[400svh] md:-mt-[100vh] md:-mb-[100vh] md:h-[400vh]"
+      className="relative z-1 mt-[-100svh] mb-[-100svh] h-[400svh] md:mt-[-100vh] md:mb-[-100vh] md:h-[400vh]"
     >
-      <div className="sticky top-0 h-[100svh] overflow-hidden md:h-screen">
+      <div className="sticky top-0 h-svh overflow-hidden md:h-screen">
         <motion.picture
           className="absolute inset-0 block h-full w-full"
           style={{ scale: imageScale }}

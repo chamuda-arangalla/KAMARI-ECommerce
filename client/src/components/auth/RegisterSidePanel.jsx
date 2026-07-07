@@ -6,13 +6,13 @@ const REGISTER_IMAGE =
 
 export default function RegisterSidePanel() {
   return (
-    <div className="sticky top-0 hidden h-screen flex-shrink-0 overflow-hidden lg:block lg:w-[40%] xl:w-[45%]">
+    <div className="sticky top-0 hidden h-screen shrink-0 overflow-hidden lg:block lg:w-[40%] xl:w-[45%]">
       <img
         src={REGISTER_IMAGE}
         alt="KAMARI model"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/25" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-black/25" />
       <div className="absolute right-0 top-0 h-28 w-28 border-r-2 border-t-2 border-white/20" />
       <div className="absolute bottom-0 left-0 h-28 w-28 border-b-2 border-l-2 border-white/20" />
 

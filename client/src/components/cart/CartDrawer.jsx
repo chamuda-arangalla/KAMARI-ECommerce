@@ -38,7 +38,7 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.38, ease: [0.32, 0, 0.15, 1] }}
-            className="cart-drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-[420px] flex-col bg-[#EAE0D6]"
+            className="cart-drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-105 flex-col bg-[#EAE0D6]"
           >
 
             <div className="flex items-center justify-between border-b border-[#2C2B28]/10 px-6 py-5">
@@ -85,7 +85,7 @@ export default function CartDrawer() {
                       className="flex gap-4 border-b border-[#2C2B28]/10 py-5 last:border-b-0"
                     >
 
-                      <div className="h-[96px] w-[96px] flex-shrink-0 overflow-hidden rounded-lg bg-[#E8DED6]">
+                      <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-[#E8DED6]">
                         <img
                           src={item.img}
                           alt={item.name}
