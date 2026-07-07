@@ -136,8 +136,9 @@ export default function CartDrawer() {
                   </span>
                 </div>
                 <p className="cart-footer-delivery-note">
-                  {/* Free delivery disabled: previously displayed "Free delivery included". */}
-                  Includes Rs {deliveryFee.toLocaleString()} delivery
+                  {deliveryFee === 0
+                    ? "Free delivery included"
+                    : `Includes Rs ${deliveryFee.toLocaleString()} delivery`}
                 </p>
 
                 <div className="cart-footer-actions">
