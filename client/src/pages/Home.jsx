@@ -244,7 +244,7 @@ export default function Home() {
 
       {showBelowContent && (
         <>
-          <div className="relative z-2 bg-white md:mt-0 md:min-h-screen">
+          <div className="relative z-2 -mt-15 lg:-mt-15 bg-white md:mt-0 md:min-h-screen">
             <HomeProductSection
               eyebrow="Just In"
               products={newArrivals}
