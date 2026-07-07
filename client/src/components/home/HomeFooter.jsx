@@ -20,7 +20,7 @@ const FOOTER_COLUMNS = [
     links: [
       { label: "About Us", to: "/about" },
       { label: "Contact Us", to: "/contact" },
-      { label: "FAQs", to: "#" },
+      { label: "FAQs", to: "/faqs" },
       { label: "Shipping Policy", to: "/shipping-policy" },
       { label: "Return Policy", to: "/return-policy" },
       { label: "Terms & Conditions", to: "/terms-conditions" },

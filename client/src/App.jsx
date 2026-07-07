@@ -21,6 +21,7 @@ import ShippingPolicyPage from "./pages/ShippingPolicyPage";
 import ReturnPolicyPage from "./pages/ReturnPolicyPage";
 import TermsConditionsPage from "./pages/TermsConditionsPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import FaqPage from "./pages/FaqPage";
 import AdminLayout from "./components/admin/AdminLayout";
 import OrdersPage from "./pages/admin/OrdersPage";
 import OrderTracking from "./pages/admin/OrderTracking";
@@ -85,6 +86,7 @@ function App() {
           <Route path="/return-policy" element={<CustomerShell><ReturnPolicyPage /></CustomerShell>} />
           <Route path="/terms-conditions" element={<CustomerShell><TermsConditionsPage /></CustomerShell>} />
           <Route path="/privacy-policy" element={<CustomerShell><PrivacyPolicyPage /></CustomerShell>} />
+          <Route path="/faqs" element={<CustomerShell><FaqPage /></CustomerShell>} />
           <Route path="/orders" element={<CustomerShell><CustomerOrdersPage /></CustomerShell>} />
           <Route path="/orders/:id" element={<CustomerShell><CustomerOrderDetailsPage /></CustomerShell>} />
           <Route path="/login" element={<CustomerAuthShell><CustomerLoginPage /></CustomerAuthShell>} />
