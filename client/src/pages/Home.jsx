@@ -251,7 +251,7 @@ export default function Home() {
             <HomeProductSection
               eyebrow="Just In"
               products={newArrivals}
-              title="NEW SELLER"
+              title="New Arrivals"
               viewAllTo="/collections?sort=newest"
               variant="white"
               imageAspect="h-[100svh] md:h-auto md:aspect-[3/4]"
@@ -270,7 +270,7 @@ export default function Home() {
             <HomeProductSection
               eyebrow="Popular"
               products={bestSellers}
-              title="BEST SELLER"
+              title="Best Seller"
               viewAllTo="/shop"
               variant="white"
               imageAspect="h-[100svh] sm:h-auto sm:aspect-[3/4]"
