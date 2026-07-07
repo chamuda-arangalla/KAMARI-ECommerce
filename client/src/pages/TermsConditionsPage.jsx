@@ -216,41 +216,46 @@ export default function TermsConditionsPage() {
         <Divider />
 
         <Section number="10" title="Privacy">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
-            Your personal information is collected and processed in accordance
-            with our{" "}
-            <Link
-              to="/privacy-policy"
-              className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </p>
+          <ul className="space-y-4 text-[15px] leading-8 text-[#5F514B]">
+            <BulletItem>
+              Your personal information is collected and processed in accordance
+              with our{" "}
+              <Link
+                to="/privacy-policy"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </BulletItem>
+          </ul>
         </Section>
 
         <Divider />
 
         <Section number="11" title="Governing Law">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
-            These Terms &amp; Conditions shall be governed and interpreted in
-            accordance with the laws of Sri Lanka.
-          </p>
+          <ul className="space-y-4 text-[15px] leading-8 text-[#5F514B]">
+            <BulletItem>
+              These Terms &amp; Conditions shall be governed and interpreted in
+              accordance with the laws of Sri Lanka.
+            </BulletItem>
+          </ul>
         </Section>
 
         <Divider />
 
         <Section number="12" title="Contact Us">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
-            If you have any questions regarding these Terms &amp; Conditions,
-            please contact us at:{" "}
-            <a
-              href="mailto:hello@kamari.lk"
-              className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
-            >
-              hello@kamari.lk
-            </a>
-          </p>
+          <ul className="space-y-4 text-[15px] leading-8 text-[#5F514B]">
+            <BulletItem>
+              If you have any questions regarding these Terms &amp; Conditions,
+              please contact us at:{" "}
+              <a
+                href="mailto:hello@kamari.lk"
+                className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
+              >
+                hello@kamari.lk
+              </a>
+            </BulletItem>
+          </ul>
         </Section>
 
         <PolicyNav exclude="terms" />
@@ -264,7 +269,7 @@ function Section({ number, title, children }) {
     <section className="mb-10">
       <h2 className="mb-5 flex items-baseline gap-3 text-lg font-medium tracking-[0.04em] text-[#342C27]">
         {number && (
-          <span className="text-sm font-normal text-[#8B7164]">{number}.</span>
+          <span className="lg:text-lg font-normal text-[#8B7164]">{number}.</span>
         )}
         <span className="uppercase tracking-[0.18em]">{title}</span>
       </h2>
@@ -276,7 +281,7 @@ function Section({ number, title, children }) {
 function BulletItem({ children }) {
   return (
     <li className="flex gap-3">
-      <span className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
+      <span className="mt-2.75 h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
       <span>{children}</span>
     </li>
   );
