@@ -238,7 +238,7 @@ const Header = () => {
             <img
               src="/Kamari-logo.png"
               alt="KAMARI"
-              className="h-8 w-auto max-w-37 object-contain mix-blend-multiply contrast-125 min-[430px]:h-10 min-[430px]:max-w-[190px] sm:h-16 sm:max-w-none"
+              className="h-8 w-auto max-w-37 object-contain mix-blend-multiply contrast-125 min-[430px]:h-10 min-[430px]:max-w-47.5 sm:h-16 sm:max-w-none"
             />
           </Link>
 

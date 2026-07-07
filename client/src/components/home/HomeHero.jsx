@@ -71,7 +71,7 @@ export default function HomeHero({
           />
         </AnimatePresence>
       </motion.div>
-      <div className="absolute inset-0 bg-linear-to-t from-[#2C2B28]/72 via-[#2C2B28]/28 to-transparent md:bg-gradient-to-r md:from-[#2C2B28]/64 md:via-[#2C2B28]/20 md:to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-[#2C2B28]/72 via-[#2C2B28]/28 to-transparent md:bg-linear-to-r md:from-[#2C2B28]/64 md:via-[#2C2B28]/20 md:to-transparent" />
 
       <div className="absolute bottom-28 left-1/2 z-10 flex -translate-x-1/2 gap-2 md:bottom-10">
         {heroBanners.map((_, index) => (
