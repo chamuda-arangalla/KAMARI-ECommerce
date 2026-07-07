@@ -129,13 +129,6 @@ export default function HomeAboutKamari({ onNavigate }) {
             className="flex flex-col items-center px-6 text-center"
           >
             <motion.p
-              style={{ color: textColor }}
-              className="mb-3 text-xs uppercase tracking-[0.24em] opacity-70 lg:mr-3"
-            >
-              About KAMARI
-            </motion.p>
-
-            <motion.p
               className="mx-auto mb-8 max-w-2xl text-4xl leading-tight opacity-75 md:text-6xl md:leading-[1.08]"
             >
               <AnimatedColorText progress={scrollYProgress} text={ABOUT_COPY} />
