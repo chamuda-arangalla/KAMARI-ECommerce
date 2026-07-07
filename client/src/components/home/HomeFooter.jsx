@@ -44,7 +44,7 @@ const SOCIAL_LINKS = [
   },
   {
     label: "TikTok",
-    href: "#",
+    href: "https://www.tiktok.com/@kamari.lk?_r=1&_t=ZS-97UrpFDdRuT",
     icon: TikTokIcon,
     hoverClass: "hover:border-[#FE2C55] hover:bg-[#FFE8ED] hover:text-[#D91E45]",
   },
