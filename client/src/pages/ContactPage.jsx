@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, Phone } from "lucide-react";
 import ContactFaq from "../components/contact/ContactFaq";
 import ContactForm from "../components/contact/ContactForm";
 import ContactHero from "../components/contact/ContactHero";
-import ContactInfoGrid from "../components/contact/ContactInfoGrid";
+import ContactInfoGrid, {
+  FacebookIcon,
+  InstagramIcon,
+} from "../components/contact/ContactInfoGrid";
 import ContactMapSocial from "../components/contact/ContactMapSocial";
 import { DEFAULT_CONTACT_CONTENT } from "../components/contact/contactConstants";
 import { getSiteContent } from "../services/siteContentApi";
@@ -40,6 +43,19 @@ export default function ContactPage() {
     { icon: Clock, title: "Working Hours", lines: data.workingHours },
   ];
 
+  const socialLinks = [
+    {
+      label: "Instagram",
+      href: `https://instagram.com/${data.instagramHandle}`,
+      icon: InstagramIcon,
+    },
+    {
+      label: "Facebook",
+      href: `https://facebook.com/${data.facebookHandle}`,
+      icon: FacebookIcon,
+    },
+  ];
+
   const handleChange = (event) => {
     setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
   };
@@ -60,7 +76,7 @@ export default function ContactPage() {
       }}
     >
       <ContactHero title={data.heroTitle} subtitle={data.heroSubtitle} />
-      <ContactInfoGrid items={contactInfo} />
+      <ContactInfoGrid items={contactInfo} socialLinks={socialLinks} />
 
       <section className="mx-auto max-w-7xl px-6 pb-16">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
