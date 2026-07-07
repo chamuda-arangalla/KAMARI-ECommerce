@@ -22,7 +22,7 @@ import {
   adminPaymentSlipTemplate,
 } from "../templates/orderEmailTemplates.js";
 
-const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 350);
+const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 450);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
 const getCustomerEmail = async (userId) => {
@@ -150,11 +150,19 @@ const calculatePricing = (productDetails) => {
     return total + (product.unitPrice - discountAmount) * product.quantity;
   }, 0);
 
+  if (subTotal >= 10000){
+    return {
+      subTotal,
+      shippingFee: 0,
+      grandTotal: subTotal,
+    };
+  }
+
   return {
     subTotal,
     shippingFee: SHIPPING_FEE,
     grandTotal: subTotal + SHIPPING_FEE,
-  };
+  }
 };
 
 const shouldMoveOrderToShipping = (paymentStatus) =>

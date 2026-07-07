@@ -63,7 +63,7 @@ export default function HomeProductQuickView({ product, onClose }) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4"
+        className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 px-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -86,7 +86,7 @@ export default function HomeProductQuickView({ product, onClose }) {
             <X size={18} />
           </button>
 
-          <div className="aspect-[3/4] w-full bg-[#f4f1ee]">
+          <div className="aspect-3/4 w-full bg-[#f4f1ee]">
             <img
               src={mainImage}
               alt={product.name}

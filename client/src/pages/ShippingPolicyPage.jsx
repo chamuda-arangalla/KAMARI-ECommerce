@@ -14,7 +14,7 @@ export default function ShippingPolicyPage() {
     >
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
-        <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
+        <h1 className="lg:text-4xl font-light tracking-[0.06em] text-2xl">
           Shipping Policy
         </h1>
       </div>
@@ -31,7 +31,7 @@ export default function ShippingPolicyPage() {
           Sri Lanka.
         </p>
 
-        <Section>
+        <Section number="1" title="Delivery Information">
           <ul className="space-y-5 text-[15px] leading-8 text-[#5F514B]">
             <BulletItem>
               Orders are typically delivered within{" "}
@@ -70,8 +70,8 @@ export default function ShippingPolicyPage() {
 
         <Divider />
 
-        <Section title="Contact Us">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
+        <Section number="2" title="Contact Us">
+          <p className="text-[15px] leading-8 text-[#5F514B] pl-6">
             If you have any questions regarding shipping or delivery, please
             contact us at:{" "}
             <a
@@ -89,12 +89,19 @@ export default function ShippingPolicyPage() {
   );
 }
 
-function Section({ title, children }) {
+function Section({ number, title, children }) {
   return (
     <section className="mb-10">
       {title && (
-        <h2 className="mb-5 text-lg font-medium uppercase tracking-[0.18em] text-[#342C27]">
-          {title}
+        <h2 className="mb-5 flex items-baseline gap-3 text-md lg:text-lg font-medium tracking-[0.04em] text-[#342C27]">
+          {number && (
+            <span className="text-sm lg:text-md font-normal text-[#8B7164]">
+              {number}.
+            </span>
+          )}
+          <span className="lg:text-lg text-md uppercase tracking-[0.18em]">
+            {title}
+          </span>
         </h2>
       )}
       {children}
@@ -104,8 +111,8 @@ function Section({ title, children }) {
 
 function BulletItem({ children }) {
   return (
-    <li className="flex gap-3">
-      <span className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
+    <li className="flex gap-3 pl-6">
+      <span className="mt-2.75 h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
       <span>{children}</span>
     </li>
   );

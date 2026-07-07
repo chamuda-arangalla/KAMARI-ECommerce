@@ -14,10 +14,10 @@ export default function TermsConditionsPage() {
     >
       {/* Page header */}
       <div className="bg-[#EFE7DF] px-6 py-16 text-center sm:py-20">
-        <h1 className="text-4xl font-light tracking-[0.06em] sm:text-5xl">
+        <h1 className="lg:text-4xl font-light tracking-[0.06em] text-2xl">
           Terms &amp; Conditions
         </h1>
-        <p className="mt-4 text-sm text-[#8B7164]">Last Updated: June 2026</p>
+        <p className="mt-4 lg:text-sm text-xs text-[#8B7164]">Last Updated: June 2026</p>
       </div>
 
       {/* Body */}
@@ -216,12 +216,11 @@ export default function TermsConditionsPage() {
         <Divider />
 
         <Section number="10" title="Privacy">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
+          <p className="text-[15px] leading-8 text-[#5F514B] pl-9">
             Your personal information is collected and processed in accordance
             with our{" "}
             <Link
               to="/privacy-policy"
-              className="text-[#342C27] underline underline-offset-4 hover:text-[#8B7164]"
             >
               Privacy Policy
             </Link>
@@ -232,7 +231,7 @@ export default function TermsConditionsPage() {
         <Divider />
 
         <Section number="11" title="Governing Law">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
+          <p className="text-[15px] leading-8 text-[#5F514B] pl-9">
             These Terms &amp; Conditions shall be governed and interpreted in
             accordance with the laws of Sri Lanka.
           </p>
@@ -241,7 +240,7 @@ export default function TermsConditionsPage() {
         <Divider />
 
         <Section number="12" title="Contact Us">
-          <p className="text-[15px] leading-8 text-[#5F514B]">
+          <p className="text-[15px] leading-8 text-[#5F514B] pl-9">
             If you have any questions regarding these Terms &amp; Conditions,
             please contact us at:{" "}
             <a
@@ -262,11 +261,11 @@ export default function TermsConditionsPage() {
 function Section({ number, title, children }) {
   return (
     <section className="mb-10">
-      <h2 className="mb-5 flex items-baseline gap-3 text-lg font-medium tracking-[0.04em] text-[#342C27]">
+      <h2 className="mb-5 flex items-baseline gap-3 text-md lg:text-lg font-medium tracking-[0.04em] text-[#342C27]">
         {number && (
-          <span className="text-sm font-normal text-[#8B7164]">{number}.</span>
+          <span className="text-sm lg:text-md font-normal text-[#8B7164]">{number}.</span>
         )}
-        <span className="uppercase tracking-[0.18em]">{title}</span>
+        <span className="lg:text-lg text-md uppercase tracking-[0.18em]">{title}</span>
       </h2>
       {children}
     </section>
@@ -275,8 +274,8 @@ function Section({ number, title, children }) {
 
 function BulletItem({ children }) {
   return (
-    <li className="flex gap-3">
-      <span className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
+    <li className="flex gap-3 pl-7">
+      <span className="mt-2.75 h-1 w-1 shrink-0 rounded-full bg-[#8B7164]" />
       <span>{children}</span>
     </li>
   );

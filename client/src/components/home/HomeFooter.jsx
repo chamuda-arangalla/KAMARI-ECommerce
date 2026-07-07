@@ -20,7 +20,7 @@ const FOOTER_COLUMNS = [
     links: [
       { label: "About Us", to: "/about" },
       { label: "Contact Us", to: "/contact" },
-      { label: "FAQs", to: "#" },
+      { label: "FAQs", to: "/faqs" },
       { label: "Shipping Policy", to: "/shipping-policy" },
       { label: "Return Policy", to: "/return-policy" },
       { label: "Terms & Conditions", to: "/terms-conditions" },
@@ -44,7 +44,7 @@ const SOCIAL_LINKS = [
   },
   {
     label: "TikTok",
-    href: "#",
+    href: "https://www.tiktok.com/@kamari.lk?_r=1&_t=ZS-97UrpFDdRuT",
     icon: TikTokIcon,
     hoverClass: "hover:border-[#FE2C55] hover:bg-[#FFE8ED] hover:text-[#D91E45]",
   },

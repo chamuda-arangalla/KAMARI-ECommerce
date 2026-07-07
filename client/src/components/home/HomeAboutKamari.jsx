@@ -104,9 +104,9 @@ export default function HomeAboutKamari({ onNavigate }) {
     <div
       ref={wrapperRef}
       aria-label="About KAMARI"
-      className="relative z-1 -mt-[100svh] -mb-[100svh] h-[400svh] md:-mt-[100vh] md:-mb-[100vh] md:h-[400vh]"
+      className="relative z-1 mt-[-100svh] mb-[-100svh] h-[400svh] md:mt-[-100vh] md:mb-[-100vh] md:h-[400vh]"
     >
-      <div className="sticky top-0 h-[100svh] overflow-hidden md:h-screen">
+      <div className="sticky top-0 h-svh overflow-hidden md:h-screen">
         <motion.picture
           className="absolute inset-0 block h-full w-full"
           style={{ scale: imageScale }}
@@ -128,13 +128,6 @@ export default function HomeAboutKamari({ onNavigate }) {
             style={{ opacity: textOpacity, color: textColor }}
             className="flex flex-col items-center px-6 text-center"
           >
-            <motion.p
-              style={{ color: textColor }}
-              className="mb-3 text-xs uppercase tracking-[0.24em] opacity-70 lg:mr-3"
-            >
-              About KAMARI
-            </motion.p>
-
             <motion.p
               className="mx-auto mb-8 max-w-2xl text-4xl leading-tight opacity-75 md:text-6xl md:leading-[1.08]"
             >

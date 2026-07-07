@@ -21,7 +21,7 @@ export default function ContactForm({
       <p className="mb-2 text-xs lowercase tracking-[0.24em] text-[#5F564D]">
         Send a Message
       </p>
-      <h4 className="mb-4 text-lg" uppercase >
+      <h4 className="mb-4 lg:text-lg text-sm leading-loose uppercase" >
         We'll get back to you soon
       </h4>
 

@@ -238,7 +238,8 @@ const Header = () => {
             <img
               src="/Kamari-logo.png"
               alt="KAMARI"
-              className="h-8 w-auto max-w-[148px] object-contain mix-blend-multiply contrast-125 min-[430px]:h-10 min-[430px]:max-w-[190px] sm:h-16 sm:max-w-none"
+              className="h-8 w-auto max-w-37 object-contain min-[430px]:h-10 min-[430px]:max-w-47.5 sm:h-16 sm:max-w-none"
+              style={{ clipPath: "inset(0 5px 0 0)" }}
             />
           </Link>
 
@@ -439,7 +440,7 @@ const Header = () => {
             <motion.button
               type="button"
               aria-label="Close search"
-              className="fixed inset-0 z-[70] bg-[#2c2b28]/35 backdrop-blur-sm"
+              className="fixed inset-0 z-70 bg-[#2c2b28]/35 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -449,7 +450,7 @@ const Header = () => {
               role="dialog"
               aria-modal="true"
               aria-label="Search products"
-              className="fixed inset-x-0 top-0 z-[71] max-h-[85vh] overflow-y-auto bg-[#fcfaf7] shadow-2xl"
+              className="fixed inset-x-0 top-0 z-71 max-h-[85vh] overflow-y-auto bg-[#fcfaf7] shadow-2xl"
               initial={{ y: "-100%" }}
               animate={{ y: 0 }}
               exit={{ y: "-100%" }}
