@@ -32,6 +32,7 @@ import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import CollectionsManagement from "./pages/admin/CollectionsManagement";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
+import OnePayReturnPage from "./pages/OnePayReturnPage";
 import { clearLegacyCustomerSession } from "./utils/customerSession";
 
 clearLegacyCustomerSession();
@@ -92,6 +93,7 @@ function App() {
           <Route path="/login" element={<CustomerAuthShell><CustomerLoginPage /></CustomerAuthShell>} />
           <Route path="/register" element={<CustomerAuthShell><CustomerRegisterPage /></CustomerAuthShell>} />
           <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+          <Route path="/payments/onepay/return" element={<OnePayReturnPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
             <Route index element={<Navigate to="/admin/orders" replace />} />

@@ -63,6 +63,34 @@ export const downloadOrderInvoice = async (orderId, token) => {
   return response;
 };
 
+export const initiateOnePayPayment = async (orderId, token) => {
+  const response = await axios.post(
+    `${API_URL}/api/payments/onepay/checkout-link`,
+    { orderId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const verifyOnePayPayment = async (orderId, token) => {
+  const response = await axios.post(
+    `${API_URL}/api/payments/onepay/verify`,
+    { orderId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
 export const uploadPaymentSlip = async (orderId, file, token) => {
   const formData = new FormData();
   formData.append("paymentSlip", file);

@@ -41,6 +41,7 @@ export const DISTRICTS = [
 export const PAYMENT_METHODS = {
   BANK_TRANSFER: "bank_transfer",
   COD: "cash_on_delivery",
+  ONEPAY: "onepay",
 };
 
 export const CHECKOUT_STEPS = {

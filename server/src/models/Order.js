@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
+import PAYMENT_METHOD from "../enums/paymentMethod.enum.js";
 
 const productDetailsSchema = new mongoose.Schema(
   {
@@ -65,6 +66,11 @@ const orderSchema = new mongoose.Schema(
       enum: Object.values(PAYMENT_STATUS),
       default: PAYMENT_STATUS.PENDING,
     },
+    paymentMethod: {
+      type: String,
+      enum: Object.values(PAYMENT_METHOD),
+      default: PAYMENT_METHOD.BANK_TRANSFER,
+    },
     orderStatus: {
       type: String,
       enum: Object.values(ORDER_STATUS),
@@ -73,6 +79,10 @@ const orderSchema = new mongoose.Schema(
     paymentSlip: {
       url:      { type: String, default: "" },
       publicId: { type: String, default: "" },
+    },
+    onepay: {
+      transactionId: { type: String, default: "" },
+      verifiedAt: { type: Date, default: null },
     },
   },
   { timestamps: true }
