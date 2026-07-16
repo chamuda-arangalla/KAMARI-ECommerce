@@ -14,7 +14,7 @@ export default function AdminPagination({ currentPage, totalItems, pageSize, onP
   const lastItem = Math.min(safePage * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-[#d7c9b8] bg-[#fcfaf7] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:py-3">
+    <div className="flex shrink-0 flex-col gap-3 border-t border-[#d7c9b8] bg-[#fcfaf7] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:py-3">
       <p className="text-center text-sm text-[#8f8376] sm:text-left">
         Showing {firstItem}-{lastItem} of {totalItems}
       </p>

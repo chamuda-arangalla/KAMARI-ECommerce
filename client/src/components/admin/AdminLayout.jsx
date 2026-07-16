@@ -12,8 +12,17 @@ const AdminLayout = () => {
     '/admin/inventory',
     '/admin/customers',
     '/admin/tracking',
+    '/admin/collections',
   ];
   const isFixedScreenPage = fixedScreenPaths.includes(pathname);
+  const noFooterPaths = [
+    '/admin/orders',
+    '/admin/inventory',
+    '/admin/customers',
+    '/admin/tracking',
+    '/admin/collections',
+  ];
+  const shouldShowFooter = !isFixedScreenPage && !noFooterPaths.includes(pathname);
 
   return (
     <AdminProvider>
@@ -32,7 +41,7 @@ const AdminLayout = () => {
             </div>
           </main>
           
-          {!isFixedScreenPage && (
+          {shouldShowFooter && (
             <footer className="px-4 py-6 text-center text-[#8f8376] text-xs sm:text-sm">
               &copy; 2024 KAMARI Admin Portal. All rights reserved.
             </footer>

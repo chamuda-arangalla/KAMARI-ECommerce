@@ -8,9 +8,9 @@ import {
 } from "../../services/collectionApi";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import AdminPagination from "../../components/admin/AdminPagination";
+import useAdminPageSize from "../../hooks/useAdminPageSize";
 
 const token = () => localStorage.getItem("adminToken");
-const PAGE_SIZE = 10;
 
 const EMPTY_FORM = { name: "", subtitle: "", description: "", displayOrder: "" };
 
@@ -30,13 +30,14 @@ export default function CollectionsManagement() {
 
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const pageSize = useAdminPageSize(10);
 
   const fileInputRef = useRef(null);
-  const totalPages = Math.max(1, Math.ceil(collections.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(collections.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
   const paginatedCollections = collections.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE,
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
   );
 
   const load = async () => {
@@ -168,8 +169,8 @@ export default function CollectionsManagement() {
           <p className="text-base">Click "Add Collection" to create your first one.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white">
-          <div className="grid gap-4 p-4 sm:gap-5 sm:p-5">
+        <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white">
+          <div className="grid min-h-0 gap-4 overflow-auto p-4 sm:gap-5 sm:p-5">
             {paginatedCollections.map((col) => (
               <div
                 key={col._id}
@@ -242,7 +243,7 @@ export default function CollectionsManagement() {
           <AdminPagination
             currentPage={safePage}
             totalItems={collections.length}
-            pageSize={PAGE_SIZE}
+            pageSize={pageSize}
             onPageChange={setCurrentPage}
           />
         </div>

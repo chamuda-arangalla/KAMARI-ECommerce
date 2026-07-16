@@ -6,8 +6,7 @@ import { useAdmin } from "../../context/useAdmin";
 import { deleteProduct } from "../../services/productApi";
 import { AlertCircle, Search, Edit2, Plus, Trash2 } from "lucide-react";
 import AdminPagination from "../../components/admin/AdminPagination";
-
-const PAGE_SIZE = 5;
+import useAdminPageSize from "../../hooks/useAdminPageSize";
 
 const InventoryPage = () => {
   const navigate = useNavigate();
@@ -18,6 +17,7 @@ const InventoryPage = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = useAdminPageSize(10);
 
   const openProductView = (product, editMode = false) => {
     navigate(`/admin/products/${product.id}`, {
@@ -30,11 +30,11 @@ const InventoryPage = () => {
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.collection?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
   const paginatedProducts = filteredProducts.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE,
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
   );
 
   const confirmDeleteProduct = async () => {
@@ -104,7 +104,7 @@ const InventoryPage = () => {
             Loading products...
           </div>
         )}
-        <div className="hidden min-h-0 flex-1 md:block">
+        <div className="hidden min-h-0 flex-1 overflow-auto md:block">
           <table className="w-full table-fixed text-left">
             <colgroup>
               <col className="w-[28%]" />
@@ -205,7 +205,7 @@ const InventoryPage = () => {
           </table>
         </div>
 
-        <div className="divide-y divide-[#f3ede8] md:hidden">
+        <div className="min-h-0 flex-1 divide-y divide-[#f3ede8] overflow-auto md:hidden">
           {!productsLoading && filteredProducts.length === 0 && (
             <div className="px-5 py-10 text-center text-[#8c7d73]">No products found.</div>
           )}
@@ -289,7 +289,7 @@ const InventoryPage = () => {
           <AdminPagination
             currentPage={safePage}
             totalItems={filteredProducts.length}
-            pageSize={PAGE_SIZE}
+            pageSize={pageSize}
             onPageChange={setCurrentPage}
           />
         )}

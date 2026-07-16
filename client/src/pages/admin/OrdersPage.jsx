@@ -3,9 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, ChevronRight, Download, Loader2, Search } from 'lucide-react';
 import AdminPagination from '../../components/admin/AdminPagination';
 import { useAdmin } from '../../context/useAdmin';
+import useAdminPageSize from '../../hooks/useAdminPageSize';
 import { downloadOrderInvoice } from '../../services/orderApi';
-
-const PAGE_SIZE = 5;
 
 const formatCurrency = (value) => `Rs ${Number(value || 0).toLocaleString()}`;
 
@@ -66,6 +65,7 @@ const OrdersPage = () => {
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
   const [invoiceError, setInvoiceError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = useAdminPageSize(10);
 
   const tabs = [
     { label: 'All', type: 'all' },
@@ -93,11 +93,11 @@ const OrdersPage = () => {
       order.paymentType,
     ].some((value) => String(value || '').toLowerCase().includes(query));
   });
-  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
   const paginatedOrders = filteredOrders.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE,
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
   );
   const isSelectedOrderCod = selectedOrder?.paymentType === 'Cash on Delivery';
   const canVerifyPayment =
@@ -270,7 +270,7 @@ const OrdersPage = () => {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white shadow-sm">
-        <div className="hidden min-h-0 flex-1 xl:block">
+        <div className="hidden min-h-0 flex-1 overflow-auto xl:block">
           <table className="w-full table-fixed text-left">
             <colgroup>
               <col className="w-[14%]" />
@@ -359,7 +359,7 @@ const OrdersPage = () => {
           </table>
         </div>
 
-        <div className="divide-y divide-[#f3ede8] xl:hidden">
+        <div className="min-h-0 flex-1 divide-y divide-[#f3ede8] overflow-auto xl:hidden">
           {ordersLoading && (
             <div className="px-5 py-10 text-center text-[#5f564d]">
               <span className="inline-flex items-center gap-2">
@@ -421,7 +421,7 @@ const OrdersPage = () => {
           <AdminPagination
             currentPage={safePage}
             totalItems={filteredOrders.length}
-            pageSize={PAGE_SIZE}
+            pageSize={pageSize}
             onPageChange={setCurrentPage}
           />
         )}
