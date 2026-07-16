@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import CustomerOrderCard from "../components/customerOrder/CustomerOrderCard";
 import OrderDetailsSkeleton from "../components/customerOrder/OrderDetailsSkeleton";
 import { getStatus } from "../components/customerOrder/orderDetailsUtils";
+import { useCart } from "../context/useCart";
 import { getOrderById, uploadPaymentSlip } from "../services/orderApi";
 import { getCustomerToken } from "../utils/customerSession";
 
 export default function CustomerOrderDetailsPage() {
   const { id } = useParams();
+  const location = useLocation();
   const token = getCustomerToken();
+  const { clearCart } = useCart();
+  const clearedKokoCartRef = useRef(false);
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +42,19 @@ export default function CustomerOrderDetailsPage() {
 
     loadOrder();
   }, [id, token]);
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+
+    if (
+      !clearedKokoCartRef.current &&
+      query.get("payment") === "koko" &&
+      query.get("status") === "success"
+    ) {
+      clearedKokoCartRef.current = true;
+      clearCart();
+    }
+  }, [clearCart, location.search]);
 
   useEffect(() => {
     return () => {

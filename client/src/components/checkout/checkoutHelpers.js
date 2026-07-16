@@ -1,4 +1,4 @@
-import { PAYMENT_METHODS } from "./constants";
+import { PAYMENT_METHODS, PAYMENT_TYPES } from "./constants";
 import { getCustomerUser } from "../../utils/customerSession";
 
 export const createReceiverDraft = () => {
@@ -40,6 +40,14 @@ export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
     phoneNumber: receiverDetails.phoneNumber.trim(),
     secondaryPhoneNumber: receiverDetails.secondaryPhoneNumber.trim(),
   },
+  paymentMethod: paymentMethod === PAYMENT_METHODS.KOKO ? "koko" : "manual",
+  paymentType:
+    paymentMethod === PAYMENT_METHODS.KOKO
+      ? PAYMENT_TYPES.KOKO
+      : paymentMethod === PAYMENT_METHODS.COD
+        ? PAYMENT_TYPES.CASH_ON_DELIVERY
+        : PAYMENT_TYPES.BANK_TRANSFER,
+  paymentMethod,
   paymentStatus: paymentMethod === PAYMENT_METHODS.COD ? "COD" : "pending",
 });
 

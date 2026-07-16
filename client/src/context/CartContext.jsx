@@ -4,7 +4,7 @@ import { getCustomerUser } from "../utils/customerSession";
 
 // Free delivery is currently disabled.
 // const FREE_DELIVERY_THRESHOLD = 10000;
-const DELIVERY_FEE = 450;
+const DELIVERY_FEE = 10;
 const LEGACY_CART_STORAGE_KEY = "kamariCartItems";
 const GUEST_CART_STORAGE_KEY = "kamariCartItems:guest";
 

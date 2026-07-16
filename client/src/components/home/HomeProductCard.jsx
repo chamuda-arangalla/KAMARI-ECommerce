@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import KokoInstallment from "../common/KokoInstallment";
 import { fadeUp, getHomeProductImage } from "./homeConstants";
 
 export default function HomeProductCard({
@@ -110,6 +111,7 @@ export default function HomeProductCard({
         <p className="text-sm text-[#2C2B28]">
           Rs {Number(product.price || 0).toLocaleString()}
         </p>
+        <KokoInstallment price={product.price} className="home-koko-installment" />
       </div>
     </motion.div>
   );

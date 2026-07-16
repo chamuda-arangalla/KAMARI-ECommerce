@@ -14,7 +14,12 @@ import {
   createReceiverDraft,
 } from "../components/checkout/checkoutHelpers";
 import { useCart } from "../context/useCart";
-import { createOrder, uploadPaymentSlip } from "../services/orderApi";
+import {
+  createOrder,
+  initiateOnePayPayment,
+  uploadPaymentSlip,
+  verifyOnePayPayment,
+} from "../services/orderApi";
 import {
   getCustomerToken,
   updateCustomerSessionUser,
@@ -49,11 +54,16 @@ export default function CheckoutPage() {
     PAYMENT_METHODS.BANK_TRANSFER,
   );
   const [checkoutStep, setCheckoutStep] = useState(CHECKOUT_STEPS.RECEIVER);
+  const [onepayInitiating, setOnepayInitiating] = useState(false);
+  const [onepayError, setOnepayError] = useState("");
+  const [onepayStatus, setOnepayStatus] = useState("idle");
+  const [onepayTransactionId, setOnepayTransactionId] = useState("");
+  const [onepayRedirectUrl, setOnepayRedirectUrl] = useState("");
   const slipInputRef = useRef(null);
 
   const token = getCustomerToken();
   const isPaymentStep = checkoutStep === CHECKOUT_STEPS.PAYMENT;
-  const isCodOrder = createdOrder?.paymentStatus === "COD";
+  const confirmedPaymentMethod = createdOrder?.paymentMethod || paymentMethod;
 
   useEffect(() => {
     return () => {
@@ -61,7 +71,53 @@ export default function CheckoutPage() {
     };
   }, [slipPreview]);
 
+  // The OnePay iframe overlay reports its own outcome via these window-level custom
+  // events (fired by the onepayjs SDK once it observes the transaction settle).
+  // That signal is only ever used to know *when* to check — the actual paymentStatus
+  // update always comes from verifyOnePayPayment, which independently re-confirms
+  // the outcome with our server (which in turn re-checks with OnePay directly).
+  useEffect(() => {
+    if (!onepayTransactionId || !createdOrder) return undefined;
+
+    const handleResult = (finalStatus) => (event) => {
+      if (event.detail?.transaction_id !== onepayTransactionId) return;
+
+      verifyOnePayPayment(createdOrder._id, token)
+        .catch(() => {})
+        .finally(() => setOnepayStatus(finalStatus));
+    };
+
+    const onSuccess = handleResult("success");
+    const onFail = handleResult("failed");
+
+    window.addEventListener("onePaySuccess", onSuccess);
+    window.addEventListener("onePayFail", onFail);
+
+    return () => {
+      window.removeEventListener("onePaySuccess", onSuccess);
+      window.removeEventListener("onePayFail", onFail);
+    };
+  }, [onepayTransactionId, createdOrder, token]);
+
   if (!token) return <Navigate to="/login" replace />;
+
+  const submitKokoPaymentForm = ({ action, method = "POST", fields }) => {
+    const form = document.createElement("form");
+    form.method = method;
+    form.action = action;
+    form.style.display = "none";
+
+    Object.entries(fields || {}).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+  };
 
   const goToReceiverStep = () => {
     setCheckoutStep(CHECKOUT_STEPS.RECEIVER);
@@ -124,6 +180,17 @@ export default function CheckoutPage() {
         promoApplied,
       };
 
+      if (paymentMethod === PAYMENT_METHODS.KOKO) {
+        if (!response?.payment?.fields || !response?.payment?.action) {
+          throw new Error("Koko payment could not be initialized. Please try another payment method.");
+        }
+
+        updateCustomerSessionUser(updatedCustomer);
+        window.dispatchEvent(new Event("kamari:user-updated"));
+        submitKokoPaymentForm(response.payment);
+        return;
+      }
+
       setOrderTotal(summarySnapshot.total);
       setCreatedOrderSummary(summarySnapshot);
       setCreatedOrder(order);
@@ -134,6 +201,7 @@ export default function CheckoutPage() {
       setError(
         submitError.response?.data?.error ||
           submitError.response?.data?.message ||
+          submitError.message ||
           "Failed to create order",
       );
     } finally {
@@ -177,6 +245,53 @@ export default function CheckoutPage() {
     if (slipInputRef.current) slipInputRef.current.value = "";
   };
 
+  // Opens OnePay's own hosted-payment iframe overlay (from the onepayjs SDK script
+  // tag in index.html) directly with a server-issued redirect URL + transaction ID.
+  // This bypasses the SDK's own client-side hash computation entirely, so the App
+  // Token and Hash Salt never need to reach the browser.
+  const openOnePayIframe = (redirectUrl, transactionId) => {
+    if (typeof window.openPaymentIframe !== "function") {
+      setOnepayError("Payment widget failed to load. Please refresh and try again.");
+      return;
+    }
+
+    window.openPaymentIframe(redirectUrl, transactionId);
+  };
+
+  const handleInitiateOnePay = async () => {
+    if (!createdOrder) return;
+
+    setOnepayInitiating(true);
+    setOnepayError("");
+    setOnepayStatus("awaiting");
+
+    try {
+      const response = await initiateOnePayPayment(createdOrder._id, token);
+      const { redirectUrl, transactionId } = response?.data || {};
+
+      if (!redirectUrl || !transactionId) {
+        throw new Error("Missing redirect URL or transaction ID");
+      }
+
+      setOnepayRedirectUrl(redirectUrl);
+      setOnepayTransactionId(transactionId);
+      openOnePayIframe(redirectUrl, transactionId);
+    } catch (initiateError) {
+      setOnepayStatus("idle");
+      setOnepayError(
+        initiateError.response?.data?.message ||
+          "Couldn't start OnePay checkout. Please try again.",
+      );
+    } finally {
+      setOnepayInitiating(false);
+    }
+  };
+
+  const handleReopenOnePay = () => {
+    if (!onepayRedirectUrl || !onepayTransactionId) return;
+    openOnePayIframe(onepayRedirectUrl, onepayTransactionId);
+  };
+
   return (
     <div className="checkout-page">
       <div className="checkout-wrapper">
@@ -193,7 +308,7 @@ export default function CheckoutPage() {
           {createdOrder ? (
             <OrderConfirmation
               createdOrder={createdOrder}
-              isCodOrder={isCodOrder}
+              paymentMethod={confirmedPaymentMethod}
               orderTotal={orderTotal}
               slipFile={slipFile}
               slipInputRef={slipInputRef}
@@ -204,6 +319,11 @@ export default function CheckoutPage() {
               onSlipRemove={handleSlipRemove}
               onSlipSelect={handleSlipSelect}
               onSlipUpload={handleSlipUpload}
+              onepayInitiating={onepayInitiating}
+              onepayError={onepayError}
+              onepayStatus={onepayStatus}
+              onInitiateOnePay={handleInitiateOnePay}
+              onReopenOnePay={handleReopenOnePay}
             />
           ) : (
             <CheckoutForm

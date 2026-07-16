@@ -12,6 +12,20 @@ export const createOrder = async (payload, token) => {
   return response.data;
 };
 
+export const initiateKokoPayment = async (orderId, token) => {
+  const response = await axios.post(
+    `${API_URL}/api/payments/koko/initiate`,
+    { orderId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
 export const getOrdersByUserId = async (userId, token) => {
   const response = await axios.get(`${API_URL}/api/orders/user/${userId}`, {
     headers: {
@@ -61,6 +75,34 @@ export const downloadOrderInvoice = async (orderId, token) => {
   });
 
   return response;
+};
+
+export const initiateOnePayPayment = async (orderId, token) => {
+  const response = await axios.post(
+    `${API_URL}/api/payments/onepay/checkout-link`,
+    { orderId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const verifyOnePayPayment = async (orderId, token) => {
+  const response = await axios.post(
+    `${API_URL}/api/payments/onepay/verify`,
+    { orderId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
 };
 
 export const uploadPaymentSlip = async (orderId, file, token) => {

@@ -4,8 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import AdminPagination from "../../components/admin/AdminPagination";
 import { useAdmin } from "../../context/useAdmin";
-
-const PAGE_SIZE = 5;
+import useAdminPageSize from "../../hooks/useAdminPageSize";
 
 const createCustomerDraft = (customer) => ({
   firstName:    customer?.firstName || "",
@@ -72,16 +71,17 @@ const CustomersPage = () => {
   const [deleteTarget, setDeleteTarget]       = useState(null);
   const [deleting, setDeleting]               = useState(false);
   const [currentPage, setCurrentPage]         = useState(1);
+  const pageSize = useAdminPageSize(10);
 
   const filteredCustomers = customers.filter((c) => {
     const q = searchTerm.toLowerCase();
     return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q);
   });
-  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
   const paginatedCustomers = filteredCustomers.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE,
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
   );
 
   const handleDraftChange = (e) => {
@@ -175,7 +175,7 @@ const CustomersPage = () => {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white shadow-sm sm:rounded-3xl">
-        <div className="hidden min-h-0 flex-1 md:block">
+        <div className="hidden min-h-0 flex-1 overflow-auto md:block">
           <table className="w-full table-fixed text-left">
             <colgroup>
               <col className="w-[24%]" />
@@ -267,7 +267,7 @@ const CustomersPage = () => {
           </table>
         </div>
 
-        <div className="divide-y divide-[#f3ede8] md:hidden">
+        <div className="min-h-0 flex-1 divide-y divide-[#f3ede8] overflow-auto md:hidden">
           {customersLoading && (
             <div className="px-5 py-10 text-center text-base text-[#5f564d]">
               <span className="inline-flex items-center gap-2">
@@ -337,7 +337,7 @@ const CustomersPage = () => {
           <AdminPagination
             currentPage={safePage}
             totalItems={filteredCustomers.length}
-            pageSize={PAGE_SIZE}
+            pageSize={pageSize}
             onPageChange={setCurrentPage}
           />
         )}

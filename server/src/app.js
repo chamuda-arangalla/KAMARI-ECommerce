@@ -10,6 +10,8 @@ import collectionRoutes from "./routes/collection.routes.js";
 import homeContentRoutes from "./routes/homeContent.routes.js";
 import siteContentRoutes from "./routes/siteContent.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import kokoRoutes from "./routes/koko.routes.js";
+import onepayRoutes from "./routes/onepay.routes.js";
 
 const app = express();
 
@@ -35,6 +37,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(
   session({
     secret: process.env.JWT_SECRET,
@@ -56,5 +59,7 @@ app.use("/api/collections", collectionRoutes);
 app.use("/api/home-content", homeContentRoutes);
 app.use("/api/site-content", siteContentRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payments/koko", kokoRoutes);
+app.use("/api/payments/onepay", onepayRoutes);
 
 export default app;
