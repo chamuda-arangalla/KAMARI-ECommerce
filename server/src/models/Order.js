@@ -68,7 +68,7 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: Object.values(PAYMENT_METHOD),
+    enum: [...Object.values(PAYMENT_METHOD), "koko"],
     default: PAYMENT_METHOD.BANK_TRANSFER,
   },
   orderStatus: {
@@ -85,22 +85,16 @@ const orderSchema = new mongoose.Schema({
     default: "",
     trim: true,
   },
-  paymentMethod: {
-    type: String,
-    enum: ["manual", "koko", "other"],
-    default: "manual",
-  },
   paymentType: {
     type: Number,
     enum: Object.values(PAYMENT_TYPE),
     required: true,
     default: PAYMENT_TYPE.BANK_TRANSFER,
-    onepay: {
-      transactionId: { type: String, default: "" },
-      verifiedAt: { type: Date, default: null },
-    },
   },
-  timestamps: true,
-});
+  onepay: {
+    transactionId: { type: String, default: "" },
+    verifiedAt: { type: Date, default: null },
+  },
+}, { timestamps: true });
 
 export default mongoose.model("Order", orderSchema);

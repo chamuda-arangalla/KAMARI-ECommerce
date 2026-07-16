@@ -16,7 +16,6 @@ import {
 import { useCart } from "../context/useCart";
 import {
   createOrder,
-  uploadPaymentSlip,
   initiateOnePayPayment,
   uploadPaymentSlip,
   verifyOnePayPayment,

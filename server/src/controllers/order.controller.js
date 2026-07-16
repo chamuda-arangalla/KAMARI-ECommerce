@@ -202,7 +202,6 @@ const buildOrderPayload = async (body, orderId) => {
   paymentStatus,
   paymentMethod,
   orderStatus,
-  paymentMethod: isKokoPayment(body.paymentMethod) ? "koko" : "manual",
   paymentType: getPaymentType(body.paymentMethod, paymentStatus),
   };
 };
