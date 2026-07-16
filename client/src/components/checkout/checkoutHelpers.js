@@ -40,6 +40,7 @@ export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
     phoneNumber: receiverDetails.phoneNumber.trim(),
     secondaryPhoneNumber: receiverDetails.secondaryPhoneNumber.trim(),
   },
+  paymentMethod,
   paymentStatus: paymentMethod === PAYMENT_METHODS.COD ? "COD" : "pending",
 });
 
