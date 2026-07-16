@@ -42,6 +42,7 @@ export const PAYMENT_METHODS = {
   BANK_TRANSFER: "bank_transfer",
   KOKO: "koko",
   COD: "cash_on_delivery",
+  ONEPAY: "onepay",
 };
 
 export const PAYMENT_TYPES = {

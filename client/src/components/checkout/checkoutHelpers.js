@@ -47,6 +47,7 @@ export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
       : paymentMethod === PAYMENT_METHODS.COD
         ? PAYMENT_TYPES.CASH_ON_DELIVERY
         : PAYMENT_TYPES.BANK_TRANSFER,
+  paymentMethod,
   paymentStatus: paymentMethod === PAYMENT_METHODS.COD ? "COD" : "pending",
 });
 

@@ -17,6 +17,10 @@ export default function PaymentStep({ paymentMethod, onPaymentMethodChange }) {
         <PaymentMethodOption checked={paymentMethod === PAYMENT_METHODS.COD} name="CASH ON DELIVERY (COD)" tag="Pay on delivery" value={PAYMENT_METHODS.COD} onChange={onPaymentMethodChange}>
           Place your order now and pay the delivery team in cash when your order arrives.
         </PaymentMethodOption>
+
+        <PaymentMethodOption checked={paymentMethod === PAYMENT_METHODS.ONEPAY} name="ONEPAY" tag="Pay online" value={PAYMENT_METHODS.ONEPAY} onChange={onPaymentMethodChange}>
+          You'll be redirected to OnePay's secure payment page to pay by card or wallet, then brought back here automatically.
+        </PaymentMethodOption>
       </div>
     </>
   );

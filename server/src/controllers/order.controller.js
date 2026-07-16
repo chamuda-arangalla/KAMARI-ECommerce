@@ -5,6 +5,7 @@ import User from "../models/User.js";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import PAYMENT_TYPE from "../enums/paymentType.enum.js";
+import PAYMENT_METHOD from "../enums/paymentMethod.enum.js";
 import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 import {
@@ -28,7 +29,7 @@ const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 10);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const KOKO_PAYMENT_METHOD = "koko";
 
-const getCustomerEmail = async (userId) => {
+export const getCustomerEmail = async (userId) => {
   if (!userId) return null;
   const user = await User.findById(userId).select("email").lean();
   return user?.email || null;
@@ -36,12 +37,12 @@ const getCustomerEmail = async (userId) => {
 
 const isValidOrderObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-const isAdmin = (req) => req.user?.role === "admin";
+export const isAdmin = (req) => req.user?.role === "admin";
 
-const isOrderOwner = (req, order) =>
+export const isOrderOwner = (req, order) =>
   String(order.receiverDetails?.userId || "") === String(req.user?.id || "");
 
-const getOrderFilter = (id) =>
+export const getOrderFilter = (id) =>
   isValidOrderObjectId(id) ? { _id: id } : { orderId: id };
 
 const getSafeInvoiceFileName = (orderId) =>
@@ -189,6 +190,9 @@ const buildOrderPayload = async (body, orderId) => {
   const orderStatus = shouldMoveOrderToShipping(paymentStatus)
     ? ORDER_STATUS.SHIPPING
     : ORDER_STATUS.CREATED;
+  const paymentMethod = Object.values(PAYMENT_METHOD).includes(body.paymentMethod)
+    ? body.paymentMethod
+    : PAYMENT_METHOD.BANK_TRANSFER;
 
   return {
   orderId,
@@ -196,6 +200,7 @@ const buildOrderPayload = async (body, orderId) => {
   pricing: calculatePricing(productDetails),
   receiverDetails: body.receiverDetails,
   paymentStatus,
+  paymentMethod,
   orderStatus,
   paymentMethod: isKokoPayment(body.paymentMethod) ? "koko" : "manual",
   paymentType: getPaymentType(body.paymentMethod, paymentStatus),
@@ -538,6 +543,72 @@ export const downloadOrderInvoice = async (req, res) => {
   }
 };
 
+// Applies a paymentStatus/orderStatus transition to an already-loaded order,
+// saves it, and fires the same status-change emails updateOrder has always sent.
+// Shared by the admin-facing updateOrder handler and the OnePay verification flow
+// so both paths cascade orderStatus and send emails identically.
+export const applyOrderPaymentUpdate = async (order, { paymentStatus, orderStatus } = {}) => {
+  const prevOrderStatus = order.orderStatus;
+  const prevPaymentStatus = order.paymentStatus;
+
+  if (paymentStatus !== undefined) {
+    order.paymentStatus = paymentStatus;
+    if (shouldMoveOrderToShipping(paymentStatus) && orderStatus === undefined) {
+      order.orderStatus = ORDER_STATUS.SHIPPING;
+    }
+  }
+  if (orderStatus !== undefined) order.orderStatus = orderStatus;
+
+  await order.save();
+
+  const customerEmail = await getCustomerEmail(order.receiverDetails?.userId);
+
+  if (customerEmail) {
+    const newOrderStatus = order.orderStatus;
+    const newPaymentStatus = order.paymentStatus;
+
+    if (orderStatus !== undefined && newOrderStatus !== prevOrderStatus) {
+      if (newOrderStatus === ORDER_STATUS.SHIPPING) {
+        sendEmail({
+          to: customerEmail,
+          subject: `Your order is on the way — ${order.orderId}`,
+          html: orderShippingTemplate(order),
+        });
+      } else if (newOrderStatus === ORDER_STATUS.RECEIVED) {
+        sendEmail({
+          to: customerEmail,
+          subject: `Order Delivered — ${order.orderId}`,
+          html: orderDeliveredTemplate(order),
+        });
+      } else if (newOrderStatus === ORDER_STATUS.CANCELLED) {
+        sendEmail({
+          to: customerEmail,
+          subject: `Order Cancelled — ${order.orderId}`,
+          html: orderCancelledTemplate(order),
+        });
+      }
+    }
+
+    if (paymentStatus !== undefined && newPaymentStatus !== prevPaymentStatus) {
+      if (newPaymentStatus === PAYMENT_STATUS.COMPLETE) {
+        sendEmail({
+          to: customerEmail,
+          subject: `Payment Confirmed — ${order.orderId}`,
+          html: paymentConfirmedTemplate(order),
+        });
+      } else if (newPaymentStatus === PAYMENT_STATUS.FAILED) {
+        sendEmail({
+          to: customerEmail,
+          subject: `Payment Failed — ${order.orderId}`,
+          html: paymentFailedTemplate(order),
+        });
+      }
+    }
+  }
+
+  return order;
+};
+
 export const updateOrder = async (req, res) => {
   try {
     const order = await Order.findOne(getOrderFilter(req.params.id));
@@ -551,69 +622,14 @@ export const updateOrder = async (req, res) => {
 
     const { productDetails, receiverDetails, paymentStatus, orderStatus } = req.body;
 
-    const prevOrderStatus = order.orderStatus;
-    const prevPaymentStatus = order.paymentStatus;
-
     if (productDetails !== undefined) {
       const updatedProductDetails = await validateOrderProducts(productDetails);
       order.productDetails = updatedProductDetails;
       order.pricing = calculatePricing(updatedProductDetails);
     }
     if (receiverDetails !== undefined) order.receiverDetails = receiverDetails;
-    if (paymentStatus !== undefined) {
-      order.paymentStatus = paymentStatus;
-      if (shouldMoveOrderToShipping(paymentStatus) && orderStatus === undefined) {
-        order.orderStatus = ORDER_STATUS.SHIPPING;
-      }
-    }
-    if (orderStatus !== undefined) order.orderStatus = orderStatus;
 
-    await order.save();
-
-    const customerEmail = await getCustomerEmail(order.receiverDetails?.userId);
-
-    if (customerEmail) {
-      const newOrderStatus = order.orderStatus;
-      const newPaymentStatus = order.paymentStatus;
-
-      if (orderStatus !== undefined && newOrderStatus !== prevOrderStatus) {
-        if (newOrderStatus === ORDER_STATUS.SHIPPING) {
-          sendEmail({
-            to: customerEmail,
-            subject: `Your order is on the way — ${order.orderId}`,
-            html: orderShippingTemplate(order),
-          });
-        } else if (newOrderStatus === ORDER_STATUS.RECEIVED) {
-          sendEmail({
-            to: customerEmail,
-            subject: `Order Delivered — ${order.orderId}`,
-            html: orderDeliveredTemplate(order),
-          });
-        } else if (newOrderStatus === ORDER_STATUS.CANCELLED) {
-          sendEmail({
-            to: customerEmail,
-            subject: `Order Cancelled — ${order.orderId}`,
-            html: orderCancelledTemplate(order),
-          });
-        }
-      }
-
-      if (paymentStatus !== undefined && newPaymentStatus !== prevPaymentStatus) {
-        if (newPaymentStatus === PAYMENT_STATUS.COMPLETE) {
-          sendEmail({
-            to: customerEmail,
-            subject: `Payment Confirmed — ${order.orderId}`,
-            html: paymentConfirmedTemplate(order),
-          });
-        } else if (newPaymentStatus === PAYMENT_STATUS.FAILED) {
-          sendEmail({
-            to: customerEmail,
-            subject: `Payment Failed — ${order.orderId}`,
-            html: paymentFailedTemplate(order),
-          });
-        }
-      }
-    }
+    await applyOrderPaymentUpdate(order, { paymentStatus, orderStatus });
 
     return res.status(200).json({
       success: true,

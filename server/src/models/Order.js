@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import PAYMENT_TYPE from "../enums/paymentType.enum.js";
+import PAYMENT_METHOD from "../enums/paymentMethod.enum.js";
 
 const productDetailsSchema = new mongoose.Schema(
   {
@@ -13,7 +14,7 @@ const productDetailsSchema = new mongoose.Schema(
     unitPrice: { type: Number, required: true, min: 0 },
     discount: { type: Number, default: 0, min: 0, max: 100 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const pricingSchema = new mongoose.Schema(
@@ -22,7 +23,7 @@ const pricingSchema = new mongoose.Schema(
     shippingFee: { type: Number, default: 0, min: 0 },
     grandTotal: { type: Number, required: true, min: 0 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const locationSchema = new mongoose.Schema(
@@ -33,7 +34,7 @@ const locationSchema = new mongoose.Schema(
     country: { type: String, default: "Sri Lanka", trim: true },
     postalCode: { type: String, required: true, trim: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const receiverDetailsSchema = new mongoose.Schema(
@@ -45,54 +46,61 @@ const receiverDetailsSchema = new mongoose.Schema(
     phoneNumber: { type: String, required: true, trim: true },
     secondaryPhoneNumber: { type: String, trim: true, default: "" },
   },
-  { _id: false }
+  { _id: false },
 );
 
-const orderSchema = new mongoose.Schema(
-  {
-    orderId: { type: String, required: true, unique: true, trim: true },
-    productDetails: {
-      type: [productDetailsSchema],
-      required: true,
-      validate: {
-        validator: (products) => products.length > 0,
-        message: "Order must include at least one product.",
-      },
-    },
-    pricing: { type: pricingSchema, required: true },
-    receiverDetails: { type: receiverDetailsSchema, required: true },
-    paymentStatus: {
-      type: String,
-      enum: Object.values(PAYMENT_STATUS),
-      default: PAYMENT_STATUS.PENDING,
-    },
-    orderStatus: {
-      type: String,
-      enum: Object.values(ORDER_STATUS),
-      default: ORDER_STATUS.CREATED,
-    },
-    paymentSlip: {
-      url:      { type: String, default: "" },
-      publicId: { type: String, default: "" },
-    },
-    kokoTransactionId: {
-      type: String,
-      default: "",
-      trim: true,
-    },
-    paymentMethod: {
-      type: String,
-      enum: ["manual", "koko", "other"],
-      default: "manual",
-    },
-    paymentType: {
-      type: Number,
-      enum: Object.values(PAYMENT_TYPE),
-      required: true,
-      default: PAYMENT_TYPE.BANK_TRANSFER,
+const orderSchema = new mongoose.Schema({
+  orderId: { type: String, required: true, unique: true, trim: true },
+  productDetails: {
+    type: [productDetailsSchema],
+    required: true,
+    validate: {
+      validator: (products) => products.length > 0,
+      message: "Order must include at least one product.",
     },
   },
-  { timestamps: true }
-);
+  pricing: { type: pricingSchema, required: true },
+  receiverDetails: { type: receiverDetailsSchema, required: true },
+  paymentStatus: {
+    type: String,
+    enum: Object.values(PAYMENT_STATUS),
+    default: PAYMENT_STATUS.PENDING,
+  },
+  paymentMethod: {
+    type: String,
+    enum: Object.values(PAYMENT_METHOD),
+    default: PAYMENT_METHOD.BANK_TRANSFER,
+  },
+  orderStatus: {
+    type: String,
+    enum: Object.values(ORDER_STATUS),
+    default: ORDER_STATUS.CREATED,
+  },
+  paymentSlip: {
+    url: { type: String, default: "" },
+    publicId: { type: String, default: "" },
+  },
+  kokoTransactionId: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  paymentMethod: {
+    type: String,
+    enum: ["manual", "koko", "other"],
+    default: "manual",
+  },
+  paymentType: {
+    type: Number,
+    enum: Object.values(PAYMENT_TYPE),
+    required: true,
+    default: PAYMENT_TYPE.BANK_TRANSFER,
+    onepay: {
+      transactionId: { type: String, default: "" },
+      verifiedAt: { type: Date, default: null },
+    },
+  },
+  timestamps: true,
+});
 
 export default mongoose.model("Order", orderSchema);
