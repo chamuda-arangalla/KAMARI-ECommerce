@@ -1,9 +1,8 @@
 import { useCallback, useState } from "react";
+import KokoInstallment from "../common/KokoInstallment";
 
 export default function ProductCard({ product, onOpen }) {
   const [hoveredColorIndex, setHoveredColorIndex] = useState(null);
-  // Koko installment calculation currently disabled:
-  // const installment = Math.round(product.price / 3).toLocaleString();
 
   const activeColor =
     hoveredColorIndex !== null ? product.colors[hoveredColorIndex] : null;
@@ -45,11 +44,7 @@ export default function ProductCard({ product, onOpen }) {
       <div className="pg-card-info">
         <p className="pg-card-name">{product.name}</p>
         <p className="pg-card-price">Rs {product.price.toLocaleString()}</p>
-        {/* Koko installment message currently disabled:
-        <p className="pg-card-installment">
-          or 3 x Rs {installment} with Koko
-        </p>
-        */}
+        <KokoInstallment price={product.price} />
 
         <div className="pg-card-colors">
           {product.colors.slice(0, 4).map((color, index) => (

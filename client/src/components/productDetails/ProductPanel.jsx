@@ -1,4 +1,5 @@
 import { RotateCcw, Shield } from "lucide-react";
+import KokoInstallment from "../common/KokoInstallment";
 import ProductOptions from "./ProductOptions";
 
 export default function ProductPanel({
@@ -33,13 +34,7 @@ export default function ProductPanel({
         <p className="pd-price">
           Rs {Number(product.price || 0).toLocaleString()}
         </p>
-        {/* Koko and Mintpay installment message currently disabled:
-        <p className="pd-installment">
-          or 3 x Rs{" "}
-          {Math.round(Number(product.price || 0) / 3).toLocaleString()} with
-          Koko / Mintpay
-        </p>
-        */}
+        <KokoInstallment price={product.price} className="pd-installment" />
       </div>
 
       <p

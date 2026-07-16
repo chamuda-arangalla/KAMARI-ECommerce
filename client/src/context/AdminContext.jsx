@@ -41,10 +41,13 @@ const normalizeFulfillmentStatus = (orderStatus) => {
   return String(orderStatus).charAt(0).toUpperCase() + String(orderStatus).slice(1).toLowerCase();
 };
 
-const getPaymentType = (paymentStatus) =>
-  String(paymentStatus).toUpperCase() === "COD"
-    ? "Cash on Delivery"
-    : "Bank Transfer";
+const getPaymentType = (order) => {
+  if (order.paymentType === 1 || order.paymentMethod === "koko") return "Koko";
+  if (order.paymentType === 2 || String(order.paymentStatus).toUpperCase() === "COD") {
+    return "Cash on Delivery";
+  }
+  return "Bank Transfer";
+};
 
 const needsPaymentVerification = (order) =>
   order.paymentStatus === "pending" &&
@@ -77,7 +80,7 @@ const mapBackendOrderToAdminOrder = (order) => {
     ].filter(Boolean).join(", "),
     status: normalizeOrderStatus(order.paymentStatus),
     orderStatus: normalizeFulfillmentStatus(order.orderStatus),
-    paymentType: getPaymentType(order.paymentStatus),
+    paymentType: getPaymentType(order),
     needsPaymentVerification: needsPaymentVerification(order),
     date: formatOrderDate(order.createdAt),
     paymentSlip: order.paymentSlip || null,

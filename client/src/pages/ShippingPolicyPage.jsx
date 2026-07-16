@@ -48,7 +48,7 @@ export default function ShippingPolicyPage() {
             </BulletItem>
             <BulletItem>
               A standard islandwide delivery fee of{" "}
-              <strong className="font-medium text-[#342C27]">Rs 450</strong>{" "}
+              <strong className="font-medium text-[#342C27]">Rs 10</strong>{" "}
               applies to all orders.
             </BulletItem>
             <BulletItem>

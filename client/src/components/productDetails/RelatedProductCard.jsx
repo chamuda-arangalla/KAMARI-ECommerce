@@ -3,6 +3,7 @@ import {
   isProductInStock,
   PRODUCT_FALLBACK_IMAGE,
 } from "./productDetailsUtils";
+import KokoInstallment from "../common/KokoInstallment";
 
 export default function RelatedProductCard({ product, onClick }) {
   const images = getProductImages(product);
@@ -25,6 +26,7 @@ export default function RelatedProductCard({ product, onClick }) {
         <p className="pd-related-price">
           Rs {Number(product.price || 0).toLocaleString()}
         </p>
+        <KokoInstallment price={product.price} className="pd-related-installment" />
       </div>
     </button>
   );

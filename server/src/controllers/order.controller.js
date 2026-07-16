@@ -4,12 +4,14 @@ import Product from "../models/Product.js";
 import User from "../models/User.js";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
+import PAYMENT_TYPE from "../enums/paymentType.enum.js";
 import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 import {
   createInvoicePdf,
   getInvoiceProfile,
 } from "../services/invoice/invoicePdf.service.js";
+import { createKokoOrderRequest } from "../services/koko.service.js";
 import { sendEmail } from "../services/emailService.js";
 import {
   orderConfirmationTemplate,
@@ -22,8 +24,9 @@ import {
   adminPaymentSlipTemplate,
 } from "../templates/orderEmailTemplates.js";
 
-const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 450);
+const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 10);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const KOKO_PAYMENT_METHOD = "koko";
 
 const getCustomerEmail = async (userId) => {
   if (!userId) return null;
@@ -169,6 +172,14 @@ const shouldMoveOrderToShipping = (paymentStatus) =>
   paymentStatus === PAYMENT_STATUS.COMPLETE ||
   paymentStatus === PAYMENT_STATUS.COD;
 
+const isKokoPayment = (paymentMethod) => paymentMethod === KOKO_PAYMENT_METHOD;
+
+const getPaymentType = (paymentMethod, paymentStatus) => {
+  if (isKokoPayment(paymentMethod)) return PAYMENT_TYPE.KOKO;
+  if (paymentStatus === PAYMENT_STATUS.COD) return PAYMENT_TYPE.CASH_ON_DELIVERY;
+  return PAYMENT_TYPE.BANK_TRANSFER;
+};
+
 const buildOrderPayload = async (body, orderId) => {
   const productDetails = await validateOrderProducts(body.productDetails);
   const paymentStatus =
@@ -186,15 +197,62 @@ const buildOrderPayload = async (body, orderId) => {
   receiverDetails: body.receiverDetails,
   paymentStatus,
   orderStatus,
+  paymentMethod: isKokoPayment(body.paymentMethod) ? "koko" : "manual",
+  paymentType: getPaymentType(body.paymentMethod, paymentStatus),
   };
 };
 
-const createOrderWithUniqueOrderId = async (body) => {
+const createHttpError = (message, statusCode) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
+const validateKokoOrderPrerequisites = (customerEmail) => {
+  if (!process.env.CLIENT_URL || !process.env.SERVER_URL) {
+    throw createHttpError(
+      "CLIENT_URL and SERVER_URL are required for Koko payments",
+      500
+    );
+  }
+
+  if (!customerEmail) {
+    throw createHttpError("Customer email is required for Koko payment", 400);
+  }
+};
+
+const buildKokoPaymentRequest = (orderPayload, customerEmail) => {
+  validateKokoOrderPrerequisites(customerEmail);
+
+  const orderDetailsUrl = `${process.env.CLIENT_URL}/orders/${orderPayload.orderId}`;
+
+  return createKokoOrderRequest({
+    orderId: orderPayload.orderId,
+    amount: orderPayload.pricing.grandTotal,
+    currency: "LKR",
+    firstName: orderPayload.receiverDetails.firstName,
+    lastName: orderPayload.receiverDetails.lastName,
+    email: customerEmail,
+    phoneNumber: orderPayload.receiverDetails.phoneNumber,
+    description: `KAMARI Order #${orderPayload.orderId}`,
+    returnUrl: `${orderDetailsUrl}?payment=koko&status=success`,
+    cancelUrl: `${orderDetailsUrl}?payment=koko&status=cancelled`,
+    responseUrl: `${process.env.SERVER_URL}/api/payments/koko/callback`,
+  });
+};
+
+const createOrderWithUniqueOrderId = async (body, options = {}) => {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const orderId = await buildUniqueOrderId();
 
     try {
-      return await Order.create(await buildOrderPayload(body, orderId));
+      const orderPayload = await buildOrderPayload(body, orderId);
+      const kokoPayment = isKokoPayment(body.paymentMethod)
+        ? buildKokoPaymentRequest(orderPayload, options.customerEmail)
+        : null;
+      const order = await Order.create(orderPayload);
+
+      return { order, kokoPayment };
     } catch (error) {
       if (error.code !== 11000 || !error.keyPattern?.orderId) {
         throw error;
@@ -271,12 +329,14 @@ export const createOrder = async (req, res) => {
       },
     };
 
-    const order = await createOrderWithUniqueOrderId(orderBody);
+    const customerEmail = await getCustomerEmail(orderBody.receiverDetails.userId);
+    const { order, kokoPayment } = await createOrderWithUniqueOrderId(orderBody, {
+      customerEmail,
+    });
     const updatedCustomer = !isAdmin(req)
       ? await saveReceiverAddressToCustomer(req.user.id, orderBody.receiverDetails)
       : null;
 
-    const customerEmail = await getCustomerEmail(req.user.id);
     if (customerEmail) {
       sendEmail({
         to: customerEmail,
@@ -296,6 +356,12 @@ export const createOrder = async (req, res) => {
       success: true,
       message: "Order created successfully",
       data: order,
+      payment: kokoPayment
+        ? {
+            provider: "koko",
+            ...kokoPayment,
+          }
+        : undefined,
       user: updatedCustomer
         ? {
             id: updatedCustomer._id,

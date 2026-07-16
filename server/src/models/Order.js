@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
+import PAYMENT_TYPE from "../enums/paymentType.enum.js";
 
 const productDetailsSchema = new mongoose.Schema(
   {
@@ -73,6 +74,22 @@ const orderSchema = new mongoose.Schema(
     paymentSlip: {
       url:      { type: String, default: "" },
       publicId: { type: String, default: "" },
+    },
+    kokoTransactionId: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["manual", "koko", "other"],
+      default: "manual",
+    },
+    paymentType: {
+      type: Number,
+      enum: Object.values(PAYMENT_TYPE),
+      required: true,
+      default: PAYMENT_TYPE.BANK_TRANSFER,
     },
   },
   { timestamps: true }

@@ -14,7 +14,10 @@ import {
   createReceiverDraft,
 } from "../components/checkout/checkoutHelpers";
 import { useCart } from "../context/useCart";
-import { createOrder, uploadPaymentSlip } from "../services/orderApi";
+import {
+  createOrder,
+  uploadPaymentSlip,
+} from "../services/orderApi";
 import {
   getCustomerToken,
   updateCustomerSessionUser,
@@ -62,6 +65,24 @@ export default function CheckoutPage() {
   }, [slipPreview]);
 
   if (!token) return <Navigate to="/login" replace />;
+
+  const submitKokoPaymentForm = ({ action, method = "POST", fields }) => {
+    const form = document.createElement("form");
+    form.method = method;
+    form.action = action;
+    form.style.display = "none";
+
+    Object.entries(fields || {}).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+  };
 
   const goToReceiverStep = () => {
     setCheckoutStep(CHECKOUT_STEPS.RECEIVER);
@@ -124,6 +145,17 @@ export default function CheckoutPage() {
         promoApplied,
       };
 
+      if (paymentMethod === PAYMENT_METHODS.KOKO) {
+        if (!response?.payment?.fields || !response?.payment?.action) {
+          throw new Error("Koko payment could not be initialized. Please try another payment method.");
+        }
+
+        updateCustomerSessionUser(updatedCustomer);
+        window.dispatchEvent(new Event("kamari:user-updated"));
+        submitKokoPaymentForm(response.payment);
+        return;
+      }
+
       setOrderTotal(summarySnapshot.total);
       setCreatedOrderSummary(summarySnapshot);
       setCreatedOrder(order);
@@ -134,6 +166,7 @@ export default function CheckoutPage() {
       setError(
         submitError.response?.data?.error ||
           submitError.response?.data?.message ||
+          submitError.message ||
           "Failed to create order",
       );
     } finally {
