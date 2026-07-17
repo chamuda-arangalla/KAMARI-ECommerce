@@ -20,28 +20,40 @@ export const createReceiverDraft = () => {
   };
 };
 
-export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
-  productDetails: items.map((item) => ({
+const buildProductDetailsPayload = (items) =>
+  items.map((item) => ({
     productId: item.productId || item.id,
     colour: item.variant,
     size: item.size,
     quantity: Number(item.qty || 1),
-  })),
-  receiverDetails: {
-    firstName: receiverDetails.firstName.trim(),
-    lastName: receiverDetails.lastName.trim(),
-    location: {
-      address: receiverDetails.address.trim(),
-      district: receiverDetails.district.trim(),
-      province: receiverDetails.province.trim(),
-      country: receiverDetails.country.trim() || "Sri Lanka",
-      postalCode: receiverDetails.postalCode.trim(),
-    },
-    phoneNumber: receiverDetails.phoneNumber.trim(),
-    secondaryPhoneNumber: receiverDetails.secondaryPhoneNumber.trim(),
+  }));
+
+const buildReceiverPayload = (receiverDetails) => ({
+  firstName: receiverDetails.firstName.trim(),
+  lastName: receiverDetails.lastName.trim(),
+  location: {
+    address: receiverDetails.address.trim(),
+    district: receiverDetails.district.trim(),
+    province: receiverDetails.province.trim(),
+    country: receiverDetails.country.trim() || "Sri Lanka",
+    postalCode: receiverDetails.postalCode.trim(),
   },
+  phoneNumber: receiverDetails.phoneNumber.trim(),
+  secondaryPhoneNumber: receiverDetails.secondaryPhoneNumber.trim(),
+});
+
+export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
+  productDetails: buildProductDetailsPayload(items),
+  receiverDetails: buildReceiverPayload(receiverDetails),
   paymentMethod,
   paymentStatus: paymentMethod === PAYMENT_METHODS.COD ? "COD" : "pending",
+});
+
+// OnePay orders aren't created until payment succeeds, so this only needs the
+// product/receiver data — no paymentMethod/paymentStatus fields to set yet.
+export const buildOnePayCheckoutPayload = (items, receiverDetails) => ({
+  productDetails: buildProductDetailsPayload(items),
+  receiverDetails: buildReceiverPayload(receiverDetails),
 });
 
 export const buildUpdatedCustomer = (receiverDetails, updatedUser) => {

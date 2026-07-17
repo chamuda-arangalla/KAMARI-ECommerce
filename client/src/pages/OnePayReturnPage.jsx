@@ -5,9 +5,11 @@ import { verifyOnePayPayment } from "../services/orderApi";
 import { getCustomerToken } from "../utils/customerSession";
 
 // Mirrors OAuthCallbackPage's "external redirect returns to our site" pattern.
-// Only our own orderId query param is trusted; any other params OnePay appends
+// Only our own reference query param is trusted; any other params OnePay appends
 // here are ignored — the real payment outcome always comes from the server-side
-// verification call, never from the raw redirect URL.
+// verification call, never from the raw redirect URL. No order exists until this
+// verification confirms success, so a failed/still-pending payment has nowhere to
+// navigate to — the customer is sent back to checkout to retry instead.
 const OnePayReturnPage = () => {
   const navigate = useNavigate();
   const processed = useRef(false);
@@ -18,21 +20,28 @@ const OnePayReturnPage = () => {
     processed.current = true;
 
     const params = new URLSearchParams(window.location.search);
-    const orderId = params.get("orderId");
+    const reference = params.get("reference");
     const token = getCustomerToken();
 
-    if (!orderId || !token) {
-      navigate("/orders", { replace: true });
+    if (!reference || !token) {
+      navigate("/checkout", { replace: true });
       return;
     }
 
-    verifyOnePayPayment(orderId, token)
-      .then(() => {
-        navigate(`/orders/${orderId}`, { replace: true });
+    verifyOnePayPayment(reference, token)
+      .then((response) => {
+        const result = response?.data || {};
+
+        if (result.status === "success" && result.order) {
+          navigate(`/orders/${result.order.orderId}`, { replace: true });
+        } else {
+          setMessage("Your OnePay payment wasn't completed. Redirecting you back to checkout...");
+          setTimeout(() => navigate("/checkout", { replace: true }), 2500);
+        }
       })
       .catch(() => {
-        setMessage("We couldn't confirm your payment automatically — check your order status below.");
-        setTimeout(() => navigate(`/orders/${orderId}`, { replace: true }), 2500);
+        setMessage("We couldn't confirm your payment automatically. Redirecting you back to checkout...");
+        setTimeout(() => navigate("/checkout", { replace: true }), 2500);
       });
   }, [navigate]);
 
