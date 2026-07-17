@@ -27,9 +27,6 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const findOrderByReference = async (reference) => Order.findOne({ orderId: reference });
 
-// Reserves a not-yet-existing order's ID as the OnePay "reference" and stashes the
-// validated/priced checkout details until payment is confirmed. Retries on the rare
-// unique-index collision, mirroring createOrderWithUniqueOrderId's own retry loop.
 const createPendingCheckoutWithUniqueReference = async ({ userId, productDetails, pricing, receiverDetails }) => {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const reference = await buildUniqueOrderId();
@@ -52,9 +49,6 @@ const createPendingCheckoutWithUniqueReference = async ({ userId, productDetails
   throw new Error("Failed to generate unique OnePay checkout reference");
 };
 
-// Turns a resolved (payment-confirmed) pending checkout into a real Order — this is
-// the only place an OnePay order is ever created, and it only runs once OnePay has
-// independently confirmed the payment actually succeeded.
 const finalizeOrderFromPending = async (pending, transactionId) => {
   const order = await Order.create({
     orderId: pending.reference,
@@ -88,13 +82,6 @@ const finalizeOrderFromPending = async (pending, transactionId) => {
   return order;
 };
 
-// Independently confirms payment with OnePay's own status API and, only on a
-// confirmed success, creates the order. Never trusts a status handed to us by the
-// client or by OnePay's callback body directly. The findOneAndDelete "claim" makes
-// order-creation race-safe: whichever caller (client-side verify vs. OnePay's
-// server-to-server callback) gets there first is the one that creates the order —
-// the other finds the pending record already gone and just returns the resulting
-// order instead of creating a duplicate.
 const resolvePendingCheckout = async (pending) => {
   if (!pending.transactionId) {
     return { status: "pending" };
@@ -195,9 +182,6 @@ export const verifyPayment = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 
-    // The server-to-server callback may not have arrived yet (it races the browser
-    // event), so give it a short bounded window to show up before reporting back
-    // "still pending" to the client.
     let result = await resolvePendingCheckout(pending);
     for (let attempt = 0; attempt < 2 && result.status === "pending"; attempt += 1) {
       await wait(1500);
@@ -220,10 +204,6 @@ export const verifyPayment = async (req, res) => {
   }
 };
 
-// Extracts the Callback Token set in the OnePay dashboard's App config from
-// whichever spot OnePay actually sends it back in — not documented anywhere in
-// OnePay's public docs, so every plausible location is checked defensively until
-// a real callback delivery confirms which one to rely on.
 const extractCallbackToken = (req) =>
   req.headers["x-callback-token"] ||
   req.headers["callback-token"] ||
@@ -232,18 +212,8 @@ const extractCallbackToken = (req) =>
   req.body?.token ||
   null;
 
-// Unauthenticated: OnePay cannot present our JWT. The callback body is treated as
-// an untrusted "go check" trigger only — resolvePendingCheckout always
-// independently re-confirms the outcome via OnePay's own status API before any
-// order is created. Always resolves 200 so OnePay stops retrying, even when the
-// referenced checkout can't be found.
 export const handleCallback = async (req, res) => {
   try {
-    // Soft-checked, not enforced: the delivery location for the Callback Token
-    // isn't confirmed yet, so a mismatch only logs (with the raw request) instead
-    // of rejecting, so the first real callback can be inspected and this tightened
-    // into a hard check afterward. resolvePendingCheckout's independent OnePay-side
-    // re-verification remains the real trust boundary either way.
     if (onepayConfig.callbackToken) {
       const receivedToken = extractCallbackToken(req);
       if (receivedToken !== onepayConfig.callbackToken) {

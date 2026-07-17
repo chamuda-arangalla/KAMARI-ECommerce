@@ -4,12 +4,6 @@ import AuthLoadingScreen from "../components/auth/AuthLoadingScreen";
 import { verifyOnePayPayment } from "../services/orderApi";
 import { getCustomerToken } from "../utils/customerSession";
 
-// Mirrors OAuthCallbackPage's "external redirect returns to our site" pattern.
-// Only our own reference query param is trusted; any other params OnePay appends
-// here are ignored — the real payment outcome always comes from the server-side
-// verification call, never from the raw redirect URL. No order exists until this
-// verification confirms success, so a failed/still-pending payment has nowhere to
-// navigate to — the customer is sent back to checkout to retry instead.
 const OnePayReturnPage = () => {
   const navigate = useNavigate();
   const processed = useRef(false);

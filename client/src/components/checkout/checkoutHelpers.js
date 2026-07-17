@@ -49,8 +49,6 @@ export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
   paymentStatus: paymentMethod === PAYMENT_METHODS.COD ? "COD" : "pending",
 });
 
-// OnePay orders aren't created until payment succeeds, so this only needs the
-// product/receiver data — no paymentMethod/paymentStatus fields to set yet.
 export const buildOnePayCheckoutPayload = (items, receiverDetails) => ({
   productDetails: buildProductDetailsPayload(items),
   receiverDetails: buildReceiverPayload(receiverDetails),
