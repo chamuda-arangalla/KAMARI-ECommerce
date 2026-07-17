@@ -38,9 +38,6 @@ export default function OrderConfirmation({
       {paymentMethod === PAYMENT_METHODS.COD ? (
         <CashOnDeliveryConfirmation orderTotal={orderTotal} />
       ) : paymentMethod === PAYMENT_METHODS.ONEPAY ? (
-        // This branch only renders once verifyOnePayPayment has already created
-        // the order, which only happens after OnePay confirms success — so the
-        // status here is always "success" by the time we get here.
         <OnePayRedirecting status="success" />
       ) : (
         <>

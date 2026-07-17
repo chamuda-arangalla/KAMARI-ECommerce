@@ -477,10 +477,6 @@ export const downloadOrderInvoice = async (req, res) => {
   }
 };
 
-// Applies a paymentStatus/orderStatus transition to an already-loaded order,
-// saves it, and fires the same status-change emails updateOrder has always sent.
-// Shared by the admin-facing updateOrder handler and the OnePay verification flow
-// so both paths cascade orderStatus and send emails identically.
 export const applyOrderPaymentUpdate = async (order, { paymentStatus, orderStatus } = {}) => {
   const prevOrderStatus = order.orderStatus;
   const prevPaymentStatus = order.paymentStatus;

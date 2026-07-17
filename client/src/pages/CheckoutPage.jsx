@@ -75,12 +75,6 @@ export default function CheckoutPage() {
     };
   }, [slipPreview]);
 
-  // The OnePay iframe overlay reports its own outcome via these window-level custom
-  // events (fired by the onepayjs SDK once it observes the transaction settle).
-  // That signal is only ever used to know *when* to check — the actual order is
-  // only ever created by verifyOnePayPayment once it independently re-confirms
-  // success with our server (which in turn re-checks with OnePay directly). On
-  // failure, no order exists at all — the customer can just retry.
   useEffect(() => {
     if (!onepayTransactionId || !onepayReference) return undefined;
 
@@ -258,10 +252,6 @@ export default function CheckoutPage() {
     if (slipInputRef.current) slipInputRef.current.value = "";
   };
 
-  // Opens OnePay's own hosted-payment iframe overlay (from the onepayjs SDK script
-  // tag in index.html) directly with a server-issued redirect URL + transaction ID.
-  // This bypasses the SDK's own client-side hash computation entirely, so the App
-  // Token and Hash Salt never need to reach the browser.
   const openOnePayIframe = (redirectUrl, transactionId) => {
     if (typeof window.openPaymentIframe !== "function") {
       setOnepayError("Payment widget failed to load. Please refresh and try again.");
@@ -271,8 +261,6 @@ export default function CheckoutPage() {
     window.openPaymentIframe(redirectUrl, transactionId);
   };
 
-  // No order exists yet at this point — it's only created server-side once
-  // verifyOnePayPayment confirms the payment actually succeeded.
   const handleInitiateOnePay = async () => {
     if (items.length === 0) return;
 
