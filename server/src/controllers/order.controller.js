@@ -58,7 +58,7 @@ const findProductColor = (product, colour) =>
 const findProductSize = (color, size) =>
   color.sizes.find((sizeOption) => matchesText(sizeOption.size, size));
 
-const validateOrderProducts = async (requestedProducts) => {
+export const validateOrderProducts = async (requestedProducts) => {
   if (!Array.isArray(requestedProducts) || requestedProducts.length === 0) {
     const error = new Error("Order must include at least one product");
     error.statusCode = 400;
@@ -145,7 +145,7 @@ const validateOrderProducts = async (requestedProducts) => {
   return orderProducts;
 };
 
-const calculatePricing = (productDetails) => {
+export const calculatePricing = (productDetails) => {
   const subTotal = productDetails.reduce((total, product) => {
     const discountAmount = (product.unitPrice * product.discount) / 100;
     return total + (product.unitPrice - discountAmount) * product.quantity;
@@ -210,7 +210,7 @@ const createOrderWithUniqueOrderId = async (body) => {
   throw new Error("Failed to generate unique order ID");
 };
 
-const saveReceiverAddressToCustomer = async (userId, receiverDetails) => {
+export const saveReceiverAddressToCustomer = async (userId, receiverDetails) => {
   const location = receiverDetails?.location || {};
   const addressLine1 = location.address?.trim();
   const phone = receiverDetails?.phoneNumber?.trim();

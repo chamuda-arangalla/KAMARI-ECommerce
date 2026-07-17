@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import CheckoutBreadcrumb from "../components/checkout/CheckoutBreadcrumb";
 import CheckoutForm from "../components/checkout/CheckoutForm";
+import OnePayRedirecting from "../components/checkout/OnePayRedirecting";
 import OrderConfirmation from "../components/checkout/OrderConfirmation";
 import OrderSummary from "../components/checkout/OrderSummary";
 import {
@@ -9,6 +10,7 @@ import {
   PAYMENT_METHODS,
 } from "../components/checkout/constants";
 import {
+  buildOnePayCheckoutPayload,
   buildOrderPayload,
   buildUpdatedCustomer,
   createReceiverDraft,
@@ -54,9 +56,11 @@ export default function CheckoutPage() {
     PAYMENT_METHODS.BANK_TRANSFER,
   );
   const [checkoutStep, setCheckoutStep] = useState(CHECKOUT_STEPS.RECEIVER);
+  const [onepayCheckoutStarted, setOnepayCheckoutStarted] = useState(false);
   const [onepayInitiating, setOnepayInitiating] = useState(false);
   const [onepayError, setOnepayError] = useState("");
   const [onepayStatus, setOnepayStatus] = useState("idle");
+  const [onepayReference, setOnepayReference] = useState("");
   const [onepayTransactionId, setOnepayTransactionId] = useState("");
   const [onepayRedirectUrl, setOnepayRedirectUrl] = useState("");
   const slipInputRef = useRef(null);
@@ -73,22 +77,45 @@ export default function CheckoutPage() {
 
   // The OnePay iframe overlay reports its own outcome via these window-level custom
   // events (fired by the onepayjs SDK once it observes the transaction settle).
-  // That signal is only ever used to know *when* to check — the actual paymentStatus
-  // update always comes from verifyOnePayPayment, which independently re-confirms
-  // the outcome with our server (which in turn re-checks with OnePay directly).
+  // That signal is only ever used to know *when* to check — the actual order is
+  // only ever created by verifyOnePayPayment once it independently re-confirms
+  // success with our server (which in turn re-checks with OnePay directly). On
+  // failure, no order exists at all — the customer can just retry.
   useEffect(() => {
-    if (!onepayTransactionId || !createdOrder) return undefined;
+    if (!onepayTransactionId || !onepayReference) return undefined;
 
-    const handleResult = (finalStatus) => (event) => {
-      if (event.detail?.transaction_id !== onepayTransactionId) return;
+    const handleResult = (event, transactionId) => {
+      if (event.detail?.transaction_id !== transactionId) return;
 
-      verifyOnePayPayment(createdOrder._id, token)
-        .catch(() => {})
-        .finally(() => setOnepayStatus(finalStatus));
+      verifyOnePayPayment(onepayReference, token)
+        .then((response) => {
+          const result = response?.data || {};
+
+          if (result.status === "success" && result.order) {
+            const order = result.order;
+            const pricing = order.pricing || {};
+
+            setCreatedOrderSummary({
+              items,
+              subtotal: pricing.subTotal ?? subtotal,
+              discount,
+              deliveryFee: pricing.shippingFee ?? deliveryFee,
+              total: pricing.grandTotal ?? total,
+              promoApplied,
+            });
+            setOrderTotal(pricing.grandTotal ?? total);
+            setCreatedOrder(order);
+            clearCart();
+            setOnepayStatus("success");
+          } else {
+            setOnepayStatus("failed");
+          }
+        })
+        .catch(() => setOnepayStatus("failed"));
     };
 
-    const onSuccess = handleResult("success");
-    const onFail = handleResult("failed");
+    const onSuccess = (event) => handleResult(event, onepayTransactionId);
+    const onFail = (event) => handleResult(event, onepayTransactionId);
 
     window.addEventListener("onePaySuccess", onSuccess);
     window.addEventListener("onePayFail", onFail);
@@ -97,7 +124,18 @@ export default function CheckoutPage() {
       window.removeEventListener("onePaySuccess", onSuccess);
       window.removeEventListener("onePayFail", onFail);
     };
-  }, [onepayTransactionId, createdOrder, token]);
+  }, [
+    onepayTransactionId,
+    onepayReference,
+    token,
+    items,
+    subtotal,
+    discount,
+    deliveryFee,
+    total,
+    promoApplied,
+    clearCart,
+  ]);
 
   if (!token) return <Navigate to="/login" replace />;
 
@@ -139,6 +177,11 @@ export default function CheckoutPage() {
 
     if (items.length === 0) {
       setError("Your cart is empty.");
+      return;
+    }
+
+    if (paymentMethod === PAYMENT_METHODS.ONEPAY) {
+      await handleInitiateOnePay();
       return;
     }
 
@@ -228,23 +271,28 @@ export default function CheckoutPage() {
     window.openPaymentIframe(redirectUrl, transactionId);
   };
 
+  // No order exists yet at this point — it's only created server-side once
+  // verifyOnePayPayment confirms the payment actually succeeded.
   const handleInitiateOnePay = async () => {
-    if (!createdOrder) return;
+    if (items.length === 0) return;
 
+    setOnepayCheckoutStarted(true);
     setOnepayInitiating(true);
     setOnepayError("");
     setOnepayStatus("awaiting");
 
     try {
-      const response = await initiateOnePayPayment(createdOrder._id, token);
-      const { redirectUrl, transactionId } = response?.data || {};
+      const payload = buildOnePayCheckoutPayload(items, receiverDetails);
+      const response = await initiateOnePayPayment(payload, token);
+      const { redirectUrl, transactionId, reference } = response?.data || {};
 
-      if (!redirectUrl || !transactionId) {
-        throw new Error("Missing redirect URL or transaction ID");
+      if (!redirectUrl || !transactionId || !reference) {
+        throw new Error("Missing checkout details from server");
       }
 
       setOnepayRedirectUrl(redirectUrl);
       setOnepayTransactionId(transactionId);
+      setOnepayReference(reference);
       openOnePayIframe(redirectUrl, transactionId);
     } catch (initiateError) {
       setOnepayStatus("idle");
@@ -289,11 +337,14 @@ export default function CheckoutPage() {
               onSlipRemove={handleSlipRemove}
               onSlipSelect={handleSlipSelect}
               onSlipUpload={handleSlipUpload}
-              onepayInitiating={onepayInitiating}
-              onepayError={onepayError}
-              onepayStatus={onepayStatus}
-              onInitiateOnePay={handleInitiateOnePay}
-              onReopenOnePay={handleReopenOnePay}
+            />
+          ) : paymentMethod === PAYMENT_METHODS.ONEPAY && onepayCheckoutStarted ? (
+            <OnePayRedirecting
+              status={onepayStatus}
+              initiating={onepayInitiating}
+              error={onepayError}
+              onRetry={handleInitiateOnePay}
+              onReopen={handleReopenOnePay}
             />
           ) : (
             <CheckoutForm
@@ -301,7 +352,7 @@ export default function CheckoutPage() {
               isPaymentStep={isPaymentStep}
               paymentMethod={paymentMethod}
               receiverDetails={receiverDetails}
-              submitting={submitting}
+              submitting={submitting || onepayInitiating}
               total={total}
               hasItems={items.length > 0}
               onBack={goToReceiverStep}
