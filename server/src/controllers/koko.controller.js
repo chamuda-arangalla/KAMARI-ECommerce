@@ -1,4 +1,5 @@
 import Order from "../models/Order.js";
+import PendingKokoCheckout from "../models/PendingKokoCheckout.js";
 import User from "../models/User.js";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
@@ -9,9 +10,16 @@ import {
 } from "../services/koko.service.js";
 import { sendEmail } from "../services/emailService.js";
 import {
-  paymentConfirmedTemplate,
-  paymentFailedTemplate,
+  orderConfirmationTemplate,
+  adminNewOrderTemplate,
 } from "../templates/orderEmailTemplates.js";
+import {
+  getCustomerEmail as getCustomerEmailByUserId,
+  saveReceiverAddressToCustomer,
+} from "./order.controller.js";
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const CLIENT_URL = process.env.CLIENT_URL;
 
 const isAdmin = (req) => req.user?.role === "admin";
 
@@ -26,14 +34,6 @@ const getCustomerEmail = async (order, req) => {
   if (!userId) return null;
 
   const customer = await User.findById(userId).select("email").lean();
-  return customer?.email || null;
-};
-
-const getOrderCustomerEmail = async (order) => {
-  if (order.receiverDetails?.email) return order.receiverDetails.email;
-  if (!order.receiverDetails?.userId) return null;
-
-  const customer = await User.findById(order.receiverDetails.userId).select("email").lean();
   return customer?.email || null;
 };
 
@@ -76,10 +76,10 @@ export const initiateKokoPaymentController = async (req, res) => {
       });
     }
 
-    if (!process.env.CLIENT_URL || !process.env.SERVER_URL) {
+    if (!process.env.CLIENT_URL || !process.env.KOKO_CALLBACK_URL) {
       return res.status(500).json({
         success: false,
-        message: "CLIENT_URL and SERVER_URL are required for Koko payments",
+        message: "CLIENT_URL and a public KOKO_CALLBACK_URL are required for Koko payments",
       });
     }
 
@@ -127,7 +127,7 @@ export const initiateKokoPaymentController = async (req, res) => {
       description: `KAMARI Order #${order.orderId}`,
       returnUrl: `${orderDetailsUrl}?payment=koko&status=success`,
       cancelUrl: `${orderDetailsUrl}?payment=koko&status=cancelled`,
-      responseUrl: `${process.env.SERVER_URL}/api/payments/koko/callback`,
+      responseUrl: `${process.env.KOKO_CALLBACK_URL.replace(/\/$/, "")}/api/payments/koko/callback`,
     });
 
     order.paymentMethod = "koko";
@@ -154,50 +154,69 @@ export const initiateKokoPaymentController = async (req, res) => {
 export const handleKokoCallback = async (req, res) => {
   try {
     const { orderId, trnId, status } = processKokoResponse(req.body);
-    const order = await Order.findOne({ orderId });
+    const existingOrder = await Order.findOne({ orderId });
 
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: "Order not found",
+    if (existingOrder) {
+      return res.status(200).json({ success: true, message: "Callback already processed" });
+    }
+
+    const paymentState = getCallbackPaymentState(status);
+    if (!paymentState.shouldSendConfirmation) {
+      // Failed and cancelled payments never create an Order document.
+      if (paymentState.shouldSendFailure) {
+        await PendingKokoCheckout.deleteOne({ reference: orderId });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Koko payment was not successful; order was not created",
       });
     }
 
-    const previousPaymentStatus = order.paymentStatus;
-    const paymentState = getCallbackPaymentState(status);
-
-    order.paymentStatus = paymentState.paymentStatus;
-    if (paymentState.orderStatus) {
-      order.orderStatus = paymentState.orderStatus;
+    const pending = await PendingKokoCheckout.findOne({ reference: orderId });
+    if (!pending) {
+      return res.status(200).json({
+        success: false,
+        message: "Pending Koko checkout not found or expired",
+      });
     }
-    order.kokoTransactionId = trnId;
-    order.paymentMethod = "koko";
-    order.paymentType = PAYMENT_TYPE.KOKO;
-    await order.save();
 
-    const customerEmail = await getOrderCustomerEmail(order);
-    const paymentStatusChanged = previousPaymentStatus !== order.paymentStatus;
-
-    if (customerEmail && paymentStatusChanged) {
-      try {
-        if (paymentState.shouldSendConfirmation) {
-          await sendEmail({
-            to: customerEmail,
-            subject: `Payment Confirmed - Order #${order.orderId}`,
-            html: paymentConfirmedTemplate(order),
-          });
-        }
-
-        if (paymentState.shouldSendFailure) {
-          await sendEmail({
-            to: customerEmail,
-            subject: `Payment Failed - Order #${order.orderId}`,
-            html: paymentFailedTemplate(order),
-          });
-        }
-      } catch {
-        // Koko should still receive a successful callback response if the order update succeeded.
+    let order;
+    try {
+      order = await Order.create({
+        orderId: pending.reference,
+        productDetails: pending.productDetails,
+        pricing: pending.pricing,
+        receiverDetails: pending.receiverDetails,
+        paymentStatus: PAYMENT_STATUS.COMPLETE,
+        paymentMethod: "koko",
+        paymentType: PAYMENT_TYPE.KOKO,
+        orderStatus: ORDER_STATUS.SHIPPING,
+        kokoTransactionId: trnId,
+      });
+    } catch (error) {
+      if (error.code === 11000) {
+        return res.status(200).json({ success: true, message: "Callback already processed" });
       }
+      throw error;
+    }
+
+    await PendingKokoCheckout.deleteOne({ reference: pending.reference });
+    await saveReceiverAddressToCustomer(pending.userId, pending.receiverDetails);
+
+    const customerEmail = pending.customerEmail || await getCustomerEmailByUserId(pending.userId);
+    if (customerEmail) {
+      sendEmail({
+        to: customerEmail,
+        subject: `Order Confirmed - ${order.orderId}`,
+        html: orderConfirmationTemplate(order),
+      });
+    }
+    if (ADMIN_EMAIL) {
+      sendEmail({
+        to: ADMIN_EMAIL,
+        subject: `New Order Received - ${order.orderId}`,
+        html: adminNewOrderTemplate(order, customerEmail || "N/A", `${CLIENT_URL}/admin/orders`),
+      });
     }
 
     return res.status(200).json({

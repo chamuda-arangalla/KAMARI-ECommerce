@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import PendingKokoCheckout from "../models/PendingKokoCheckout.js";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import PAYMENT_TYPE from "../enums/paymentType.enum.js";
@@ -213,9 +214,9 @@ const createHttpError = (message, statusCode) => {
 };
 
 const validateKokoOrderPrerequisites = (customerEmail) => {
-  if (!process.env.CLIENT_URL || !process.env.SERVER_URL) {
+  if (!process.env.CLIENT_URL || !process.env.KOKO_CALLBACK_URL) {
     throw createHttpError(
-      "CLIENT_URL and SERVER_URL are required for Koko payments",
+      "CLIENT_URL and a public KOKO_CALLBACK_URL are required for Koko payments",
       500
     );
   }
@@ -241,7 +242,7 @@ const buildKokoPaymentRequest = (orderPayload, customerEmail) => {
     description: `KAMARI Order #${orderPayload.orderId}`,
     returnUrl: `${orderDetailsUrl}?payment=koko&status=success`,
     cancelUrl: `${orderDetailsUrl}?payment=koko&status=cancelled`,
-    responseUrl: `${process.env.SERVER_URL}/api/payments/koko/callback`,
+    responseUrl: `${process.env.KOKO_CALLBACK_URL.replace(/\/$/, "")}/api/payments/koko/callback`,
   });
 };
 
@@ -265,6 +266,35 @@ const createOrderWithUniqueOrderId = async (body, options = {}) => {
   }
 
   throw new Error("Failed to generate unique order ID");
+};
+
+const createPendingKokoCheckout = async (body, customerEmail) => {
+  validateKokoOrderPrerequisites(customerEmail);
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const reference = await buildUniqueOrderId();
+
+    try {
+      const orderPayload = await buildOrderPayload(body, reference);
+      const pending = await PendingKokoCheckout.create({
+        reference,
+        userId: body.receiverDetails.userId,
+        productDetails: orderPayload.productDetails,
+        pricing: orderPayload.pricing,
+        receiverDetails: orderPayload.receiverDetails,
+        customerEmail,
+      });
+
+      return {
+        pending,
+        payment: buildKokoPaymentRequest(orderPayload, customerEmail),
+      };
+    } catch (error) {
+      if (error.code !== 11000 || !error.keyPattern?.reference) throw error;
+    }
+  }
+
+  throw new Error("Failed to generate unique Koko checkout reference");
 };
 
 export const saveReceiverAddressToCustomer = async (userId, receiverDetails) => {
@@ -334,6 +364,24 @@ export const createOrder = async (req, res) => {
     };
 
     const customerEmail = await getCustomerEmail(orderBody.receiverDetails.userId);
+
+    if (isKokoPayment(orderBody.paymentMethod)) {
+      const { pending, payment } = await createPendingKokoCheckout(
+        orderBody,
+        customerEmail,
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Koko checkout created successfully",
+        data: {
+          orderId: pending.reference,
+          pricing: pending.pricing,
+        },
+        payment: { provider: "koko", ...payment },
+      });
+    }
+
     const { order, kokoPayment } = await createOrderWithUniqueOrderId(orderBody, {
       customerEmail,
     });

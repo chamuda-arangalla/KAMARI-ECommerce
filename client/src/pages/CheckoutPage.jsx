@@ -211,8 +211,6 @@ export default function CheckoutPage() {
           throw new Error("Koko payment could not be initialized. Please try another payment method.");
         }
 
-        updateCustomerSessionUser(updatedCustomer);
-        window.dispatchEvent(new Event("kamari:user-updated"));
         submitKokoPaymentForm(response.payment);
         return;
       }
