@@ -6,9 +6,11 @@ export default function PaymentStep({ paymentMethod, onPaymentMethodChange }) {
     <>
       <h2 className="checkout-section-title">Payment</h2>
       <div className="payment-methods">
+        {/* Bank transfer is temporarily disabled.
         <PaymentMethodOption checked={paymentMethod === PAYMENT_METHODS.BANK_TRANSFER} name="BANK TRANSFER" tag="Slip required" value={PAYMENT_METHODS.BANK_TRANSFER} onChange={onPaymentMethodChange}>
           Transfer to our bank account after placing the order and upload your payment slip for confirmation.
         </PaymentMethodOption>
+        */}
 
         <PaymentMethodOption checked={paymentMethod === PAYMENT_METHODS.KOKO} name="KOKO" tag="Card / BNPL" value={PAYMENT_METHODS.KOKO} onChange={onPaymentMethodChange}>
           Pay securely through Koko. You will be redirected to Koko to complete the payment.

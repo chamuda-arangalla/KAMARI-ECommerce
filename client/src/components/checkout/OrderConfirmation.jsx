@@ -1,24 +1,16 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
-import BankTransferDetails from "./BankTransferDetails";
+// import BankTransferDetails from "./BankTransferDetails";
 import CashOnDeliveryConfirmation from "./CashOnDeliveryConfirmation";
 import OnePayRedirecting from "./OnePayRedirecting";
-import PaymentSlipUpload from "./PaymentSlipUpload";
+// import PaymentSlipUpload from "./PaymentSlipUpload";
 import { PAYMENT_METHODS } from "./constants";
 
 export default function OrderConfirmation({
   createdOrder,
   paymentMethod,
   orderTotal,
-  slipFile,
-  slipInputRef,
-  slipPreview,
-  slipUploaded,
-  slipUploading,
-  slipError,
-  onSlipRemove,
-  onSlipSelect,
-  onSlipUpload,
+  // Bank-transfer payment-slip props are temporarily disabled.
 }) {
   const orderId = createdOrder.orderId || createdOrder._id;
 
@@ -39,12 +31,12 @@ export default function OrderConfirmation({
         <CashOnDeliveryConfirmation orderTotal={orderTotal} />
       ) : paymentMethod === PAYMENT_METHODS.ONEPAY ? (
         <OnePayRedirecting status="success" />
-      ) : (
-        <>
-          <BankTransferDetails orderId={orderId} orderTotal={orderTotal} />
-          <PaymentSlipUpload slipFile={slipFile} slipInputRef={slipInputRef} slipPreview={slipPreview} slipUploaded={slipUploaded} slipUploading={slipUploading} slipError={slipError} onSlipRemove={onSlipRemove} onSlipSelect={onSlipSelect} onSlipUpload={onSlipUpload} />
-        </>
-      )}
+      ) : null}
+
+      {/* Bank-transfer confirmation and payment-slip upload are temporarily disabled.
+      <BankTransferDetails orderId={orderId} orderTotal={orderTotal} />
+      <PaymentSlipUpload ... />
+      */}
 
       <Link to="/" className="checkout-btn-primary checkout-btn-link" style={{ marginTop: "24px" }}>
         Continue Shopping

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import CheckoutBreadcrumb from "../components/checkout/CheckoutBreadcrumb";
 import CheckoutForm from "../components/checkout/CheckoutForm";
@@ -19,7 +19,7 @@ import { useCart } from "../context/useCart";
 import {
   createOrder,
   initiateOnePayPayment,
-  uploadPaymentSlip,
+  // uploadPaymentSlip,
   verifyOnePayPayment,
 } from "../services/orderApi";
 import {
@@ -47,13 +47,9 @@ export default function CheckoutPage() {
   const [createdOrder, setCreatedOrder] = useState(null);
   const [createdOrderSummary, setCreatedOrderSummary] = useState(null);
   const [orderTotal, setOrderTotal] = useState(0);
-  const [slipFile, setSlipFile] = useState(null);
-  const [slipPreview, setSlipPreview] = useState(null);
-  const [slipUploading, setSlipUploading] = useState(false);
-  const [slipUploaded, setSlipUploaded] = useState(false);
-  const [slipError, setSlipError] = useState("");
+  // Bank-transfer payment-slip state is temporarily disabled.
   const [paymentMethod, setPaymentMethod] = useState(
-    PAYMENT_METHODS.BANK_TRANSFER,
+    PAYMENT_METHODS.KOKO,
   );
   const [checkoutStep, setCheckoutStep] = useState(CHECKOUT_STEPS.RECEIVER);
   const [onepayCheckoutStarted, setOnepayCheckoutStarted] = useState(false);
@@ -63,17 +59,10 @@ export default function CheckoutPage() {
   const [onepayReference, setOnepayReference] = useState("");
   const [onepayTransactionId, setOnepayTransactionId] = useState("");
   const [onepayRedirectUrl, setOnepayRedirectUrl] = useState("");
-  const slipInputRef = useRef(null);
 
   const token = getCustomerToken();
   const isPaymentStep = checkoutStep === CHECKOUT_STEPS.PAYMENT;
   const confirmedPaymentMethod = createdOrder?.paymentMethod || paymentMethod;
-
-  useEffect(() => {
-    return () => {
-      if (slipPreview) URL.revokeObjectURL(slipPreview);
-    };
-  }, [slipPreview]);
 
   useEffect(() => {
     if (!onepayTransactionId || !onepayReference) return undefined;
@@ -246,41 +235,11 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleSlipSelect = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (slipPreview) URL.revokeObjectURL(slipPreview);
-    setSlipFile(file);
-    setSlipPreview(URL.createObjectURL(file));
-    setSlipUploaded(false);
-    setSlipError("");
-  };
-
-  const handleSlipUpload = async () => {
-    if (!slipFile || !createdOrder) return;
-
-    setSlipUploading(true);
-    setSlipError("");
-
-    try {
-      await uploadPaymentSlip(createdOrder._id, slipFile, token);
-      setSlipUploaded(true);
-    } catch {
-      setSlipError("Upload failed. Please try again.");
-    } finally {
-      setSlipUploading(false);
-    }
-  };
-
-  const handleSlipRemove = () => {
-    if (slipPreview) URL.revokeObjectURL(slipPreview);
-    setSlipFile(null);
-    setSlipPreview(null);
-    setSlipUploaded(false);
-    setSlipError("");
-    if (slipInputRef.current) slipInputRef.current.value = "";
-  };
+  /* Bank-transfer payment-slip handlers are temporarily disabled.
+  const handleSlipSelect = () => {};
+  const handleSlipUpload = async () => {};
+  const handleSlipRemove = () => {};
+  */
 
   const openOnePayIframe = (redirectUrl, transactionId) => {
     if (typeof window.openPaymentIframe !== "function") {
@@ -346,15 +305,6 @@ export default function CheckoutPage() {
               createdOrder={createdOrder}
               paymentMethod={confirmedPaymentMethod}
               orderTotal={orderTotal}
-              slipFile={slipFile}
-              slipInputRef={slipInputRef}
-              slipPreview={slipPreview}
-              slipUploaded={slipUploaded}
-              slipUploading={slipUploading}
-              slipError={slipError}
-              onSlipRemove={handleSlipRemove}
-              onSlipSelect={handleSlipSelect}
-              onSlipUpload={handleSlipUpload}
             />
           ) : paymentMethod === PAYMENT_METHODS.ONEPAY && onepayCheckoutStarted ? (
             <OnePayRedirecting
