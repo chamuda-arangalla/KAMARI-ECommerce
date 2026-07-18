@@ -9,10 +9,6 @@ const buildHash = ({ amount, currency }) =>
     .update(`${appId}${currency}${amount}${hashSalt}`)
     .digest("hex");
 
-// Confirmed against OnePay's live API and their official onepayjs SDK source
-// (onepayv2.js -> triggerPayAPI): the Authorization header is the raw app token,
-// with no "Bearer " prefix. ONEPAY_APP_TOKEN is a third credential, separate from
-// ONEPAY_APP_ID and ONEPAY_HASH_SALT, issued alongside them in the merchant portal.
 const postJson = async (path, body) => {
   const response = await fetch(`${baseUrl}${path}`, {
     method: "POST",
@@ -37,10 +33,6 @@ const postJson = async (path, body) => {
   return data;
 };
 
-// Response shape confirmed from OnePay's official onepayjs SDK source
-// (onepayv2.js -> triggerPayAPI): { data: { gateway: { redirect_url }, ipg_transaction_id } }.
-// Falls back to a couple of other plausible shapes defensively, and logs the raw
-// payload, in case this differs slightly for the server-side (non-JS-SDK) API path.
 export const createCheckoutLink = async ({
   amount,
   currency,
@@ -94,10 +86,6 @@ export const getTransactionStatus = async ({ onepayTransactionId }) => {
 
   console.log("[OnePay] transaction-status raw response:", JSON.stringify(data));
 
-  // Not exercised by the official onepayjs SDK (it relies on the Firestore push
-  // channel instead), so this shape is still unconfirmed against a real sandbox
-  // response — check both a nested "data" wrapper and top-level, same as the
-  // now-confirmed checkout/link response, and narrow once observed.
   const payload = data?.data ?? data;
   const success =
     payload?.status === true ||
