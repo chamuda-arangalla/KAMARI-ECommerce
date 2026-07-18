@@ -28,20 +28,47 @@ export default function CustomerOrderDetailsPage() {
   useEffect(() => {
     if (!token) return;
 
+    let cancelled = false;
+    const query = new URLSearchParams(location.search);
+    const isSuccessfulKokoReturn =
+      (query.get("payment") === "koko" ||
+        (query.has("trnId") && query.has("orderId"))) &&
+      query.get("status")?.toUpperCase() === "SUCCESS";
+
     const loadOrder = async () => {
-      try {
-        setLoading(true);
-        const res = await getOrderById(id, token);
-        setOrder(res.data);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to load order");
-      } finally {
-        setLoading(false);
+      setLoading(true);
+      setError("");
+
+      for (let attempt = 0; attempt < 6 && !cancelled; attempt += 1) {
+        try {
+          const res = await getOrderById(id, token);
+          if (!cancelled) setOrder(res.data);
+          break;
+        } catch (err) {
+          const shouldRetry =
+            isSuccessfulKokoReturn &&
+            err.response?.status === 404 &&
+            attempt < 5;
+
+          if (!shouldRetry) {
+            if (!cancelled) {
+              setError(err.response?.data?.message || "Failed to load order");
+            }
+            break;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
       }
+
+      if (!cancelled) setLoading(false);
     };
 
     loadOrder();
-  }, [id, token]);
+    return () => {
+      cancelled = true;
+    };
+  }, [id, location.search, token]);
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
