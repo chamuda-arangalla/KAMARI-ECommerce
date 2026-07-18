@@ -46,11 +46,13 @@ export default function CustomerOrderDetailsPage() {
   useEffect(() => {
     const query = new URLSearchParams(location.search);
 
-    if (
-      !clearedKokoCartRef.current &&
-      query.get("payment") === "koko" &&
-      query.get("status") === "success"
-    ) {
+    const isKokoReturn =
+      query.get("payment") === "koko" ||
+      (query.has("trnId") && query.has("orderId"));
+    const isSuccessfulReturn =
+      query.get("status")?.toUpperCase() === "SUCCESS";
+
+    if (!clearedKokoCartRef.current && isKokoReturn && isSuccessfulReturn) {
       clearedKokoCartRef.current = true;
       clearCart();
     }
