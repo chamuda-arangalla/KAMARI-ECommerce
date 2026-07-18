@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import BankTransferDetails from "./BankTransferDetails";
@@ -20,21 +19,8 @@ export default function OrderConfirmation({
   onSlipRemove,
   onSlipSelect,
   onSlipUpload,
-  onepayInitiating,
-  onepayError,
-  onepayStatus,
-  onInitiateOnePay,
-  onReopenOnePay,
 }) {
   const orderId = createdOrder.orderId || createdOrder._id;
-  const onepayInitiated = useRef(false);
-
-  useEffect(() => {
-    if (paymentMethod !== PAYMENT_METHODS.ONEPAY) return;
-    if (onepayInitiated.current) return;
-    onepayInitiated.current = true;
-    onInitiateOnePay();
-  }, [paymentMethod, onInitiateOnePay]);
 
   return (
     <div>
@@ -52,13 +38,7 @@ export default function OrderConfirmation({
       {paymentMethod === PAYMENT_METHODS.COD ? (
         <CashOnDeliveryConfirmation orderTotal={orderTotal} />
       ) : paymentMethod === PAYMENT_METHODS.ONEPAY ? (
-        <OnePayRedirecting
-          status={onepayStatus}
-          initiating={onepayInitiating}
-          error={onepayError}
-          onRetry={onInitiateOnePay}
-          onReopen={onReopenOnePay}
-        />
+        <OnePayRedirecting status="success" />
       ) : (
         <>
           <BankTransferDetails orderId={orderId} orderTotal={orderTotal} />

@@ -1,103 +1,153 @@
 import Order from "../models/Order.js";
+import PendingOnePayCheckout from "../models/PendingOnePayCheckout.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import PAYMENT_METHOD from "../enums/paymentMethod.enum.js";
+import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import onepayConfig from "../config/onepay.js";
 import { createCheckoutLink, getTransactionStatus } from "../utils/onepayClient.js";
+import buildUniqueOrderId from "../utils/buildUniqueOrderId.js";
+import { sendEmail } from "../services/emailService.js";
 import {
-  applyOrderPaymentUpdate,
-  getOrderFilter,
+  orderConfirmationTemplate,
+  adminNewOrderTemplate,
+} from "../templates/orderEmailTemplates.js";
+import {
   getCustomerEmail,
   isAdmin,
   isOrderOwner,
+  saveReceiverAddressToCustomer,
+  validateOrderProducts,
+  calculatePricing,
 } from "./order.controller.js";
 
 const CLIENT_URL = process.env.CLIENT_URL;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const loadOrder = async (orderId) => Order.findOne(getOrderFilter(orderId));
+const findOrderByReference = async (reference) => Order.findOne({ orderId: reference });
 
-// Independently confirms the payment with OnePay's own status API and applies the
-// result. Never trusts a paymentStatus/status field handed to us by the client or
-// by OnePay's callback body directly. Idempotent once complete: a completed order
-// is a no-op, so duplicate callbacks/verify calls can't double-fire emails or
-// re-advance orderStatus. "failed" is intentionally NOT terminal here — the
-// customer can retry (see initiateCheckout), and a retry overwrites
-// onepay.transactionId with the new attempt's ID, so this always re-checks
-// whichever transaction is current.
-const verifyAndApplyOnePayStatus = async (order) => {
-  if (order.paymentStatus === PAYMENT_STATUS.COMPLETE) {
-    return order;
+const createPendingCheckoutWithUniqueReference = async ({ userId, productDetails, pricing, receiverDetails }) => {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const reference = await buildUniqueOrderId();
+
+    try {
+      return await PendingOnePayCheckout.create({
+        reference,
+        userId,
+        productDetails,
+        pricing,
+        receiverDetails,
+      });
+    } catch (error) {
+      if (error.code !== 11000 || !error.keyPattern?.reference) {
+        throw error;
+      }
+    }
   }
 
-  const transactionId = order.onepay?.transactionId;
-  if (!transactionId) {
-    return order;
-  }
+  throw new Error("Failed to generate unique OnePay checkout reference");
+};
 
-  const result = await getTransactionStatus({ onepayTransactionId: transactionId });
-
-  order.onepay.verifiedAt = new Date();
-  if (result.transactionId) order.onepay.transactionId = result.transactionId;
-
-  await applyOrderPaymentUpdate(order, {
-    paymentStatus: result.success ? PAYMENT_STATUS.COMPLETE : PAYMENT_STATUS.FAILED,
+const finalizeOrderFromPending = async (pending, transactionId) => {
+  const order = await Order.create({
+    orderId: pending.reference,
+    productDetails: pending.productDetails,
+    pricing: pending.pricing,
+    receiverDetails: pending.receiverDetails,
+    paymentStatus: PAYMENT_STATUS.COMPLETE,
+    paymentMethod: PAYMENT_METHOD.ONEPAY,
+    orderStatus: ORDER_STATUS.SHIPPING,
+    onepay: { transactionId: transactionId || "", verifiedAt: new Date() },
   });
+
+  await saveReceiverAddressToCustomer(pending.userId, pending.receiverDetails);
+
+  const customerEmail = await getCustomerEmail(pending.userId);
+  if (customerEmail) {
+    sendEmail({
+      to: customerEmail,
+      subject: `Order Confirmed — ${order.orderId}`,
+      html: orderConfirmationTemplate(order),
+    });
+  }
+  if (ADMIN_EMAIL) {
+    sendEmail({
+      to: ADMIN_EMAIL,
+      subject: `New Order Received — ${order.orderId}`,
+      html: adminNewOrderTemplate(order, customerEmail || "N/A", `${CLIENT_URL}/admin/orders`),
+    });
+  }
 
   return order;
 };
 
+const resolvePendingCheckout = async (pending) => {
+  if (!pending.transactionId) {
+    return { status: "pending" };
+  }
+
+  const result = await getTransactionStatus({ onepayTransactionId: pending.transactionId });
+
+  if (!result.success) {
+    return { status: result.success === false ? "failed" : "pending" };
+  }
+
+  const claimed = await PendingOnePayCheckout.findOneAndDelete({ reference: pending.reference });
+  if (!claimed) {
+    const existingOrder = await findOrderByReference(pending.reference);
+    return existingOrder ? { status: "success", order: existingOrder } : { status: "pending" };
+  }
+
+  const order = await finalizeOrderFromPending(claimed, result.transactionId || pending.transactionId);
+  return { status: "success", order };
+};
+
 export const initiateCheckout = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { productDetails: rawProducts, receiverDetails } = req.body;
 
-    if (!orderId) {
-      return res.status(400).json({ success: false, message: "orderId is required" });
+    if (!Array.isArray(rawProducts) || rawProducts.length === 0) {
+      return res.status(400).json({ success: false, message: "Order must include at least one product" });
     }
 
-    const order = await loadOrder(orderId);
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+    if (!receiverDetails) {
+      return res.status(400).json({ success: false, message: "Receiver details are required" });
     }
 
-    if (!isAdmin(req) && !isOrderOwner(req, order)) {
-      return res.status(403).json({ success: false, message: "Not authorized" });
-    }
+    const productDetails = await validateOrderProducts(rawProducts);
+    const pricing = calculatePricing(productDetails);
+    const customerEmail = await getCustomerEmail(req.user.id);
 
-    if (order.paymentMethod !== PAYMENT_METHOD.ONEPAY) {
-      return res.status(400).json({ success: false, message: "Order is not set up for OnePay" });
-    }
-
-    // A previous attempt on this order may have failed (paymentStatus "failed"),
-    // which must still be retryable — only a completed payment blocks re-initiation.
-    if (order.paymentStatus === PAYMENT_STATUS.COMPLETE) {
-      return res.status(409).json({ success: false, message: "Order payment is already settled" });
-    }
-
-    const receiver = order.receiverDetails || {};
-    const amount = Number(order.pricing?.grandTotal || 0).toFixed(2);
-    const customerEmail = await getCustomerEmail(receiver.userId);
+    const pending = await createPendingCheckoutWithUniqueReference({
+      userId: req.user.id,
+      productDetails,
+      pricing,
+      receiverDetails: { ...receiverDetails, userId: req.user.id },
+    });
 
     const { redirectUrl, transactionId } = await createCheckoutLink({
-      amount,
+      amount: pricing.grandTotal.toFixed(2),
       currency: "LKR",
-      reference: order.orderId,
+      reference: pending.reference,
       customer: {
-        firstName: receiver.firstName,
-        lastName: receiver.lastName,
-        phoneNumber: receiver.phoneNumber,
+        firstName: receiverDetails.firstName,
+        lastName: receiverDetails.lastName,
+        phoneNumber: receiverDetails.phoneNumber,
         email: customerEmail || "",
       },
-      redirectUrl: `${CLIENT_URL}/payments/onepay/return?orderId=${order.orderId}`,
+      redirectUrl: `${CLIENT_URL}/payments/onepay/return?reference=${pending.reference}`,
     });
 
     if (transactionId) {
-      order.onepay.transactionId = transactionId;
-      await order.save();
+      pending.transactionId = transactionId;
+      await pending.save();
     }
 
-    return res.status(200).json({ success: true, data: { redirectUrl, transactionId } });
+    return res.status(200).json({
+      success: true,
+      data: { redirectUrl, transactionId, reference: pending.reference },
+    });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       success: false,
@@ -109,35 +159,42 @@ export const initiateCheckout = async (req, res) => {
 
 export const verifyPayment = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { reference } = req.body;
 
-    if (!orderId) {
-      return res.status(400).json({ success: false, message: "orderId is required" });
+    if (!reference) {
+      return res.status(400).json({ success: false, message: "reference is required" });
     }
 
-    let order = await loadOrder(orderId);
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+    const existingOrder = await findOrderByReference(reference);
+    if (existingOrder) {
+      if (!isAdmin(req) && !isOrderOwner(req, existingOrder)) {
+        return res.status(403).json({ success: false, message: "Not authorized" });
+      }
+      return res.status(200).json({ success: true, data: { status: "success", order: existingOrder } });
     }
 
-    if (!isAdmin(req) && !isOrderOwner(req, order)) {
+    const pending = await PendingOnePayCheckout.findOne({ reference });
+    if (!pending) {
+      return res.status(404).json({ success: false, message: "Checkout not found or expired" });
+    }
+
+    if (!isAdmin(req) && String(pending.userId) !== String(req.user?.id || "")) {
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 
-    // The server-to-server callback may not have arrived yet (it races the
-    // browser redirect), so give it a short bounded window to show up before
-    // reporting back "still pending" to the client.
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      order = await verifyAndApplyOnePayStatus(order);
-      if (order.paymentStatus !== PAYMENT_STATUS.PENDING) break;
-      if (attempt < 2) {
-        await wait(1500);
-        order = await loadOrder(orderId);
+    let result = await resolvePendingCheckout(pending);
+    for (let attempt = 0; attempt < 2 && result.status === "pending"; attempt += 1) {
+      await wait(1500);
+      const stillPending = await PendingOnePayCheckout.findOne({ reference });
+      if (!stillPending) {
+        const order = await findOrderByReference(reference);
+        result = order ? { status: "success", order } : { status: "pending" };
+        break;
       }
+      result = await resolvePendingCheckout(stillPending);
     }
 
-    return res.status(200).json({ success: true, data: order });
+    return res.status(200).json({ success: true, data: result });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       success: false,
@@ -147,10 +204,6 @@ export const verifyPayment = async (req, res) => {
   }
 };
 
-// Extracts the Callback Token set in the OnePay dashboard's App config from
-// whichever spot OnePay actually sends it back in — not documented anywhere in
-// OnePay's public docs, so every plausible location is checked defensively until
-// a real callback delivery confirms which one to rely on.
 const extractCallbackToken = (req) =>
   req.headers["x-callback-token"] ||
   req.headers["callback-token"] ||
@@ -159,18 +212,8 @@ const extractCallbackToken = (req) =>
   req.body?.token ||
   null;
 
-// Unauthenticated: OnePay cannot present our JWT. The callback body is treated as
-// an untrusted "go check" trigger only — verifyAndApplyOnePayStatus always
-// independently re-confirms the outcome via OnePay's own status API before any
-// order is mutated. Always resolves 200 so OnePay stops retrying, even when the
-// referenced order can't be found.
 export const handleCallback = async (req, res) => {
   try {
-    // Soft-checked, not enforced: the delivery location for the Callback Token
-    // isn't confirmed yet, so a mismatch only logs (with the raw request) instead
-    // of rejecting, so the first real callback can be inspected and this tightened
-    // into a hard check afterward. verifyAndApplyOnePayStatus's independent
-    // OnePay-side re-verification remains the real trust boundary either way.
     if (onepayConfig.callbackToken) {
       const receivedToken = extractCallbackToken(req);
       if (receivedToken !== onepayConfig.callbackToken) {
@@ -187,21 +230,29 @@ export const handleCallback = async (req, res) => {
       return res.status(200).json({ success: false, message: "Missing reference" });
     }
 
-    const order = reference
-      ? await Order.findOne(getOrderFilter(reference))
+    const existingOrder = reference
+      ? await findOrderByReference(reference)
       : await Order.findOne({ "onepay.transactionId": transactionId });
 
-    if (!order) {
-      console.warn("[OnePay] callback received for unknown order", { reference, transactionId });
-      return res.status(200).json({ success: false, message: "Order not found" });
+    if (existingOrder) {
+      return res.status(200).json({ success: true });
     }
 
-    if (transactionId && !order.onepay.transactionId) {
-      order.onepay.transactionId = transactionId;
-      await order.save();
+    const pending = reference
+      ? await PendingOnePayCheckout.findOne({ reference })
+      : await PendingOnePayCheckout.findOne({ transactionId });
+
+    if (!pending) {
+      console.warn("[OnePay] callback received for unknown/expired checkout", { reference, transactionId });
+      return res.status(200).json({ success: false, message: "Checkout not found" });
     }
 
-    await verifyAndApplyOnePayStatus(order);
+    if (transactionId && !pending.transactionId) {
+      pending.transactionId = transactionId;
+      await pending.save();
+    }
+
+    await resolvePendingCheckout(pending);
 
     return res.status(200).json({ success: true });
   } catch (error) {

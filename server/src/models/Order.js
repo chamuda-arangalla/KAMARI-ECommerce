@@ -68,7 +68,7 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: [...Object.values(PAYMENT_METHOD), "koko"],
+    enum: Object.values(PAYMENT_METHOD),
     default: PAYMENT_METHOD.BANK_TRANSFER,
   },
   orderStatus: {

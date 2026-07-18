@@ -61,7 +61,7 @@ const findProductColor = (product, colour) =>
 const findProductSize = (color, size) =>
   color.sizes.find((sizeOption) => matchesText(sizeOption.size, size));
 
-const validateOrderProducts = async (requestedProducts) => {
+export const validateOrderProducts = async (requestedProducts) => {
   if (!Array.isArray(requestedProducts) || requestedProducts.length === 0) {
     const error = new Error("Order must include at least one product");
     error.statusCode = 400;
@@ -148,7 +148,7 @@ const validateOrderProducts = async (requestedProducts) => {
   return orderProducts;
 };
 
-const calculatePricing = (productDetails) => {
+export const calculatePricing = (productDetails) => {
   const subTotal = productDetails.reduce((total, product) => {
     const discountAmount = (product.unitPrice * product.discount) / 100;
     return total + (product.unitPrice - discountAmount) * product.quantity;
@@ -267,7 +267,7 @@ const createOrderWithUniqueOrderId = async (body, options = {}) => {
   throw new Error("Failed to generate unique order ID");
 };
 
-const saveReceiverAddressToCustomer = async (userId, receiverDetails) => {
+export const saveReceiverAddressToCustomer = async (userId, receiverDetails) => {
   const location = receiverDetails?.location || {};
   const addressLine1 = location.address?.trim();
   const phone = receiverDetails?.phoneNumber?.trim();
@@ -542,10 +542,6 @@ export const downloadOrderInvoice = async (req, res) => {
   }
 };
 
-// Applies a paymentStatus/orderStatus transition to an already-loaded order,
-// saves it, and fires the same status-change emails updateOrder has always sent.
-// Shared by the admin-facing updateOrder handler and the OnePay verification flow
-// so both paths cascade orderStatus and send emails identically.
 export const applyOrderPaymentUpdate = async (order, { paymentStatus, orderStatus } = {}) => {
   const prevOrderStatus = order.orderStatus;
   const prevPaymentStatus = order.paymentStatus;

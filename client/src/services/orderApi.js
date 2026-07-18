@@ -77,10 +77,10 @@ export const downloadOrderInvoice = async (orderId, token) => {
   return response;
 };
 
-export const initiateOnePayPayment = async (orderId, token) => {
+export const initiateOnePayPayment = async (checkoutPayload, token) => {
   const response = await axios.post(
     `${API_URL}/api/payments/onepay/checkout-link`,
-    { orderId },
+    checkoutPayload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -91,10 +91,10 @@ export const initiateOnePayPayment = async (orderId, token) => {
   return response.data;
 };
 
-export const verifyOnePayPayment = async (orderId, token) => {
+export const verifyOnePayPayment = async (reference, token) => {
   const response = await axios.post(
     `${API_URL}/api/payments/onepay/verify`,
-    { orderId },
+    { reference },
     {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -1,5 +1,6 @@
 const PAYMENT_METHOD = Object.freeze({
   BANK_TRANSFER: "bank_transfer",
+  KOKO: "koko",
   COD: "cash_on_delivery",
   ONEPAY: "onepay",
 });
