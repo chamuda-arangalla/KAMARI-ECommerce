@@ -442,10 +442,10 @@ const OrdersPage = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white z-[70] shadow-2xl overflow-y-auto"
+              className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-md flex-col overflow-hidden bg-white shadow-2xl"
             >
-              <div className="p-5 sm:p-8 space-y-6 sm:space-y-8">
-                <div className="flex items-center justify-between">
+              <div className="flex min-h-0 flex-1 flex-col">
+                <div className="flex shrink-0 items-center justify-between border-b border-[#f3ede8] px-5 py-4 sm:px-8 sm:py-5">
                   <h3 className="text-2xl font-semibold text-[#2c2b28]">Order Details</h3>
                   <button
                     onClick={handleCloseOrder}
@@ -455,11 +455,12 @@ const OrdersPage = () => {
                   </button>
                 </div>
 
+                <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-6 sm:space-y-8 sm:px-8">
                 <div className="bg-[#fcfaf7] p-6 rounded-2xl border border-[#d7c9b8] space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div>
+                  <div className="flex flex-col items-start gap-3 min-[380px]:flex-row min-[380px]:justify-between">
+                    <div className="min-w-0">
                       <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">Order Number</p>
-                      <p className="text-xl font-bold text-[#2c2b28]">{selectedOrder.orderNumber}</p>
+                      <p className="break-words text-xl font-bold text-[#2c2b28]">{selectedOrder.orderNumber}</p>
                     </div>
                     <StatusBadge status={selectedOrder.status} />
                   </div>
@@ -470,8 +471,8 @@ const OrdersPage = () => {
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border border-[#d7c9b8] space-y-4 shadow-sm">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
+                  <div className="flex flex-col items-start gap-3 min-[380px]:flex-row min-[380px]:justify-between">
+                    <div className="min-w-0">
                       <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">Update Order Status</p>
                       <p className="text-sm text-[#5f564d]">Change the fulfillment stage for this order.</p>
                     </div>
@@ -511,9 +512,9 @@ const OrdersPage = () => {
                   <h4 className="text-base font-bold text-[#2c2b28] uppercase tracking-widest">Order Items</h4>
                   <div className="divide-y divide-[#f3ede8]">
                     {selectedOrder.items.map((item, idx) => (
-                      <div key={`${item.name}-${idx}`} className="py-4 flex justify-between gap-4">
-                        <div>
-                          <p className="text-[#2c2b28] font-medium">{item.name}</p>
+                      <div key={`${item.name}-${idx}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 py-4">
+                        <div className="min-w-0">
+                          <p className="break-words text-[#2c2b28] font-medium">{item.name}</p>
                           <p className="text-sm text-[#8f8376]">
                             {item.colour} · Size {item.size} · Qty: {item.quantity} x {formatCurrency(item.price)}
                           </p>
@@ -624,6 +625,7 @@ const OrdersPage = () => {
                     </button>
                   </>
                 )}
+                </div>
               </div>
             </motion.div>
           </>

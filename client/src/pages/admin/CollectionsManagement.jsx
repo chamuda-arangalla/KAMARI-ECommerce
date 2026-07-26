@@ -139,10 +139,10 @@ export default function CollectionsManagement() {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-6 sm:space-y-8 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:gap-4 lg:space-y-0">
 
       {/* ── Page Header ─────────────────────────────── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-4xl font-bold text-[#2c2b28]">Collections</h1>
           <p className="text-base text-[#8f8376] mt-2">
@@ -169,8 +169,8 @@ export default function CollectionsManagement() {
           <p className="text-base">Click "Add Collection" to create your first one.</p>
         </div>
       ) : (
-        <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white">
-          <div className="grid min-h-0 gap-4 overflow-auto p-4 sm:gap-5 sm:p-5">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white">
+          <div className="grid min-h-0 flex-1 content-start gap-4 overflow-y-auto overscroll-contain p-4 sm:gap-5 sm:p-5">
             {paginatedCollections.map((col) => (
               <div
                 key={col._id}

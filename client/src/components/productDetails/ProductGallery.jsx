@@ -29,29 +29,36 @@ export default function ProductGallery({
         ))}
       </div>
 
-      <button
-        type="button"
-        className="pd-main-img-wrap"
-        onClick={() => setFullImageOpen(true)}
-        aria-label={`View full image of ${product.name}`}
-      >
-        <img
-          src={selectedImage}
-          alt={product.name}
-          className="pd-main-img"
-        />
-        {!inStock && (
-          <div className="pd-sold-out-overlay">
-            <span>Sold Out</span>
+      <div className="pd-main-media">
+        {inStock && (product.isNewArrival || product.isFeatured) && (
+          <div className="pd-badges">
+            {product.isNewArrival && (
+              <span className="pd-badge new">New Arrival</span>
+            )}
+            {product.isFeatured && (
+              <span className="pd-badge best">Best Seller</span>
+            )}
           </div>
         )}
-        {product.isNewArrival && inStock && (
-          <span className="pd-badge new">New Arrival</span>
-        )}
-        {product.isFeatured && inStock && (
-          <span className="pd-badge best">Best Seller</span>
-        )}
-      </button>
+
+        <button
+          type="button"
+          className="pd-main-img-wrap"
+          onClick={() => setFullImageOpen(true)}
+          aria-label={`View full image of ${product.name}`}
+        >
+          <img
+            src={selectedImage}
+            alt={product.name}
+            className="pd-main-img"
+          />
+          {!inStock && (
+            <div className="pd-sold-out-overlay">
+              <span>Sold Out</span>
+            </div>
+          )}
+        </button>
+      </div>
 
       {fullImageOpen && (
         <div

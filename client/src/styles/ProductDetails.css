@@ -110,6 +110,13 @@
 .pd-thumb.active  { border-color: #e47911; border-width: 2px; }
 
 /* ── Main Image ───────────────────────────────── */
+.pd-main-media {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+
 .pd-main-img-wrap {
   background: #f0ede9;
   border: 0;
@@ -118,9 +125,9 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 100%;
-  min-height: 100%;
+  height: auto;
   min-height: 0;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,10 +210,17 @@
 }
 
 /* Badges */
+.pd-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
 .pd-badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
+  position: static;
+  display: inline-flex;
+  align-items: center;
   padding: 4px 12px;
   border-radius: 4px;
   font-size: 11px;
@@ -719,16 +733,20 @@
     overflow-x: auto;
   }
   .pd-thumb { width: 76px; flex-shrink: 0; }
-  .pd-main-img-wrap {
-    position: static;
+  .pd-main-media {
     order: 1;
     width: min(100%, 570px);
-    height: auto;
-    min-height: 0;
-    aspect-ratio: 1 / 1;
-    max-height: none;
     justify-self: center;
   }
+  .pd-main-img-wrap {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: auto;
+    max-height: none;
+  }
+  .pd-main-img { height: auto; }
   .pd-panel { position: static; order: 3; margin-top: 16px; }
   .pd-details { padding: 0 16px; }
   .pd-related { padding: 0 16px; }
@@ -736,7 +754,7 @@
 }
 
 @media (max-width: 540px) {
-  .pd-main-img-wrap {
+  .pd-main-media {
     width: 100%;
   }
   .pd-related-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
