@@ -3,7 +3,6 @@ import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import collectionCoverImage from "../../assets/images/collection-static.JPG.jpeg";
-import { getHomeProductImage } from "./homeConstants";
 
 const premiumStagger = {
   hidden: {},
@@ -33,7 +32,6 @@ const premiumImage = {
 
 export default function HomeCollectionsSection({
   collections,
-  collectionProducts = {},
   revealProgress,
   sliderRef,
   onOpenCollection,
@@ -53,8 +51,11 @@ export default function HomeCollectionsSection({
 
   if (!collections.length) return null;
 
-  const activeMobileIndex = Math.min(mobileIndex, collections.length - 1);
-  const activeMobileCollection = collections[activeMobileIndex];
+  const mobileSlideCount = collections.length + 1;
+  const activeMobileIndex = Math.min(mobileIndex, mobileSlideCount - 1);
+  const isMobileViewAll = activeMobileIndex === 0;
+  const activeMobileCollection =
+    collections[Math.max(0, activeMobileIndex - 1)];
 
   return (
     <motion.section
@@ -71,10 +72,9 @@ export default function HomeCollectionsSection({
           className="w-full overflow-hidden bg-white"
         >
           <CollectionCard
-            key={activeMobileCollection._id}
+            key={isMobileViewAll ? "view-all" : activeMobileCollection._id}
             collection={activeMobileCollection}
-            product={collectionProducts[activeMobileCollection.name]}
-            index={activeMobileIndex}
+            isViewAll={isMobileViewAll}
             className="w-full"
             onOpenCollection={onOpenCollection}
           />
@@ -93,13 +93,13 @@ export default function HomeCollectionsSection({
           </button>
         )}
 
-        {activeMobileIndex < collections.length - 1 && (
+        {activeMobileIndex < mobileSlideCount - 1 && (
           <button
             type="button"
             aria-label="Next collection"
             onClick={() =>
               setMobileIndex((currentIndex) =>
-                Math.min(currentIndex + 1, collections.length - 1),
+                Math.min(currentIndex + 1, mobileSlideCount - 1),
               )
             }
             className={`absolute right-3 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-[#2C2B28] shadow-sm backdrop-blur transition hover:bg-white ${
@@ -121,8 +121,7 @@ export default function HomeCollectionsSection({
       >
         <CollectionCard
           collection={collections[0]}
-          product={collectionProducts[collections[0].name]}
-          index={0}
+          isViewAll
           className="w-full"
           onOpenCollection={onOpenCollection}
         />
@@ -152,12 +151,10 @@ export default function HomeCollectionsSection({
             animate={isRevealed ? "visible" : "hidden"}
             className="flex cursor-grab snap-x snap-mandatory gap-1 overflow-x-auto bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {collections.slice(1).map((collection, offset) => (
+            {collections.map((collection) => (
               <CollectionCard
                 key={collection._id}
                 collection={collection}
-                product={collectionProducts[collection.name]}
-                index={offset + 1}
                 className="w-[calc((100%-0.25rem)/2)] lg:w-[calc((100%-0.5rem)/3)]"
                 onOpenCollection={onOpenCollection}
               />
@@ -171,42 +168,36 @@ export default function HomeCollectionsSection({
 
 function CollectionCard({
   collection,
-  product,
-  index,
+  isViewAll = false,
   className,
   onOpenCollection,
 }) {
-  const imageUrl =
-    index === 0
-      ? collectionCoverImage
-      : product
-        ? getHomeProductImage(product)
-        : collection.image?.url;
+  const imageUrl = isViewAll ? collectionCoverImage : collection.image?.url;
 
   return (
     <motion.div
       variants={premiumCard}
-      className={`group relative min-w-0 shrink-0 self-start snap-start cursor-pointer bg-white ${className}`}
-      onClick={() => onOpenCollection(collection)}
+      className={`group relative min-w-0 shrink-0 self-start snap-start bg-white ${
+        isViewAll ? "" : "cursor-pointer"
+      } ${className}`}
+      onClick={isViewAll ? undefined : () => onOpenCollection(collection)}
     >
       <div className="relative h-[78svh] min-h-130 max-h-170 overflow-hidden bg-[#F7F4F0] md:h-auto md:min-h-0 md:max-h-none md:aspect-4/5">
         {imageUrl ? (
           <motion.img
             variants={premiumImage}
             src={imageUrl}
-            alt={product?.name || collection.name}
+            alt={collection.name}
             loading="lazy"
             decoding="async"
-            className={`h-full w-full object-cover transition duration-700 group-hover:scale-105 ${
-              index > 0 && product ? "object-top" : "object-center"
-            }`}
+            className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
           />
         ) : (
           <div className="h-full w-full bg-[#E8DED6]" />
         )}
         <div className="absolute inset-0 bg-[#2C2B28]/12 transition duration-300 group-hover:bg-[#2C2B28]/6" />
 
-        {index === 0 && (
+        {isViewAll && (
           <div className="absolute inset-0 z-10 flex items-center justify-center px-4 text-center text-white">
             <div>
               <p className="mb-6 text-3xl font-light uppercase leading-none tracking-[0.03em] drop-shadow-sm">
@@ -229,7 +220,7 @@ function CollectionCard({
         )}
       </div>
 
-      {index > 0 && (
+      {!isViewAll && (
         <div className="min-h-20 bg-white px-4 py-3 text-center md:min-h-0 md:px-0 md:pt-3 md:pb-0">
           <h3 className="mb-1 text-sm font-medium uppercase tracking-[0.08em]">
             {collection.name}
