@@ -1,142 +1,69 @@
-import crypto from "crypto";
+import crypto from "node:crypto";
 
-const KOKO_API_BASE = (process.env.KOKO_API_URL || "https://prodapi.paykoko.com").replace(
+const API_BASE = (process.env.KOKO_API_URL || "https://qaapi.paykoko.com").replace(
   /\/$/,
-  ""
+  "",
 );
 const MERCHANT_ID = process.env.KOKO_MERCHANT_ID;
 const API_KEY = process.env.KOKO_API_KEY;
 const PLUGIN_NAME = process.env.KOKO_PLUGIN_NAME || "customapi";
 const PLUGIN_VERSION = process.env.KOKO_PLUGIN_VERSION || "1";
-const DEFAULT_REFERENCE = process.env.KOKO_REFERENCE || "1234";
-const SAMPLE_MERCHANT_ID = "c8cca514bdfa0582cdc40c9703c71e9d";
+const REFERENCE = process.env.KOKO_REFERENCE || "1234";
 
-const parsePEMKey = (keyString) => {
-  if (!keyString) return null;
+const readPem = (value) =>
+  value
+    ?.trim()
+    .replace(/^["']|["']$/g, "")
+    .replace(/\\n/g, "\n");
 
-  let key = keyString.trim();
-  if (
-    (key.startsWith('"') && key.endsWith('"')) ||
-    (key.startsWith("'") && key.endsWith("'"))
-  ) {
-    key = key.slice(1, -1);
-  }
+const PRIVATE_KEY = readPem(process.env.KOKO_PRIVATE_KEY);
+const PUBLIC_KEY = readPem(process.env.KOKO_PUBLIC_KEY);
 
-  return key.replace(/\\n/g, "\n");
-};
+const requireValues = (values) => {
+  const missing = Object.entries(values)
+    .filter(([, value]) => value === undefined || value === null || value === "")
+    .map(([name]) => name);
 
-const PRIVATE_KEY = parsePEMKey(process.env.KOKO_PRIVATE_KEY);
-const PUBLIC_KEY = parsePEMKey(process.env.KOKO_PUBLIC_KEY);
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const createKokoValidationError = (message) => {
-  const error = new Error(message);
-  error.statusCode = 400;
-  return error;
-};
-
-const isHttpUrl = (value) => {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
+  if (missing.length) {
+    throw new Error(`Missing Koko configuration or fields: ${missing.join(", ")}`);
   }
 };
 
-const createConfigError = (missing) =>
-  new Error(`Missing Koko configuration: ${missing.join(", ")}`);
-
-export const validateKokoOrderCreateConfig = () => {
-  const missing = [];
-
-  if (!MERCHANT_ID) missing.push("KOKO_MERCHANT_ID");
-  if (!API_KEY) missing.push("KOKO_API_KEY");
-  if (!PRIVATE_KEY) missing.push("KOKO_PRIVATE_KEY");
-
-  if (missing.length > 0) {
-    throw createConfigError(missing);
-  }
-
-  if (
-    MERCHANT_ID === SAMPLE_MERCHANT_ID &&
-    KOKO_API_BASE.includes("prodapi.paykoko.com")
-  ) {
-    const error = new Error(
-      "Koko sample merchant credentials must use https://qaapi.paykoko.com. Use live merchant credentials before switching to production."
-    );
-    error.statusCode = 400;
-    throw error;
-  }
-};
-
-export const validateKokoCallbackConfig = () => {
-  const missing = [];
-
-  if (!PUBLIC_KEY) missing.push("KOKO_PUBLIC_KEY");
-
-  if (missing.length > 0) {
-    throw createConfigError(missing);
-  }
-};
-
-export const validateKokoConfig = () => {
-  validateKokoOrderCreateConfig();
-  validateKokoCallbackConfig();
-};
-
-const createOrderDataString = ({
-  orderId,
-  amount,
-  currency,
-  returnUrl,
-  cancelUrl,
-  responseUrl,
-  reference,
-  firstName,
-  lastName,
-  email,
-  description,
-}) =>
-  MERCHANT_ID +
-  amount +
-  currency +
-  PLUGIN_NAME +
-  PLUGIN_VERSION +
-  returnUrl +
-  cancelUrl +
-  orderId +
-  reference +
-  firstName +
-  lastName +
-  email +
-  description +
-  API_KEY +
-  responseUrl;
-
-const createSignature = (dataString, key) => {
+const sign = (dataString) => {
+  requireValues({ KOKO_PRIVATE_KEY: PRIVATE_KEY });
   const signer = crypto.createSign("RSA-SHA256");
   signer.update(dataString);
   signer.end();
-  return signer.sign(key, "base64");
+  return signer.sign(PRIVATE_KEY, "base64");
 };
 
-export const verifyKokoSignature = (dataString, signature) => {
-  validateKokoCallbackConfig();
-
+const verify = (dataString, signature) => {
+  requireValues({ KOKO_PUBLIC_KEY: PUBLIC_KEY });
   const verifier = crypto.createVerify("RSA-SHA256");
   verifier.update(dataString);
   verifier.end();
   return verifier.verify(PUBLIC_KEY, signature, "base64");
 };
 
-export const createKokoOrderRequest = (paymentParams) => {
-  validateKokoOrderCreateConfig();
-
-  const {
+// Mirrors sample-koko-order-create.php field-for-field.
+export const createKokoPaymentForm = ({
+  orderId,
+  amount,
+  firstName,
+  lastName,
+  email,
+  phoneNumber,
+  description,
+  returnUrl,
+  cancelUrl,
+  responseUrl,
+}) => {
+  requireValues({
+    KOKO_MERCHANT_ID: MERCHANT_ID,
+    KOKO_API_KEY: API_KEY,
+    KOKO_PRIVATE_KEY: PRIVATE_KEY,
     orderId,
     amount,
-    currency = "LKR",
     firstName,
     lastName,
     email,
@@ -145,128 +72,73 @@ export const createKokoOrderRequest = (paymentParams) => {
     returnUrl,
     cancelUrl,
     responseUrl,
-    reference = DEFAULT_REFERENCE,
-  } = paymentParams;
-
-  const required = {
-    orderId,
-    amount,
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    description,
-    returnUrl,
-    cancelUrl,
-    responseUrl,
-  };
-  const missing = Object.entries(required)
-    .filter(([, value]) => value === undefined || value === null || value === "")
-    .map(([key]) => key);
-
-  if (missing.length > 0) {
-    throw createKokoValidationError(
-      `Missing required Koko payment fields: ${missing.join(", ")}`
-    );
-  }
-
-  const amountValue = Number(amount);
-  if (!Number.isFinite(amountValue) || amountValue <= 0) {
-    throw createKokoValidationError("Koko payment amount must be greater than zero");
-  }
-
-  if (!emailRegex.test(String(email).trim())) {
-    throw createKokoValidationError("Customer email is not valid for Koko payment");
-  }
-
-  if (!String(firstName).trim() || !String(lastName).trim()) {
-    throw createKokoValidationError("Customer first name and last name are required for Koko payment");
-  }
-
-  if (!/^\+?[0-9\s-]{7,15}$/.test(String(phoneNumber).trim())) {
-    throw createKokoValidationError("Customer phone number is not valid for Koko payment");
-  }
-
-  const invalidUrls = Object.entries({ returnUrl, cancelUrl, responseUrl })
-    .filter(([, value]) => !isHttpUrl(value))
-    .map(([key]) => key);
-
-  if (invalidUrls.length > 0) {
-    throw createKokoValidationError(
-      `Invalid Koko payment URL fields: ${invalidUrls.join(", ")}`
-    );
-  }
-
-  const normalizedAmount = Number.isInteger(amountValue)
-    ? String(amountValue)
-    : String(amount);
-  const normalizedFirstName = String(firstName).trim();
-  const normalizedLastName = String(lastName).trim();
-  const normalizedEmail = String(email).trim().toLowerCase();
-  const normalizedPhoneNumber = String(phoneNumber).trim();
-  const normalizedReference = String(reference);
-  const normalizedDescription = String(description).trim();
-  const dataString = createOrderDataString({
-    orderId: String(orderId),
-    amount: normalizedAmount,
-    currency,
-    returnUrl,
-    cancelUrl,
-    responseUrl,
-    reference: normalizedReference,
-    firstName: normalizedFirstName,
-    lastName: normalizedLastName,
-    email: normalizedEmail,
-    description: normalizedDescription,
   });
-  const signature = createSignature(dataString, PRIVATE_KEY);
 
-  // Keep the field names and order aligned with Koko's PHP sample.
-  const fields = {
-    _mId: MERCHANT_ID,
-    api_key: API_KEY,
-    _returnUrl: returnUrl,
-    _responseUrl: responseUrl,
-    _currency: currency,
-    _amount: normalizedAmount,
-    _reference: normalizedReference,
-    _pluginName: PLUGIN_NAME,
-    _pluginVersion: PLUGIN_VERSION,
-    _cancelUrl: cancelUrl,
-    _orderId: String(orderId),
-    _firstName: normalizedFirstName,
-    _lastName: normalizedLastName,
-    _email: normalizedEmail,
-    _description: normalizedDescription,
-    dataString,
-    signature,
-    _mobileNo: normalizedPhoneNumber,
+  const values = {
+    orderId: String(orderId),
+    amount: String(amount),
+    firstName: String(firstName).trim(),
+    lastName: String(lastName).trim(),
+    email: String(email).trim().toLowerCase(),
+    phoneNumber: String(phoneNumber).trim(),
+    description: String(description),
   };
+
+  const dataString =
+    MERCHANT_ID +
+    values.amount +
+    "LKR" +
+    PLUGIN_NAME +
+    PLUGIN_VERSION +
+    returnUrl +
+    cancelUrl +
+    values.orderId +
+    REFERENCE +
+    values.firstName +
+    values.lastName +
+    values.email +
+    values.description +
+    API_KEY +
+    responseUrl;
 
   return {
-    action: `${KOKO_API_BASE}/api/merchants/orderCreate`,
+    action: `${API_BASE}/api/merchants/orderCreate`,
     method: "POST",
-    fields,
+    fields: {
+      _mId: MERCHANT_ID,
+      api_key: API_KEY,
+      _returnUrl: returnUrl,
+      _responseUrl: responseUrl,
+      _currency: "LKR",
+      _amount: values.amount,
+      _reference: REFERENCE,
+      _pluginName: PLUGIN_NAME,
+      _pluginVersion: PLUGIN_VERSION,
+      _cancelUrl: cancelUrl,
+      _orderId: values.orderId,
+      _firstName: values.firstName,
+      _lastName: values.lastName,
+      _email: values.email,
+      _description: values.description,
+      dataString,
+      signature: sign(dataString),
+      _mobileNo: values.phoneNumber,
+    },
   };
 };
 
-export const processKokoResponse = (responseData) => {
-  validateKokoCallbackConfig();
+export const processKokoResponse = (response) => {
+  const payload = response?.content || response?.data || response;
+  const orderId = payload?.orderId || payload?._orderId;
+  const trnId = payload?.trnId || payload?._trnId || payload?.transactionId;
+  const status = payload?.status || payload?._status;
+  const desc = payload?.desc || payload?.description || "";
+  const signature = payload?.signature;
 
-  const orderId = responseData.orderId || responseData._orderId;
-  const trnId = responseData.trnId || responseData._trnId || responseData.transactionId;
-  const status = responseData.status || responseData._status;
-  const desc = responseData.desc || responseData.description || "";
-  const signature = responseData.signature;
+  requireValues({ orderId, trnId, status, signature });
 
-  if (!orderId || !trnId || !status || !signature) {
-    throw new Error("Missing required Koko callback fields");
-  }
-
-  const dataString = String(orderId) + String(trnId) + String(status) + String(desc);
-
-  if (!verifyKokoSignature(dataString, signature)) {
-    throw new Error("Invalid Koko callback signature");
+  if (!verify(`${orderId}${trnId}${status}${desc}`, signature)) {
+    throw new Error("Invalid Koko response signature");
   }
 
   return {
@@ -277,11 +149,45 @@ export const processKokoResponse = (responseData) => {
   };
 };
 
-export default {
-  createKokoOrderRequest,
-  processKokoResponse,
-  verifyKokoSignature,
-  validateKokoConfig,
-  validateKokoOrderCreateConfig,
-  validateKokoCallbackConfig,
+export const viewKokoOrder = async (orderId) => {
+  requireValues({
+    KOKO_MERCHANT_ID: MERCHANT_ID,
+    KOKO_API_KEY: API_KEY,
+    KOKO_PRIVATE_KEY: PRIVATE_KEY,
+    KOKO_PUBLIC_KEY: PUBLIC_KEY,
+    orderId,
+  });
+
+  const normalizedOrderId = String(orderId);
+  const dataString =
+    MERCHANT_ID +
+    PLUGIN_NAME +
+    PLUGIN_VERSION +
+    normalizedOrderId +
+    API_KEY;
+
+  const response = await fetch(`${API_BASE}/api/merchants/orderView`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      _mId: MERCHANT_ID,
+      _pluginName: PLUGIN_NAME,
+      _pluginVersion: PLUGIN_VERSION,
+      api_key: API_KEY,
+      _orderId: normalizedOrderId,
+      signature: sign(dataString),
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Koko Order View request failed (${response.status})`);
+  }
+
+  const result = processKokoResponse(await response.json());
+  if (result.orderId !== normalizedOrderId) {
+    throw new Error("Koko returned a different order ID");
+  }
+
+  return result;
 };

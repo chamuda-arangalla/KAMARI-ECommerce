@@ -13,7 +13,7 @@ import {
   createInvoicePdf,
   getInvoiceProfile,
 } from "../services/invoice/invoicePdf.service.js";
-import { createKokoOrderRequest } from "../services/koko.service.js";
+import { createKokoPaymentForm } from "../services/koko.service.js";
 import { sendEmail } from "../services/emailService.js";
 import {
   orderConfirmationTemplate,
@@ -207,57 +207,15 @@ const buildOrderPayload = async (body, orderId) => {
   };
 };
 
-const createHttpError = (message, statusCode) => {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
-};
-
-const validateKokoOrderPrerequisites = (customerEmail) => {
-  if (!process.env.CLIENT_URL || !process.env.KOKO_CALLBACK_URL) {
-    throw createHttpError(
-      "CLIENT_URL and a public KOKO_CALLBACK_URL are required for Koko payments",
-      500
-    );
-  }
-
-  if (!customerEmail) {
-    throw createHttpError("Customer email is required for Koko payment", 400);
-  }
-};
-
-const buildKokoPaymentRequest = (orderPayload, customerEmail) => {
-  validateKokoOrderPrerequisites(customerEmail);
-
-  const orderDetailsUrl = `${process.env.CLIENT_URL}/orders/${orderPayload.orderId}`;
-
-  return createKokoOrderRequest({
-    orderId: orderPayload.orderId,
-    amount: orderPayload.pricing.grandTotal,
-    currency: "LKR",
-    firstName: orderPayload.receiverDetails.firstName,
-    lastName: orderPayload.receiverDetails.lastName,
-    email: customerEmail,
-    phoneNumber: orderPayload.receiverDetails.phoneNumber,
-    description: `KAMARI Order #${orderPayload.orderId}`,
-    returnUrl: `${orderDetailsUrl}?payment=koko&status=success`,
-    cancelUrl: `${orderDetailsUrl}?payment=koko&status=cancelled`,
-    responseUrl: `${process.env.KOKO_CALLBACK_URL.replace(/\/$/, "")}/api/payments/koko/callback`,
-  });
-};
-
-const createOrderWithUniqueOrderId = async (body, options = {}) => {
+const createOrderWithUniqueOrderId = async (body) => {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const orderId = await buildUniqueOrderId();
 
     try {
       const orderPayload = await buildOrderPayload(body, orderId);
-      const kokoPayment = isKokoPayment(body.paymentMethod)
-        ? buildKokoPaymentRequest(orderPayload, options.customerEmail)
-        : null;
       const order = await Order.create(orderPayload);
 
-      return { order, kokoPayment };
+      return order;
     } catch (error) {
       if (error.code !== 11000 || !error.keyPattern?.orderId) {
         throw error;
@@ -269,13 +227,32 @@ const createOrderWithUniqueOrderId = async (body, options = {}) => {
 };
 
 const createPendingKokoCheckout = async (body, customerEmail) => {
-  validateKokoOrderPrerequisites(customerEmail);
+  if (!customerEmail) {
+    const error = new Error("Customer email is required for Koko payment");
+    error.statusCode = 400;
+    throw error;
+  }
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const reference = await buildUniqueOrderId();
 
     try {
       const orderPayload = await buildOrderPayload(body, reference);
+      const clientUrl = process.env.CLIENT_URL.replace(/\/$/, "");
+      const callbackUrl = process.env.KOKO_CALLBACK_URL.replace(/\/$/, "");
+      const returnUrl = `${clientUrl}/payments/koko/return/${encodeURIComponent(reference)}`;
+      const payment = createKokoPaymentForm({
+        orderId: reference,
+        amount: orderPayload.pricing.grandTotal,
+        firstName: orderPayload.receiverDetails.firstName,
+        lastName: orderPayload.receiverDetails.lastName,
+        email: customerEmail,
+        phoneNumber: orderPayload.receiverDetails.phoneNumber,
+        description: `KAMARI Order #${reference}`,
+        returnUrl,
+        cancelUrl: `${returnUrl}?cancelled=true`,
+        responseUrl: `${callbackUrl}/api/payments/koko/callback`,
+      });
       const pending = await PendingKokoCheckout.create({
         reference,
         userId: body.receiverDetails.userId,
@@ -285,10 +262,7 @@ const createPendingKokoCheckout = async (body, customerEmail) => {
         customerEmail,
       });
 
-      return {
-        pending,
-        payment: buildKokoPaymentRequest(orderPayload, customerEmail),
-      };
+      return { pending, payment };
     } catch (error) {
       if (error.code !== 11000 || !error.keyPattern?.reference) throw error;
     }
@@ -382,9 +356,7 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const { order, kokoPayment } = await createOrderWithUniqueOrderId(orderBody, {
-      customerEmail,
-    });
+    const order = await createOrderWithUniqueOrderId(orderBody);
     const updatedCustomer = !isAdmin(req)
       ? await saveReceiverAddressToCustomer(req.user.id, orderBody.receiverDetails)
       : null;
@@ -408,12 +380,6 @@ export const createOrder = async (req, res) => {
       success: true,
       message: "Order created successfully",
       data: order,
-      payment: kokoPayment
-        ? {
-            provider: "koko",
-            ...kokoPayment,
-          }
-        : undefined,
       user: updatedCustomer
         ? {
             id: updatedCustomer._id,

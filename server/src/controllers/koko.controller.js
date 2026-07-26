@@ -1,12 +1,11 @@
 import Order from "../models/Order.js";
 import PendingKokoCheckout from "../models/PendingKokoCheckout.js";
-import User from "../models/User.js";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import PAYMENT_TYPE from "../enums/paymentType.enum.js";
 import {
-  createKokoOrderRequest,
   processKokoResponse,
+  viewKokoOrder,
 } from "../services/koko.service.js";
 import { sendEmail } from "../services/emailService.js";
 import {
@@ -14,61 +13,90 @@ import {
   adminNewOrderTemplate,
 } from "../templates/orderEmailTemplates.js";
 import {
-  getCustomerEmail as getCustomerEmailByUserId,
+  getCustomerEmail,
   saveReceiverAddressToCustomer,
 } from "./order.controller.js";
+import { logger } from "../utils/logger.js";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-const CLIENT_URL = process.env.CLIENT_URL;
+const CLIENT_URL = process.env.CLIENT_URL?.replace(/\/$/, "");
 
-const isAdmin = (req) => req.user?.role === "admin";
+const isSuccessful = (status) => status === "SUCCESS";
 
-const isOrderOwner = (req, order) =>
+const canAccessPendingCheckout = (req, pending) =>
+  req.user?.role === "admin" ||
+  String(pending.userId) === String(req.user?.id || "");
+
+const canAccessOrder = (req, order) =>
+  req.user?.role === "admin" ||
   String(order.receiverDetails?.userId || "") === String(req.user?.id || "");
 
-const getCustomerEmail = async (order, req) => {
-  if (req.user?.email) return req.user.email;
-  if (order.receiverDetails?.email) return order.receiverDetails.email;
+const sendOrderNotifications = async (order, pending) => {
+  const customerEmail =
+    pending.customerEmail || (await getCustomerEmail(pending.userId));
 
-  const userId = order.receiverDetails?.userId || req.user?.id;
-  if (!userId) return null;
+  if (customerEmail) {
+    void sendEmail({
+      to: customerEmail,
+      subject: `Order Confirmed - ${order.orderId}`,
+      html: orderConfirmationTemplate(order),
+    });
+  }
 
-  const customer = await User.findById(userId).select("email").lean();
-  return customer?.email || null;
+  if (ADMIN_EMAIL) {
+    void sendEmail({
+      to: ADMIN_EMAIL,
+      subject: `New Order Received - ${order.orderId}`,
+      html: adminNewOrderTemplate(
+        order,
+        customerEmail || "N/A",
+        `${CLIENT_URL}/admin/orders`,
+      ),
+    });
+  }
 };
 
-const getCallbackPaymentState = (status) => {
-  if (["SUCCESS", "SUCCEEDED", "COMPLETE", "COMPLETED"].includes(status)) {
-    return {
+const finalizeKokoOrder = async ({ orderId, transactionId }) => {
+  const existingOrder = await Order.findOne({ orderId });
+  if (existingOrder) return existingOrder;
+
+  const pending = await PendingKokoCheckout.findOne({ reference: orderId });
+  if (!pending) {
+    const error = new Error("Pending Koko checkout not found or expired");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  let order;
+  try {
+    order = await Order.create({
+      orderId: pending.reference,
+      productDetails: pending.productDetails,
+      pricing: pending.pricing,
+      receiverDetails: pending.receiverDetails,
       paymentStatus: PAYMENT_STATUS.COMPLETE,
+      paymentMethod: "koko",
+      paymentType: PAYMENT_TYPE.KOKO,
       orderStatus: ORDER_STATUS.SHIPPING,
-      shouldSendConfirmation: true,
-    };
+      kokoTransactionId: transactionId,
+    });
+  } catch (error) {
+    if (error.code !== 11000) throw error;
+    return Order.findOne({ orderId });
   }
 
-  if (["FAILURE", "FAILED"].includes(status)) {
-    return {
-      paymentStatus: PAYMENT_STATUS.FAILED,
-      shouldSendFailure: true,
-    };
-  }
+  await Promise.all([
+    PendingKokoCheckout.deleteOne({ reference: orderId }),
+    saveReceiverAddressToCustomer(pending.userId, pending.receiverDetails),
+  ]);
+  await sendOrderNotifications(order, pending);
 
-  if (["CANCELED", "CANCELLED", "CANCEL"].includes(status)) {
-    return {
-      paymentStatus: PAYMENT_STATUS.PENDING,
-    };
-  }
-
-  return {
-    paymentStatus: PAYMENT_STATUS.FAILED,
-    shouldSendFailure: true,
-  };
+  return order;
 };
 
-export const initiateKokoPaymentController = async (req, res) => {
+export const verifyKokoPayment = async (req, res) => {
   try {
     const { orderId } = req.body;
-
     if (!orderId) {
       return res.status(400).json({
         success: false,
@@ -76,157 +104,100 @@ export const initiateKokoPaymentController = async (req, res) => {
       });
     }
 
-    if (!process.env.CLIENT_URL || !process.env.KOKO_CALLBACK_URL) {
-      return res.status(500).json({
-        success: false,
-        message: "CLIENT_URL and a public KOKO_CALLBACK_URL are required for Koko payments",
+    const existingOrder = await Order.findOne({ orderId });
+    if (existingOrder) {
+      if (!canAccessOrder(req, existingOrder)) {
+        return res.status(403).json({
+          success: false,
+          message: "Not authorized to view this payment",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        status: "success",
+        data: existingOrder,
       });
     }
 
-    const order = await Order.findOne({ orderId });
-
-    if (!order) {
+    const pending = await PendingKokoCheckout.findOne({ reference: orderId });
+    if (!pending) {
       return res.status(404).json({
         success: false,
-        message: "Order not found",
+        message: "Koko checkout not found or expired",
       });
     }
 
-    if (!isAdmin(req) && !isOrderOwner(req, order)) {
+    if (!canAccessPendingCheckout(req, pending)) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized to pay for this order",
+        message: "Not authorized to view this payment",
       });
     }
 
-    if (order.paymentStatus === PAYMENT_STATUS.COMPLETE) {
-      return res.status(409).json({
-        success: false,
-        message: "Payment already completed for this order",
+    const payment = await viewKokoOrder(orderId);
+
+    if (isSuccessful(payment.status)) {
+      const order = await finalizeKokoOrder({
+        orderId: payment.orderId,
+        transactionId: payment.trnId,
+      });
+      return res.status(200).json({
+        success: true,
+        status: "success",
+        data: order,
       });
     }
 
-    const customerEmail = await getCustomerEmail(order, req);
-
-    if (!customerEmail) {
-      return res.status(400).json({
-        success: false,
-        message: "Customer email is required for Koko payment",
-      });
+    if (["FAILED", "FAILURE", "CANCELED", "CANCELLED"].includes(payment.status)) {
+      await PendingKokoCheckout.deleteOne({ reference: orderId });
     }
-
-    const orderDetailsUrl = `${process.env.CLIENT_URL}/orders/${order.orderId}`;
-    const kokoOrder = createKokoOrderRequest({
-      orderId: order.orderId,
-      amount: order.pricing.grandTotal,
-      currency: "LKR",
-      firstName: order.receiverDetails.firstName,
-      lastName: order.receiverDetails.lastName,
-      email: customerEmail,
-      phoneNumber: order.receiverDetails.phoneNumber,
-      description: `KAMARI Order #${order.orderId}`,
-      returnUrl: `${orderDetailsUrl}?payment=koko&status=success`,
-      cancelUrl: `${orderDetailsUrl}?payment=koko&status=cancelled`,
-      responseUrl: `${process.env.KOKO_CALLBACK_URL.replace(/\/$/, "")}/api/payments/koko/callback`,
-    });
-
-    order.paymentMethod = "koko";
-    order.paymentType = PAYMENT_TYPE.KOKO;
-    await order.save();
 
     return res.status(200).json({
       success: true,
-      message: "Koko payment request created successfully",
-      data: {
-        orderId: order.orderId,
-        amount: order.pricing.grandTotal,
-        ...kokoOrder,
-      },
+      status: payment.status.toLowerCase(),
     });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       success: false,
-      message: error.message || "Failed to create Koko payment request",
+      message: error.message || "Failed to verify Koko payment",
     });
   }
 };
 
 export const handleKokoCallback = async (req, res) => {
   try {
-    const { orderId, trnId, status } = processKokoResponse(req.body);
-    const existingOrder = await Order.findOne({ orderId });
+    const payment = processKokoResponse(req.body);
 
-    if (existingOrder) {
-      return res.status(200).json({ success: true, message: "Callback already processed" });
-    }
-
-    const paymentState = getCallbackPaymentState(status);
-    if (!paymentState.shouldSendConfirmation) {
-      // Failed and cancelled payments never create an Order document.
-      if (paymentState.shouldSendFailure) {
-        await PendingKokoCheckout.deleteOne({ reference: orderId });
-      }
-      return res.status(200).json({
-        success: true,
-        message: "Koko payment was not successful; order was not created",
+    if (isSuccessful(payment.status)) {
+      await finalizeKokoOrder({
+        orderId: payment.orderId,
+        transactionId: payment.trnId,
       });
-    }
-
-    const pending = await PendingKokoCheckout.findOne({ reference: orderId });
-    if (!pending) {
-      return res.status(200).json({
-        success: false,
-        message: "Pending Koko checkout not found or expired",
-      });
-    }
-
-    let order;
-    try {
-      order = await Order.create({
-        orderId: pending.reference,
-        productDetails: pending.productDetails,
-        pricing: pending.pricing,
-        receiverDetails: pending.receiverDetails,
-        paymentStatus: PAYMENT_STATUS.COMPLETE,
-        paymentMethod: "koko",
-        paymentType: PAYMENT_TYPE.KOKO,
-        orderStatus: ORDER_STATUS.SHIPPING,
-        kokoTransactionId: trnId,
-      });
-    } catch (error) {
-      if (error.code === 11000) {
-        return res.status(200).json({ success: true, message: "Callback already processed" });
-      }
-      throw error;
-    }
-
-    await PendingKokoCheckout.deleteOne({ reference: pending.reference });
-    await saveReceiverAddressToCustomer(pending.userId, pending.receiverDetails);
-
-    const customerEmail = pending.customerEmail || await getCustomerEmailByUserId(pending.userId);
-    if (customerEmail) {
-      sendEmail({
-        to: customerEmail,
-        subject: `Order Confirmed - ${order.orderId}`,
-        html: orderConfirmationTemplate(order),
-      });
-    }
-    if (ADMIN_EMAIL) {
-      sendEmail({
-        to: ADMIN_EMAIL,
-        subject: `New Order Received - ${order.orderId}`,
-        html: adminNewOrderTemplate(order, customerEmail || "N/A", `${CLIENT_URL}/admin/orders`),
-      });
+    } else if (["FAILED", "FAILURE"].includes(payment.status)) {
+      await PendingKokoCheckout.deleteOne({ reference: payment.orderId });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Callback processed successfully",
+      message: "Koko callback processed",
     });
   } catch (error) {
-    return res.status(200).json({
+    const invalidRequest =
+      error.message.startsWith("Missing Koko configuration or fields:") ||
+      error.message === "Invalid Koko response signature";
+    const status = invalidRequest ? 400 : error.statusCode || 500;
+
+    logger.error("koko_callback_failed", {
+      requestId: req.requestId,
+      status,
+      error,
+    });
+    res.locals.errorAlreadyLogged = true;
+
+    return res.status(status).json({
       success: false,
-      message: error.message || "Failed to process callback",
+      message: invalidRequest ? error.message : "Failed to process Koko callback",
     });
   }
 };

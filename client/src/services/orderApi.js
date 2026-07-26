@@ -12,15 +12,15 @@ export const createOrder = async (payload, token) => {
   return response.data;
 };
 
-export const initiateKokoPayment = async (orderId, token) => {
+export const verifyKokoPayment = async (orderId, token) => {
   const response = await axios.post(
-    `${API_URL}/api/payments/koko/initiate`,
+    `${API_URL}/api/payments/koko/verify`,
     { orderId },
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return response.data;
