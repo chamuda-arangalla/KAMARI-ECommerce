@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import sendAuthResponse from "../utils/sendAuthResponse.js";
 import validateEmail from "../utils/validateEmail.js";
 import generateToken from "../utils/generateToken.js";
+import validatePassword from "../utils/validatePassword.js";
 
 export const logout = (req, res) => {
   return res.status(200).json({
@@ -20,6 +21,14 @@ export const registerAdmin = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
+      });
+    }
+
+    const passwordCheck = validatePassword(password);
+    if (!passwordCheck.valid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordCheck.reason,
       });
     }
 
@@ -167,10 +176,11 @@ export const registerCustomer = async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
+    const passwordCheck = validatePassword(password);
+    if (!passwordCheck.valid) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 6 characters",
+        message: passwordCheck.reason,
       });
     }
 

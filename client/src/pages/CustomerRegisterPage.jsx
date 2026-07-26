@@ -4,6 +4,7 @@ import CustomerRegisterForm from "../components/auth/CustomerRegisterForm";
 import RegisterSidePanel from "../components/auth/RegisterSidePanel";
 import { API_URL } from "../components/auth/authConstants";
 import { registerCustomer } from "../services/authApi";
+import { validatePassword } from "../utils/validatePassword";
 
 const initialForm = {
   email: "",
@@ -26,6 +27,12 @@ const CustomerRegisterPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+
+    const passwordError = validatePassword(form.password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
 
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");

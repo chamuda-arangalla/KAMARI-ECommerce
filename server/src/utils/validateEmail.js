@@ -1,23 +1,22 @@
-import dns from "dns/promises";
+const emailRegex =
+  /^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+$/i;
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const validateEmail = async (email) => {
-  if (!emailRegex.test(email)) {
+const validateEmail = (email) => {
+  if (typeof email !== "string") {
     return { valid: false, reason: "Invalid email format" };
   }
 
-  const domain = email.split("@")[1];
+  const [localPart] = email.split("@");
+  const isValid =
+    email.length <= 254 &&
+    localPart?.length <= 64 &&
+    emailRegex.test(email);
 
-  try {
-    const records = await dns.resolveMx(domain);
-    if (!records || records.length === 0) {
-      return { valid: false, reason: "Email domain does not exist" };
-    }
-    return { valid: true };
-  } catch {
-    return { valid: false, reason: "Email domain does not exist" };
+  if (!isValid) {
+    return { valid: false, reason: "Invalid email format" };
   }
+
+  return { valid: true };
 };
 
 export default validateEmail;

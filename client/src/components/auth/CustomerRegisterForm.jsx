@@ -4,6 +4,7 @@ import FacebookIcon from "./FacebookIcon";
 import GoogleIcon from "./GoogleIcon";
 import RegisterSectionTitle from "./RegisterSectionTitle";
 import BrandLogo from "../common/BrandLogo";
+import { PASSWORD_REQUIREMENTS } from "../../utils/validatePassword";
 
 export default function CustomerRegisterForm({
   apiUrl,
@@ -55,6 +56,9 @@ export default function CustomerRegisterForm({
                   value={form.password}
                   onChange={onChange}
                   autoComplete="new-password"
+                  minLength={8}
+                  maxLength={72}
+                  title={PASSWORD_REQUIREMENTS}
                 />
                 <AuthTextField
                   label="Confirm Password *"
@@ -63,8 +67,13 @@ export default function CustomerRegisterForm({
                   value={form.confirmPassword}
                   onChange={onChange}
                   autoComplete="new-password"
+                  minLength={8}
+                  maxLength={72}
                 />
               </div>
+              <p className="text-sm text-[#8f8376]">
+                {PASSWORD_REQUIREMENTS}
+              </p>
             </section>
 
             <section className="space-y-4">

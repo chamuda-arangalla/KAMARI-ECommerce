@@ -5,6 +5,7 @@ export default function AuthTextField({
   value,
   onChange,
   autoComplete,
+  ...inputProps
 }) {
   return (
     <div>
@@ -18,6 +19,7 @@ export default function AuthTextField({
         onChange={onChange}
         required
         autoComplete={autoComplete}
+        {...inputProps}
         className="w-full rounded-xl border border-[#d7c9b8] bg-white px-4 py-3 text-base text-[#2c2b28] outline-none focus:ring-1 focus:ring-[#c2b2a6]"
       />
     </div>

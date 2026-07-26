@@ -12,8 +12,15 @@ import siteContentRoutes from "./routes/siteContent.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import kokoRoutes from "./routes/koko.routes.js";
 import onepayRoutes from "./routes/onepay.routes.js";
+import {
+  errorHandler,
+  notFoundHandler,
+  requestLogger,
+} from "./middleware/errorLogger.middleware.js";
 
 const app = express();
+
+app.use(requestLogger);
 
 const allowedOrigins = new Set(
   [
@@ -61,5 +68,8 @@ app.use("/api/site-content", siteContentRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments/koko", kokoRoutes);
 app.use("/api/payments/onepay", onepayRoutes);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;

@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import validatePassword from "../utils/validatePassword.js";
 
 const isValidUserId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -222,10 +223,11 @@ export const updateMyProfile = async (req, res) => {
         });
       }
 
-      if (password.length < 6) {
+      const passwordCheck = validatePassword(password);
+      if (!passwordCheck.valid) {
         return res.status(400).json({
           success: false,
-          message: "Password must be at least 6 characters",
+          message: passwordCheck.reason,
         });
       }
 
@@ -264,10 +266,11 @@ export const createCustomer = async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
+    const passwordCheck = validatePassword(password);
+    if (!passwordCheck.valid) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 6 characters",
+        message: passwordCheck.reason,
       });
     }
 
@@ -409,10 +412,11 @@ export const updateCustomer = async (req, res) => {
     if (lastName !== undefined) customer.lastName = lastName;
     if (phone !== undefined) customer.phone = phone || null;
     if (password !== undefined && password !== "") {
-      if (password.length < 6) {
+      const passwordCheck = validatePassword(password);
+      if (!passwordCheck.valid) {
         return res.status(400).json({
           success: false,
-          message: "Password must be at least 6 characters",
+          message: passwordCheck.reason,
         });
       }
 
