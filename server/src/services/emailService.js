@@ -1,12 +1,19 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+const getTransporter = () => {
+  const port = Number(process.env.SMTP_PORT || 587);
+
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465,
+    requireTLS: port === 587,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
+    },
+  });
+};
 
 const htmlToPlainText = (html) =>
   html
@@ -29,8 +36,8 @@ export const sendEmail = async ({ to, subject, html }) => {
     return;
   }
   try {
-    await transporter.sendMail({
-      from: `"Kamari Store" <${process.env.GMAIL_USER}>`,
+    await getTransporter().sendMail({
+      from: `"Kamari Store" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
       to,
       subject,
       html,
