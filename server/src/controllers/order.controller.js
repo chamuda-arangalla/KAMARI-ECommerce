@@ -153,6 +153,114 @@ export const validateOrderProducts = async (requestedProducts) => {
   return orderProducts;
 };
 
+const groupStockChanges = (productDetails) => {
+  const grouped = new Map();
+
+  for (const item of productDetails) {
+    const key = `${item.productId}\u0000${item.colour}\u0000${item.size}`;
+    const existing = grouped.get(key);
+
+    if (existing) {
+      existing.quantity += item.quantity;
+    } else {
+      grouped.set(key, {
+        productId: item.productId,
+        productName: item.productName,
+        colour: item.colour,
+        size: item.size,
+        quantity: item.quantity,
+      });
+    }
+  }
+
+  return [...grouped.values()];
+};
+
+const releaseProductStock = async (stockChanges) => {
+  for (const item of stockChanges) {
+    await Product.updateOne(
+      { _id: item.productId },
+      {
+        $inc: {
+          "colors.$[color].sizes.$[size].stock": item.quantity,
+        },
+        $set: { isSoldOut: false },
+      },
+      {
+        arrayFilters: [
+          { "color.colorName": item.colour },
+          { "size.size": item.size },
+        ],
+      },
+    );
+  }
+};
+
+const reserveProductStock = async (productDetails) => {
+  const stockChanges = groupStockChanges(productDetails);
+  const reserved = [];
+
+  try {
+    for (const item of stockChanges) {
+      const product = await Product.findOneAndUpdate(
+        {
+          _id: item.productId,
+          isActive: true,
+          isSoldOut: false,
+          colors: {
+            $elemMatch: {
+              colorName: item.colour,
+              sizes: {
+                $elemMatch: {
+                  size: item.size,
+                  stock: { $gte: item.quantity },
+                },
+              },
+            },
+          },
+        },
+        {
+          $inc: {
+            "colors.$[color].sizes.$[size].stock": -item.quantity,
+          },
+        },
+        {
+          new: true,
+          arrayFilters: [
+            { "color.colorName": item.colour },
+            { "size.size": item.size },
+          ],
+        },
+      );
+
+      if (!product) {
+        const error = new Error(
+          `Not enough stock for ${item.productName} ${item.colour} ${item.size}`,
+        );
+        error.statusCode = 409;
+        throw error;
+      }
+
+      reserved.push(item);
+
+      const hasStock = product.colors.some((color) =>
+        color.sizes.some((sizeOption) => sizeOption.stock > 0),
+      );
+      if (!hasStock) {
+        await Product.updateOne(
+          { _id: product._id, "colors.sizes.stock": { $not: { $gt: 0 } } },
+          { $set: { isSoldOut: true } },
+        );
+      }
+    }
+
+    return stockChanges;
+  } catch (error) {
+    await releaseProductStock(reserved);
+    throw error;
+  }
+};
+
 export const calculatePricing = (productDetails) => {
   const subTotal = productDetails.reduce((total, product) => {
     const discountAmount = (product.unitPrice * product.discount) / 100;
@@ -217,7 +325,15 @@ const createOrderWithUniqueOrderId = async (body) => {
 
     try {
       const orderPayload = await buildOrderPayload(body, orderId);
-      const order = await Order.create(orderPayload);
+      const reservedStock = await reserveProductStock(orderPayload.productDetails);
+      let order;
+
+      try {
+        order = await Order.create(orderPayload);
+      } catch (error) {
+        await releaseProductStock(reservedStock);
+        throw error;
+      }
 
       return order;
     } catch (error) {
