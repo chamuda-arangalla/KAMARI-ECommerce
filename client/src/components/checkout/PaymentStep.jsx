@@ -12,9 +12,11 @@ export default function PaymentStep({ paymentMethod, onPaymentMethodChange }) {
         </PaymentMethodOption>
         */}
 
+        {/* Koko payment is currently disabled.
         <PaymentMethodOption checked={paymentMethod === PAYMENT_METHODS.KOKO} name="KOKO" tag="Card / BNPL" value={PAYMENT_METHODS.KOKO} onChange={onPaymentMethodChange}>
           Pay securely through Koko. You will be redirected to Koko to complete the payment.
         </PaymentMethodOption>
+        */}
 
         <PaymentMethodOption checked={paymentMethod === PAYMENT_METHODS.COD} name="CASH ON DELIVERY (COD)" tag="Pay on delivery" value={PAYMENT_METHODS.COD} onChange={onPaymentMethodChange}>
           Place your order now and pay the delivery team in cash when your order arrives.

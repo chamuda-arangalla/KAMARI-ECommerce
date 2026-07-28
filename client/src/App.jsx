@@ -33,7 +33,7 @@ import CollectionsManagement from "./pages/admin/CollectionsManagement";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
 import OnePayReturnPage from "./pages/OnePayReturnPage";
-import KokoReturnPage from "./pages/KokoReturnPage";
+// import KokoReturnPage from "./pages/KokoReturnPage"; // Koko disabled
 import { clearLegacyCustomerSession } from "./utils/customerSession";
 
 clearLegacyCustomerSession();
@@ -95,7 +95,7 @@ function App() {
           <Route path="/register" element={<CustomerAuthShell><CustomerRegisterPage /></CustomerAuthShell>} />
           <Route path="/auth/callback" element={<OAuthCallbackPage />} />
           <Route path="/payments/onepay/return" element={<OnePayReturnPage />} />
-          <Route path="/payments/koko/return/:orderId" element={<KokoReturnPage />} />
+          {/* <Route path="/payments/koko/return/:orderId" element={<KokoReturnPage />} /> */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
             <Route index element={<Navigate to="/admin/orders" replace />} />

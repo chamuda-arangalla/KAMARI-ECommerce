@@ -46,12 +46,18 @@ export const buildOrderPayload = (items, receiverDetails, paymentMethod) => ({
   productDetails: buildProductDetailsPayload(items),
   receiverDetails: buildReceiverPayload(receiverDetails),
   paymentMethod,
+  /* Koko payment type mapping is currently disabled.
   paymentType:
     paymentMethod === PAYMENT_METHODS.KOKO
       ? PAYMENT_TYPES.KOKO
       : paymentMethod === PAYMENT_METHODS.COD
         ? PAYMENT_TYPES.CASH_ON_DELIVERY
         : PAYMENT_TYPES.BANK_TRANSFER,
+  */
+  paymentType:
+    paymentMethod === PAYMENT_METHODS.COD
+      ? PAYMENT_TYPES.CASH_ON_DELIVERY
+      : PAYMENT_TYPES.BANK_TRANSFER,
   paymentStatus: paymentMethod === PAYMENT_METHODS.COD ? "COD" : "pending",
 });
 

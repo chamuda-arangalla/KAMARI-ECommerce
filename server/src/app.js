@@ -10,7 +10,7 @@ import collectionRoutes from "./routes/collection.routes.js";
 import homeContentRoutes from "./routes/homeContent.routes.js";
 import siteContentRoutes from "./routes/siteContent.routes.js";
 import orderRoutes from "./routes/order.routes.js";
-import kokoRoutes from "./routes/koko.routes.js";
+// import kokoRoutes from "./routes/koko.routes.js"; // Koko payments disabled
 import onepayRoutes from "./routes/onepay.routes.js";
 import {
   errorHandler,
@@ -66,7 +66,7 @@ app.use("/api/collections", collectionRoutes);
 app.use("/api/home-content", homeContentRoutes);
 app.use("/api/site-content", siteContentRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/payments/koko", kokoRoutes);
+// app.use("/api/payments/koko", kokoRoutes); // Koko payments disabled
 app.use("/api/payments/onepay", onepayRoutes);
 
 app.use(notFoundHandler);

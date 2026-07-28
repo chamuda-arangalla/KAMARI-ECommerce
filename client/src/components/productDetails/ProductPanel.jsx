@@ -1,5 +1,5 @@
 import { RotateCcw, Shield } from "lucide-react";
-import KokoInstallment from "../common/KokoInstallment";
+// import KokoInstallment from "../common/KokoInstallment"; // Koko disabled
 import ProductOptions from "./ProductOptions";
 
 export default function ProductPanel({
@@ -34,7 +34,7 @@ export default function ProductPanel({
         <p className="pd-price">
           Rs {Number(product.price || 0).toLocaleString()}
         </p>
-        <KokoInstallment price={product.price} className="pd-installment" />
+        {/* <KokoInstallment price={product.price} className="pd-installment" /> */}
       </div>
 
       <p

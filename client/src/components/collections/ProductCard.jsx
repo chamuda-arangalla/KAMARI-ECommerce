@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import KokoInstallment from "../common/KokoInstallment";
+// import KokoInstallment from "../common/KokoInstallment"; // Koko disabled
 
 export default function ProductCard({ product, onOpen }) {
   const [hoveredColorIndex, setHoveredColorIndex] = useState(null);
@@ -44,7 +44,7 @@ export default function ProductCard({ product, onOpen }) {
       <div className="pg-card-info">
         <p className="pg-card-name">{product.name}</p>
         <p className="pg-card-price">Rs {product.price.toLocaleString()}</p>
-        <KokoInstallment price={product.price} />
+        {/* <KokoInstallment price={product.price} /> */}
 
         <div className="pg-card-colors">
           {product.colors.slice(0, 4).map((color, index) => (

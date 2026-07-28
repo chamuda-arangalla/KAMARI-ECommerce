@@ -5,7 +5,7 @@ import {
   isColorSoldOut,
   isProductInStock,
 } from "./shopUtils";
-import KokoInstallment from "../common/KokoInstallment";
+// import KokoInstallment from "../common/KokoInstallment"; // Koko disabled
 
 export default function ShopCard({ product, onOpen }) {
   const colors = product.colors || [];
@@ -47,7 +47,7 @@ export default function ShopCard({ product, onOpen }) {
         <p className="pg-card-price">
           Rs {Number(product.price || 0).toLocaleString()}
         </p>
-        <KokoInstallment price={product.price} />
+        {/* <KokoInstallment price={product.price} /> */}
 
         <div className="pg-card-colors">
           {colors.slice(0, 5).map((color) => {

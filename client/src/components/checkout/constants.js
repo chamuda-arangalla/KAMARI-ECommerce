@@ -40,13 +40,13 @@ export const DISTRICTS = [
 
 export const PAYMENT_METHODS = {
   BANK_TRANSFER: "bank_transfer",
-  KOKO: "koko",
+  // KOKO: "koko", // Koko disabled
   COD: "cash_on_delivery",
   ONEPAY: "onepay",
 };
 
 export const PAYMENT_TYPES = {
-  KOKO: 1,
+  // KOKO: 1, // Koko disabled
   CASH_ON_DELIVERY: 2,
   BANK_TRANSFER: 3,
 };

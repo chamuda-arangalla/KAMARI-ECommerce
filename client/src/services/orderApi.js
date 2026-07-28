@@ -12,6 +12,7 @@ export const createOrder = async (payload, token) => {
   return response.data;
 };
 
+/* Koko payment verification is currently disabled.
 export const verifyKokoPayment = async (orderId, token) => {
   const response = await axios.post(
     `${API_URL}/api/payments/koko/verify`,
@@ -25,6 +26,7 @@ export const verifyKokoPayment = async (orderId, token) => {
 
   return response.data;
 };
+*/
 
 export const getOrdersByUserId = async (userId, token) => {
   const response = await axios.get(`${API_URL}/api/orders/user/${userId}`, {
