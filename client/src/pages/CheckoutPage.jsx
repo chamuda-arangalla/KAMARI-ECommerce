@@ -276,8 +276,13 @@ export default function CheckoutPage() {
       openOnePayIframe(redirectUrl, transactionId);
     } catch (initiateError) {
       setOnepayStatus("idle");
+      const responseError = initiateError.response?.data?.error;
       setOnepayError(
-        initiateError.response?.data?.message ||
+        (typeof responseError === "string"
+          ? responseError
+          : responseError?.message) ||
+          initiateError.response?.data?.message ||
+          initiateError.message ||
           "Couldn't start OnePay checkout. Please try again.",
       );
     } finally {
