@@ -41,6 +41,11 @@ const buildColorsWithUploadedImages = (parsedColors, uploadedImages) =>
     };
   });
 
+const hasAvailableStock = (colors = []) =>
+  colors.some((color) =>
+    (color.sizes || []).some((size) => Number(size.stock || 0) > 0),
+  );
+
 export const createProduct = async (req, res) => {
   try {
     const {
@@ -96,6 +101,7 @@ export const createProduct = async (req, res) => {
       colors: colorsWithImages,
       isFeatured: toBoolean(isFeatured),
       isNewArrival: toBoolean(isNewArrival),
+      isSoldOut: !hasAvailableStock(colorsWithImages),
     });
 
     return res.status(201).json({
@@ -234,6 +240,7 @@ export const updateProduct = async (req, res) => {
           stock: Number(item.stock || 0),
         })),
       }));
+      product.isSoldOut = !hasAvailableStock(product.colors);
     }
 
     const nextSlug = createSlug(`${product.collection}-${product.setName}-${product.name}`);
