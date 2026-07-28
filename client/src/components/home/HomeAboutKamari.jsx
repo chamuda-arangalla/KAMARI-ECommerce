@@ -9,7 +9,7 @@ import aboutHeroImg from "../../assets/images/Home-about.png";
 import aboutHeroMobileImg from "../../assets/images/Home-about-mobile.png";
 
 const ABOUT_COPY =
-  "We design modern women's clothing for the Sri Lankan lifestyle - comfortable, versatile and beautifully made for every occasion.";
+  "We believe confidence begins with comfort. Every piece is thoughtfully designed to make you feel effortlessly beautiful—wherever life takes you.";
 
 function AnimatedLetter({ children, index, progress, total }) {
   const delay = total > 1 ? index / (total - 1) : 0;

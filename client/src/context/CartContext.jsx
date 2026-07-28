@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { CartContext } from "./cartContextValue";
 import { getCustomerUser } from "../utils/customerSession";
 
-// Free delivery is currently disabled.
-// const FREE_DELIVERY_THRESHOLD = 10000;
-const DELIVERY_FEE = 10;
+const DELIVERY_FEE = Number(import.meta.env.VITE_DELIVERY_FEE);
+const FREE_DELIVERY_THRESHOLD = Number(
+  import.meta.env.VITE_FREE_DELIVERY_THRESHOLD,
+);
 const LEGACY_CART_STORAGE_KEY = "kamariCartItems";
 const GUEST_CART_STORAGE_KEY = "kamariCartItems:guest";
 
@@ -177,15 +178,10 @@ export function CartProvider({ children }) {
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
   const discount = promoApplied ? Math.round(subtotal * 0.1) : 0;
   const afterDiscount = subtotal - discount;
-  // const freeDelivery = afterDiscount >= FREE_DELIVERY_THRESHOLD;
-  // const deliveryFee for the Total value >= LKR 10,000;
-  let deliveryFee;
-  if ( afterDiscount >= 10000){
-    deliveryFee = 0;
-  }
-  else{
-    deliveryFee = items.length === 0 ? 0 : DELIVERY_FEE;
-  }
+  const deliveryFee =
+    items.length === 0 || afterDiscount >= FREE_DELIVERY_THRESHOLD
+      ? 0
+      : DELIVERY_FEE;
 
   const total = afterDiscount + deliveryFee;
 

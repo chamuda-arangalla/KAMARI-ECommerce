@@ -1,3 +1,4 @@
+import "dotenv/config";
 import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
@@ -26,7 +27,10 @@ import {
   adminPaymentSlipTemplate,
 } from "../templates/orderEmailTemplates.js";
 
-const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE || 10);
+const SHIPPING_FEE = Number(process.env.ORDER_SHIPPING_FEE);
+const FREE_DELIVERY_THRESHOLD = Number(
+  process.env.ORDER_FREE_DELIVERY_THRESHOLD
+);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const KOKO_PAYMENT_METHOD = "koko";
 
@@ -155,7 +159,7 @@ export const calculatePricing = (productDetails) => {
     return total + (product.unitPrice - discountAmount) * product.quantity;
   }, 0);
 
-  if (subTotal >= 10000){
+  if (subTotal >= FREE_DELIVERY_THRESHOLD) {
     return {
       subTotal,
       shippingFee: 0,

@@ -1,6 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
+const DELIVERY_FEE = Number(import.meta.env.VITE_DELIVERY_FEE);
+const FREE_DELIVERY_THRESHOLD = Number(
+  import.meta.env.VITE_FREE_DELIVERY_THRESHOLD,
+);
+
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -48,8 +53,11 @@ export default function ShippingPolicyPage() {
             </BulletItem>
             <BulletItem>
               A standard islandwide delivery fee of{" "}
-              <strong className="font-medium text-[#342C27]">Rs 10</strong>{" "}
-              applies to all orders.
+              <strong className="font-medium text-[#342C27]">
+                Rs {DELIVERY_FEE.toLocaleString()}
+              </strong>{" "}
+              applies to orders below Rs{" "}
+              {FREE_DELIVERY_THRESHOLD.toLocaleString()}.
             </BulletItem>
             <BulletItem>
               Orders placed on weekends or public holidays will be processed on
