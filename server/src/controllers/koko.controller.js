@@ -3,6 +3,7 @@ import PendingKokoCheckout from "../models/PendingKokoCheckout.js";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import PAYMENT_TYPE from "../enums/paymentType.enum.js";
+import PAYMENT_METHOD from "../enums/paymentMethod.enum.js";
 import {
   processKokoResponse,
   viewKokoOrder,
@@ -14,6 +15,8 @@ import {
 } from "../templates/orderEmailTemplates.js";
 import {
   getCustomerEmail,
+  releaseProductStock,
+  reserveProductStock,
   saveReceiverAddressToCustomer,
 } from "./order.controller.js";
 import { logger } from "../utils/logger.js";
@@ -60,35 +63,80 @@ const finalizeKokoOrder = async ({ orderId, transactionId }) => {
   const existingOrder = await Order.findOne({ orderId });
   if (existingOrder) return existingOrder;
 
-  const pending = await PendingKokoCheckout.findOne({ reference: orderId });
+  const pending = await PendingKokoCheckout.findOneAndDelete({
+    reference: orderId,
+  });
   if (!pending) {
+    const orderCreatedByAnotherRequest = await Order.findOne({ orderId });
+    if (orderCreatedByAnotherRequest) return orderCreatedByAnotherRequest;
+
     const error = new Error("Pending Koko checkout not found or expired");
     error.statusCode = 404;
     throw error;
   }
 
+  let reservedStock = [];
   let order;
   try {
+    reservedStock = await reserveProductStock(pending.productDetails);
     order = await Order.create({
       orderId: pending.reference,
       productDetails: pending.productDetails,
       pricing: pending.pricing,
       receiverDetails: pending.receiverDetails,
       paymentStatus: PAYMENT_STATUS.COMPLETE,
-      paymentMethod: "koko",
+      paymentMethod: PAYMENT_METHOD.KOKO,
       paymentType: PAYMENT_TYPE.KOKO,
       orderStatus: ORDER_STATUS.SHIPPING,
       kokoTransactionId: transactionId,
     });
   } catch (error) {
-    if (error.code !== 11000) throw error;
-    return Order.findOne({ orderId });
+    if (reservedStock.length) {
+      try {
+        await releaseProductStock(reservedStock);
+      } catch (releaseError) {
+        logger.error("koko_stock_release_failed", {
+          orderId,
+          error: releaseError,
+        });
+      }
+    }
+
+    if (error.code === 11000) {
+      const duplicateOrder = await Order.findOne({ orderId });
+      if (duplicateOrder) return duplicateOrder;
+    }
+
+    try {
+      await PendingKokoCheckout.updateOne(
+        { reference: pending.reference },
+        {
+          $setOnInsert: {
+            reference: pending.reference,
+            userId: pending.userId,
+            productDetails: pending.productDetails,
+            pricing: pending.pricing,
+            receiverDetails: pending.receiverDetails,
+            customerEmail: pending.customerEmail,
+            createdAt: new Date(),
+          },
+        },
+        { upsert: true },
+      );
+    } catch (restoreError) {
+      logger.error("koko_pending_checkout_restore_failed", {
+        orderId,
+        error: restoreError,
+      });
+    }
+    throw error;
   }
 
-  await Promise.all([
-    PendingKokoCheckout.deleteOne({ reference: orderId }),
-    saveReceiverAddressToCustomer(pending.userId, pending.receiverDetails),
-  ]);
+  try {
+    await saveReceiverAddressToCustomer(pending.userId, pending.receiverDetails);
+  } catch (error) {
+    logger.error("koko_customer_address_save_failed", { orderId, error });
+  }
   await sendOrderNotifications(order, pending);
 
   return order;
@@ -174,7 +222,9 @@ export const handleKokoCallback = async (req, res) => {
         orderId: payment.orderId,
         transactionId: payment.trnId,
       });
-    } else if (["FAILED", "FAILURE"].includes(payment.status)) {
+    } else if (
+      ["FAILED", "FAILURE", "CANCELED", "CANCELLED"].includes(payment.status)
+    ) {
       await PendingKokoCheckout.deleteOne({ reference: payment.orderId });
     }
 

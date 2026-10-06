@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
-// import PendingKokoCheckout from "../models/PendingKokoCheckout.js"; // Koko disabled
+import PendingKokoCheckout from "../models/PendingKokoCheckout.js";
 import ORDER_STATUS from "../enums/orderStatus.enum.js";
 import PAYMENT_STATUS from "../enums/paymentStatus.enum.js";
 import PAYMENT_TYPE from "../enums/paymentType.enum.js";
@@ -14,7 +14,7 @@ import {
   createInvoicePdf,
   getInvoiceProfile,
 } from "../services/invoice/invoicePdf.service.js";
-// import { createKokoPaymentForm } from "../services/koko.service.js"; // Koko disabled
+import { createKokoPaymentForm } from "../services/koko.service.js";
 import { sendEmail } from "../services/emailService.js";
 import {
   orderConfirmationTemplate,
@@ -32,7 +32,7 @@ const FREE_DELIVERY_THRESHOLD = Number(
   process.env.ORDER_FREE_DELIVERY_THRESHOLD
 );
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-// const KOKO_PAYMENT_METHOD = "koko"; // Koko disabled
+const KOKO_PAYMENT_METHOD = PAYMENT_METHOD.KOKO;
 
 export const getCustomerEmail = async (userId) => {
   if (!userId) return null;
@@ -176,7 +176,7 @@ const groupStockChanges = (productDetails) => {
   return [...grouped.values()];
 };
 
-const releaseProductStock = async (stockChanges) => {
+export const releaseProductStock = async (stockChanges) => {
   for (const item of stockChanges) {
     await Product.updateOne(
       { _id: item.productId },
@@ -196,7 +196,7 @@ const releaseProductStock = async (stockChanges) => {
   }
 };
 
-const reserveProductStock = async (productDetails) => {
+export const reserveProductStock = async (productDetails) => {
   const stockChanges = groupStockChanges(productDetails);
   const reserved = [];
 
@@ -286,10 +286,10 @@ const shouldMoveOrderToShipping = (paymentStatus) =>
   paymentStatus === PAYMENT_STATUS.COMPLETE ||
   paymentStatus === PAYMENT_STATUS.COD;
 
-// const isKokoPayment = (paymentMethod) => paymentMethod === KOKO_PAYMENT_METHOD;
+const isKokoPayment = (paymentMethod) => paymentMethod === KOKO_PAYMENT_METHOD;
 
 const getPaymentType = (paymentMethod, paymentStatus) => {
-  // if (isKokoPayment(paymentMethod)) return PAYMENT_TYPE.KOKO;
+  if (isKokoPayment(paymentMethod)) return PAYMENT_TYPE.KOKO;
   if (paymentStatus === PAYMENT_STATUS.COD) return PAYMENT_TYPE.CASH_ON_DELIVERY;
   return PAYMENT_TYPE.BANK_TRANSFER;
 };
@@ -346,7 +346,6 @@ const createOrderWithUniqueOrderId = async (body) => {
   throw new Error("Failed to generate unique order ID");
 };
 
-/* Koko payment checkout is currently disabled.
 const createPendingKokoCheckout = async (body, customerEmail) => {
   if (!customerEmail) {
     const error = new Error("Customer email is required for Koko payment");
@@ -359,8 +358,15 @@ const createPendingKokoCheckout = async (body, customerEmail) => {
 
     try {
       const orderPayload = await buildOrderPayload(body, reference);
-      const clientUrl = process.env.CLIENT_URL.replace(/\/$/, "");
-      const callbackUrl = process.env.KOKO_CALLBACK_URL.replace(/\/$/, "");
+      const clientUrl = process.env.CLIENT_URL?.trim().replace(/\/$/, "");
+      const callbackUrl = process.env.KOKO_CALLBACK_URL?.trim().replace(/\/$/, "");
+      if (!clientUrl || !callbackUrl) {
+        const error = new Error(
+          "CLIENT_URL and KOKO_CALLBACK_URL are required for Koko payment",
+        );
+        error.statusCode = 500;
+        throw error;
+      }
       const returnUrl = `${clientUrl}/payments/koko/return/${encodeURIComponent(reference)}`;
       const payment = createKokoPaymentForm({
         orderId: reference,
@@ -391,7 +397,6 @@ const createPendingKokoCheckout = async (body, customerEmail) => {
 
   throw new Error("Failed to generate unique Koko checkout reference");
 };
-*/
 
 export const saveReceiverAddressToCustomer = async (userId, receiverDetails) => {
   const location = receiverDetails?.location || {};
@@ -461,7 +466,6 @@ export const createOrder = async (req, res) => {
 
     const customerEmail = await getCustomerEmail(orderBody.receiverDetails.userId);
 
-    /* Koko payment checkout is currently disabled.
     if (isKokoPayment(orderBody.paymentMethod)) {
       const { pending, payment } = await createPendingKokoCheckout(
         orderBody,
@@ -478,7 +482,6 @@ export const createOrder = async (req, res) => {
         payment: { provider: "koko", ...payment },
       });
     }
-    */
 
     const order = await createOrderWithUniqueOrderId(orderBody);
     const updatedCustomer = !isAdmin(req)

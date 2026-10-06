@@ -1,18 +1,25 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CustomerLoginCard from "../components/auth/CustomerLoginCard";
-import { API_URL, REDIRECT_MAP } from "../components/auth/authConstants";
+import {
+  API_URL,
+  resolveCustomerRedirect,
+} from "../components/auth/authConstants";
 import { login } from "../services/authApi";
 import { setCustomerSession } from "../utils/customerSession";
 
 const CustomerLoginPage = () => {
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() =>
+    searchParams.get("session") === "expired"
+      ? "Your session expired. Please sign in again."
+      : "",
+  );
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const redirectParam = searchParams.get("redirect");
-  const redirectTo = REDIRECT_MAP[redirectParam] || "/";
+  const redirectTo = resolveCustomerRedirect(redirectParam);
 
   const handleChange = (event) => {
     setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));

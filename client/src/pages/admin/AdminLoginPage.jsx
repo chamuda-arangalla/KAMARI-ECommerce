@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { loginAdmin } from "../../services/authApi";
 import BrandLogo from "../../components/common/BrandLogo";
 
 const AdminLoginPage = () => {
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() =>
+    searchParams.get("session") === "expired"
+      ? "Your admin session expired. Please sign in again."
+      : "",
+  );
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

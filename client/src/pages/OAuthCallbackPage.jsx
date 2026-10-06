@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLoadingScreen from "../components/auth/AuthLoadingScreen";
-import { REDIRECT_MAP } from "../components/auth/authConstants";
+import { resolveCustomerRedirect } from "../components/auth/authConstants";
 import { setCustomerSession } from "../utils/customerSession";
 
 const OAuthCallbackPage = () => {
@@ -17,7 +17,7 @@ const OAuthCallbackPage = () => {
     const userRaw = params.get("user");
     const error = params.get("error");
     const redirect = params.get("redirect");
-    const redirectTo = REDIRECT_MAP[redirect] || "/";
+    const redirectTo = resolveCustomerRedirect(redirect);
 
     if (error || !token || !userRaw) {
       navigate(`/login?error=${error || "oauth_failed"}`, { replace: true });

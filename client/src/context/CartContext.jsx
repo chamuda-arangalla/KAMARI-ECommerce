@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CartContext } from "./cartContextValue";
 import { getCustomerUser } from "../utils/customerSession";
 
@@ -12,17 +12,22 @@ const GUEST_CART_STORAGE_KEY = "kamariCartItems:guest";
 const getCartStorage = (storageKey) =>
   storageKey === GUEST_CART_STORAGE_KEY ? sessionStorage : localStorage;
 
-const getCustomerCartStorageKey = () => {
+const getCustomerCartStorageKeys = () => {
   try {
     const customer = getCustomerUser();
-    const customerId = customer?._id || customer?.id || customer?.email;
-    return customerId
-      ? `kamariCartItems:customer:${customerId}`
-      : GUEST_CART_STORAGE_KEY;
+    const customerIds = [customer?._id, customer?.id, customer?.email]
+      .filter(Boolean)
+      .map(String);
+
+    return customerIds.length
+      ? [...new Set(customerIds.map((id) => `kamariCartItems:customer:${id}`))]
+      : [GUEST_CART_STORAGE_KEY];
   } catch {
-    return GUEST_CART_STORAGE_KEY;
+    return [GUEST_CART_STORAGE_KEY];
   }
 };
+
+const getCustomerCartStorageKey = () => getCustomerCartStorageKeys()[0];
 
 const getStoredItems = (storageKey) => {
   try {
@@ -103,6 +108,29 @@ export function CartProvider({ children }) {
     return () => window.removeEventListener("kamari:user-updated", handleUserChange);
   }, []);
 
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      const currentStorageKey = storageKeyRef.current;
+      if (event.key !== currentStorageKey) return;
+
+      try {
+        const nextItems = event.newValue ? JSON.parse(event.newValue) : [];
+        setItems(Array.isArray(nextItems) ? nextItems : []);
+        if (!nextItems.length) {
+          setPromoApplied(false);
+          setPromoCode("");
+          setPromoError("");
+          setIsDrawerOpen(false);
+        }
+      } catch {
+        setItems([]);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   const handleUpdateQty = (id, delta) =>
     setItems((prev) =>
       prev
@@ -167,12 +195,25 @@ export function CartProvider({ children }) {
     setPromoError("");
   };
 
-  const clearCart = () => {
-    getCartStorage(storageKeyRef.current).removeItem(storageKeyRef.current);
+  const clearCart = useCallback(() => {
+    const activeStorageKeys = new Set([
+      storageKeyRef.current,
+      ...getCustomerCartStorageKeys(),
+    ]);
+
+    activeStorageKeys.forEach((key) => {
+      getCartStorage(key).setItem(key, "[]");
+    });
+    localStorage.removeItem(LEGACY_CART_STORAGE_KEY);
+    localStorage.removeItem(GUEST_CART_STORAGE_KEY);
+    sessionStorage.setItem(GUEST_CART_STORAGE_KEY, "[]");
+
     setItems([]);
-    handleRemovePromo();
+    setPromoApplied(false);
+    setPromoCode("");
+    setPromoError("");
     setIsDrawerOpen(false);
-  };
+  }, []);
 
   const totalItems = items.reduce((sum, i) => sum + i.qty, 0);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);

@@ -48,10 +48,7 @@ export default function CheckoutPage() {
   const [createdOrderSummary, setCreatedOrderSummary] = useState(null);
   const [orderTotal, setOrderTotal] = useState(0);
   // Bank-transfer payment-slip state is temporarily disabled.
-  const [paymentMethod, setPaymentMethod] = useState(
-    // PAYMENT_METHODS.KOKO, // Koko disabled
-    PAYMENT_METHODS.COD,
-  );
+  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS.KOKO);
   const [checkoutStep, setCheckoutStep] = useState(CHECKOUT_STEPS.RECEIVER);
   const [onepayCheckoutStarted, setOnepayCheckoutStarted] = useState(false);
   const [onepayInitiating, setOnepayInitiating] = useState(false);
@@ -123,7 +120,6 @@ export default function CheckoutPage() {
 
   if (!token) return <Navigate to="/login" replace />;
 
-  /* Koko form submission is currently disabled.
   const submitKokoPaymentForm = ({ action, method = "POST", fields }) => {
     const form = document.createElement("form");
     form.method = method;
@@ -134,14 +130,13 @@ export default function CheckoutPage() {
       const input = document.createElement("input");
       input.type = "hidden";
       input.name = name;
-      input.value = value;
+      input.value = String(value ?? "");
       form.appendChild(input);
     });
 
     document.body.appendChild(form);
     form.submit();
   };
-  */
 
   const goToReceiverStep = () => {
     setCheckoutStep(CHECKOUT_STEPS.RECEIVER);
@@ -209,7 +204,6 @@ export default function CheckoutPage() {
         promoApplied,
       };
 
-      /* Koko checkout redirect is currently disabled.
       if (paymentMethod === PAYMENT_METHODS.KOKO) {
         if (!response?.payment?.fields || !response?.payment?.action) {
           throw new Error("Koko payment could not be initialized. Please try another payment method.");
@@ -218,7 +212,6 @@ export default function CheckoutPage() {
         submitKokoPaymentForm(response.payment);
         return;
       }
-      */
 
       setOrderTotal(summarySnapshot.total);
       setCreatedOrderSummary(summarySnapshot);

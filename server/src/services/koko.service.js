@@ -74,9 +74,16 @@ export const createKokoPaymentForm = ({
     responseUrl,
   });
 
+  const numericAmount = Number(amount);
+  if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+    const error = new Error("Koko payment amount must be greater than zero");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const values = {
     orderId: String(orderId),
-    amount: String(amount),
+    amount: numericAmount.toFixed(2),
     firstName: String(firstName).trim(),
     lastName: String(lastName).trim(),
     email: String(email).trim().toLowerCase(),
@@ -133,7 +140,7 @@ export const processKokoResponse = (response) => {
   const trnId = payload?.trnId || payload?._trnId || payload?.transactionId;
   const status = payload?.status || payload?._status;
   const desc = payload?.desc || payload?.description || "";
-  const signature = payload?.signature;
+  const signature = String(payload?.signature || "").replace(/ /g, "+");
 
   requireValues({ orderId, trnId, status, signature });
 

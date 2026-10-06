@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import PaymentStep from "./PaymentStep";
 import ReceiverDetailsStep from "./ReceiverDetailsStep";
+import { PAYMENT_METHODS } from "./constants";
 
 export default function CheckoutForm({
   error,
@@ -17,6 +18,13 @@ export default function CheckoutForm({
   onReceiverSelectChange,
   onSubmit,
 }) {
+  const paymentAction =
+    paymentMethod === PAYMENT_METHODS.KOKO
+      ? "Continue with Koko"
+      : paymentMethod === PAYMENT_METHODS.ONEPAY
+        ? "Continue with OnePay"
+        : "Create Order";
+
   return (
     <form onSubmit={onSubmit}>
       {isPaymentStep ? (
@@ -31,10 +39,10 @@ export default function CheckoutForm({
         {submitting ? (
           <span className="checkout-btn-loading">
             <Loader2 size={16} className="checkout-spinner" />
-            Creating Order
+            Processing
           </span>
         ) : isPaymentStep ? (
-          `Create Order - Rs ${total.toLocaleString()}`
+          `${paymentAction} - Rs ${total.toLocaleString()}`
         ) : (
           "Proceed to Payment"
         )}
