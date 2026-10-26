@@ -42,10 +42,16 @@ const normalizeFulfillmentStatus = (orderStatus) => {
 };
 
 const getPaymentType = (order) => {
-  if (order.paymentType === 1 || order.paymentMethod === "koko") return "Koko";
-  if (order.paymentType === 2 || String(order.paymentStatus).toUpperCase() === "COD") {
+  const paymentType = Number(order.paymentType);
+  if (paymentType === 1 || order.paymentMethod === "koko") return "Koko";
+  if (
+    paymentType === 2 ||
+    order.paymentMethod === "cash_on_delivery" ||
+    String(order.paymentStatus).toUpperCase() === "COD"
+  ) {
     return "Cash on Delivery";
   }
+  if (order.paymentMethod === "onepay") return "OnePay";
   return "Bank Transfer";
 };
 

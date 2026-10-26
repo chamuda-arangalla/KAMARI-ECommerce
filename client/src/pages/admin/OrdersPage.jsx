@@ -262,7 +262,7 @@ const OrdersPage = () => {
                 setSearchTerm(event.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search order, customer, address, or status"
+              placeholder="Search order, customer, address, status, or type"
               className="w-full rounded-xl border border-[#d7c9b8] bg-[#fcfaf7] py-3 pl-10 pr-4 text-sm text-[#2c2b28] outline-none transition-all placeholder:text-[#b8ada5] focus:border-[#c2b2a6] focus:bg-white"
             />
           </div>
@@ -271,16 +271,17 @@ const OrdersPage = () => {
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#d7c9b8] bg-white shadow-sm">
         <div className="hidden min-h-0 flex-1 overflow-auto xl:block">
-          <table className="w-full table-fixed text-left">
+          <table className="w-full min-w-[1100px] table-fixed text-left">
             <colgroup>
               <col className="w-[14%]" />
-              <col className="w-[15%]" />
-              <col className="w-[8%]" />
-              <col className="w-[12%]" />
-              <col className="w-[15%]" />
-              <col className="w-[14%]" />
-              <col className="w-[16%]" />
+              <col className="w-[13%]" />
               <col className="w-[6%]" />
+              <col className="w-[11%]" />
+              <col className="w-[12%]" />
+              <col className="w-[14%]" />
+              <col className="w-[13%]" />
+              <col className="w-[12%]" />
+              <col className="w-[5%]" />
             </colgroup>
             <thead>
               <tr className="bg-[#fcfaf7] border-b border-[#d7c9b8]">
@@ -288,6 +289,7 @@ const OrdersPage = () => {
                 <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Customer</th>
                 <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Items</th>
                 <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Total</th>
+                <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Order Type</th>
                 <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Payment</th>
                 <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Order Status</th>
                 <th className="px-3 py-4 text-xs font-semibold text-[#8f8376] uppercase tracking-wider">Verification</th>
@@ -297,7 +299,7 @@ const OrdersPage = () => {
             <tbody className="divide-y divide-[#f3ede8]">
               {ordersLoading && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-[#5f564d]">
+                  <td colSpan={9} className="px-6 py-12 text-center text-[#5f564d]">
                     <span className="inline-flex items-center gap-2">
                       <Loader2 size={18} className="animate-spin" />
                       Loading orders...
@@ -308,7 +310,7 @@ const OrdersPage = () => {
 
               {!ordersLoading && ordersError && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8">
+                  <td colSpan={9} className="px-6 py-8">
                     <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
                       {ordersError}
                     </p>
@@ -318,7 +320,7 @@ const OrdersPage = () => {
 
               {!ordersLoading && !ordersError && filteredOrders.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-[#8f8376]">
+                  <td colSpan={9} className="px-6 py-12 text-center text-[#8f8376]">
                     No orders found.
                   </td>
                 </tr>
@@ -339,6 +341,7 @@ const OrdersPage = () => {
                     {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                   </td>
                   <td className="break-words px-3 py-3 text-sm font-semibold text-[#2c2b28]">{formatCurrency(order.totalAmount)}</td>
+                  <td className="break-words px-3 py-3 text-sm font-medium text-[#5f564d]">{order.paymentType}</td>
                   <td className="px-3 py-3">
                     <StatusBadge status={order.status} />
                   </td>
@@ -410,7 +413,11 @@ const OrdersPage = () => {
                     {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                   </p>
                 </div>
-                <div className="flex items-end justify-end text-[#8f8376]">
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-[#8f8376]">Order Type</p>
+                  <p className="mt-1 font-medium text-[#5f564d]">{order.paymentType}</p>
+                </div>
+                <div className="col-span-2 flex items-end justify-end text-[#8f8376]">
                   <ChevronRight size={22} />
                 </div>
               </div>
@@ -467,6 +474,10 @@ const OrdersPage = () => {
                   <div>
                     <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">Placed On</p>
                     <p className="text-base text-[#5f564d]">{selectedOrder.date}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#8f8376] uppercase tracking-widest font-bold mb-1">Order Type</p>
+                    <p className="text-base text-[#5f564d]">{selectedOrder.paymentType}</p>
                   </div>
                 </div>
 
