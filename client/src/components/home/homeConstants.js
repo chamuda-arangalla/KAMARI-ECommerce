@@ -1,22 +1,22 @@
-import heroBanner1 from "../../assets/images/banner1-flowset.png";
-import heroBanner2 from "../../assets/images/banner2-playset.png";
-import heroBanner3 from "../../assets/images/banner3-eas-set.png";
-import heroBanner4 from "../../assets/images/banner4-bold-set.png";
+import heroBanner1 from "../../assets/images/Aura Desktop Banner 1 .png";
+import heroBanner2 from "../../assets/images/Origin - 2 Desktop Banner - 2.png";
+import heroBanner3 from "../../assets/images/Origin Desktop Banner- 3.png";
+import heroBanner4 from "../../assets/images/Origin Desktop Banner 4.PNG";
 import content01Img from "../../assets/images/Content01.png";
-import flowMobileImg from "../../assets/images/flow-mobile.png";
-import playMobileImg from "../../assets/images/play-mobile2.png";
-import easeMobileImg from "../../assets/images/ease-mobile2.png";
-import boldMobileImg from "../../assets/images/bold-mobile2.png";
+import heroMobileBanner1 from "../../assets/images/Aura Mobile Banner-1.png";
+import heroMobileBanner2 from "../../assets/images/Origin - 2 Mobile Banner-2.png";
+import heroMobileBanner3 from "../../assets/images/Origin Mobile Banner 3.png";
+import heroMobileBanner4 from "../../assets/images/Origin Mobile Banner - 4.PNG";
 
 export const HOME_FALLBACK_IMG =
   "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80";
 
 export const HERO_BANNERS = [heroBanner1, heroBanner2, heroBanner3, heroBanner4];
 export const HERO_MOBILE_BANNERS = [
-  flowMobileImg,
-  playMobileImg,
-  easeMobileImg,
-  boldMobileImg,
+  heroMobileBanner1,
+  heroMobileBanner2,
+  heroMobileBanner3,
+  heroMobileBanner4,
 ];
 export const BRAND_IMG = content01Img;
 
